@@ -44,7 +44,7 @@ const client = new Client({
 });
 
 client.once("clientReady", () => {
-  console.log("🤖 TARS online");
+  console.log("🤖 Tars online.");
   client.user.setPresence({
     status: "dnd",
     activities: [{ name: "your next bad take", type: ActivityType.Watching }],
@@ -99,29 +99,43 @@ client.on("messageCreate", async (message) => {
 
   const mentionedUsers = message.mentions.users;
   const hasRoastKeyword = /\broast\b/i.test(message.content);
+  const hasWishKeyword = /\b(wish|birthday|congrats|happy)\b/i.test(
+    message.content,
+  );
 
   let roastTarget = null;
 
-  if (hasRoastKeyword && mentionedUsers.size >= 1) {
+  if ((hasRoastKeyword || hasWishKeyword) && mentionedUsers.size >= 1) {
     roastTarget = mentionedUsers.find((user) => user.id !== client.user.id);
   }
 
   if (roastTarget) {
     if (roastTarget.id === message.author.id) {
-      return message.reply({
-        content: "Self-roast arc is wild.",
-        allowedMentions: { parse: [] },
-      });
+      if (hasRoastKeyword) {
+        return message.reply({
+          content:
+            "Roasting yourself? That’s a bold strategy. Let’s see if it pays off.",
+          allowedMentions: { parse: [] },
+        });
+      }
+
+      if (hasWishKeyword) {
+        return message.reply({
+          content: "Wishing yourself? At least someone remembered.",
+          allowedMentions: { parse: [] },
+        });
+      }
     }
 
     if (roastTarget.id === client.user.id) {
       return message.reply({
-        content: "You think I’d roast myself? Delusion.",
+        content: "Trying to roast me? Cute. You’re in for a world of hurt.",
         allowedMentions: { parse: [] },
       });
     }
   }
 
+  const mentionPrefix = roastTarget ? `<@${roastTarget.id}> ` : "";
   const lastUsed = cooldowns.get(message.author.id);
   if (lastUsed && Date.now() - lastUsed < 8000) return;
   cooldowns.set(message.author.id, Date.now());
@@ -157,7 +171,7 @@ client.on("messageCreate", async (message) => {
     Tone Profiles:
     - alpha-homie: Talk like a confident homie. Direct, competitive, playful dominance.
     - smooth-dominant: Confident, sharp, slightly smoother energy. Still savage if provoked.
-    - neutral: Default dominant TARS personality.
+    - neutral: Default dominant Tars personality.
 
     Never awkwardly mention gender.
     Tone shift must be noticeable but natural. Never identical across profiles.
@@ -177,7 +191,10 @@ client.on("messageCreate", async (message) => {
 
     convo.messages.push({ role: "assistant", content: text });
     await saveConversation(message.author.id, convo);
-    await message.reply(text || "...");
+    await message.reply({
+      content: mentionPrefix + (text || "..."),
+      allowedMentions: { users: roastTarget ? [roastTarget.id] : [] },
+    });
   } catch (err) {
     console.error("AI Error:", err);
     await message.reply("I'm drawing a blank. Try again later.");
@@ -195,7 +212,7 @@ app.get("/", (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TARS Status</title>
+    <title>Tars Status</title>
     <link rel="icon" type="image/png" href="https://img.icons8.com/color/144/grok--v2.png">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -279,6 +296,6 @@ app.get("/", (req, res) => {
 </html>
   `);
 });
-app.listen(process.env.PORT || 3000, () => console.log(`🌐 Server running`));
+app.listen(process.env.PORT || 3000, () => console.log(`🌐 Server running.`));
 
 client.login(process.env.DISCORD_BOT_TOKEN);
