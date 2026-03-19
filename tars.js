@@ -191,9 +191,19 @@ client.on("messageCreate", async (message) => {
 
     convo.messages.push({ role: "assistant", content: text });
     await saveConversation(message.author.id, convo);
+    const isExternalTarget =
+      roastTarget && roastTarget.id !== message.author.id;
+
+    const finalContent = isExternalTarget
+      ? `<@${roastTarget.id}> ${text}`
+      : text;
+
     await message.reply({
-      content: mentionPrefix + (text || "..."),
-      allowedMentions: { users: roastTarget ? [roastTarget.id] : [] },
+      content: finalContent || "...",
+      allowedMentions: {
+        repliedUser: true,
+        users: roastTarget ? [roastTarget.id] : [],
+      },
     });
   } catch (err) {
     console.error("AI Error:", err);
