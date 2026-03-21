@@ -8,14 +8,14 @@ import { getConversation, saveConversation } from "./database.js";
 /* ---------------- AI ---------------- */
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-async function generateContent(contents, systemInstruction) {
+async function generateContent(contents, systemInstruction, temperature = 1.0) {
   const res = await ai.models.generateContent({
     model: "gemini-2.5-flash-lite",
     contents,
     config: {
       systemInstruction: systemInstruction,
       maxOutputTokens: 250,
-      temperature: 1.0,
+      temperature,
       tools: [{ googleSearch: {} }],
     },
   });
@@ -31,6 +31,30 @@ async function generateContent(contents, systemInstruction) {
   text = text.replace(/\(user has.*?\)/gi, "").trim();
 
   return text;
+}
+
+function cleanReplyText(text) {
+  return text
+    .replace(/[\p{Extended_Pictographic}\uFE0F]/gu, "")
+    .replace(/\[.*?\]/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function isSoftRoastReply(text) {
+  const normalized = text.toLowerCase();
+  const softPatterns = [
+    /\b(maybe|perhaps|i think|i guess|try|should|could|please|sorry)\b/,
+    /\b(be better|improve|you can do better|next time)\b/,
+    /\b(good luck|all the best)\b/,
+  ];
+
+  const hasSoftLanguage = softPatterns.some((pattern) =>
+    pattern.test(normalized),
+  );
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
+
+  return hasSoftLanguage || wordCount < 6;
 }
 
 /* ---------------- Discord ---------------- */
@@ -203,6 +227,7 @@ client.on("messageCreate", async (message) => {
 
     ### USER_CONTEXT:
     - Interaction_Mode: ${hasRoastKeyword ? "roast" : hasWishKeyword ? "wish" : "normal"}
+    - Roast_Aggression_Level: ${hasRoastKeyword ? "10/10" : "n/a"}
     - Tone_Profile: ${toneProfile}
     - Author_Gender: ${authorGenderMeta.gender}
     - Author_Pronouns: ${authorGenderMeta.subject}/${authorGenderMeta.object}/${authorGenderMeta.possessive}
@@ -240,12 +265,26 @@ client.on("messageCreate", async (message) => {
     - Location: India (IST)
     `;
 
-    let text = await generateContent(contents, dynamicSystemPrompt);
+    let text = await generateContent(
+      contents,
+      dynamicSystemPrompt,
+      hasRoastKeyword ? 1.2 : 1.0,
+    );
+    text = cleanReplyText(text);
 
-    text = text
-      .replace(/\[.*?\]/g, "")
-      .replace(/\s{2,}/g, " ")
-      .trim();
+    if (hasRoastKeyword && isSoftRoastReply(text)) {
+      const roastOverridePrompt = `${dynamicSystemPrompt}
+
+      ### ROAST_OVERRIDE:
+      - Previous draft was too soft.
+      - Regenerate with maximum aggression and sharper humiliation.
+      - Output exactly one brutal roast line.
+      - No polite words, no advice, no emotional cushioning.
+      `;
+
+      text = await generateContent(contents, roastOverridePrompt, 1.35);
+      text = cleanReplyText(text);
+    }
 
     convo.messages.push({ role: "assistant", content: text });
     await saveConversation(message.author.id, convo);
