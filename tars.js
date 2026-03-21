@@ -3,7 +3,12 @@ import { Client, GatewayIntentBits, ActivityType } from "discord.js";
 import { GoogleGenAI } from "@google/genai";
 import { tarsSystemPrompt } from "./config.js";
 import express from "express";
-import { getConversation, saveConversation } from "./database.js";
+import {
+  getConversation,
+  saveConversation,
+  getGuildSettings,
+  saveGuildSettings,
+} from "./database.js";
 
 /* ---------------- AI ---------------- */
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -51,6 +56,56 @@ client.once("clientReady", () => {
   });
 });
 
+/* ---------------- Guild Setup ---------------- */
+const ROLE_NAMES = { male: "Male", female: "Female" };
+
+async function ensureGuildRoles(guild) {
+  const settings = await getGuildSettings(guild.id);
+  let maleRoleId = settings.maleRoleId;
+  let femaleRoleId = settings.femaleRoleId;
+  let changed = false;
+
+  const maleExists = maleRoleId
+    ? await guild.roles.fetch(maleRoleId).catch(() => null)
+    : null;
+  if (!maleExists) {
+    const role = await guild.roles.create({
+      name: ROLE_NAMES.male,
+      reason: "Tars bot integrated role",
+    });
+    maleRoleId = role.id;
+    changed = true;
+  }
+
+  const femaleExists = femaleRoleId
+    ? await guild.roles.fetch(femaleRoleId).catch(() => null)
+    : null;
+  if (!femaleExists) {
+    const role = await guild.roles.create({
+      name: ROLE_NAMES.female,
+      reason: "Tars bot integrated role",
+    });
+    femaleRoleId = role.id;
+    changed = true;
+  }
+
+  if (changed) {
+    await saveGuildSettings(guild.id, { maleRoleId, femaleRoleId });
+  }
+
+  return { maleRoleId, femaleRoleId };
+}
+
+client.on("guildCreate", async (guild) => {
+  console.log(`Joined guild: ${guild.name} (${guild.id})`);
+  try {
+    await ensureGuildRoles(guild);
+    console.log(`Roles ensured for guild: ${guild.name}`);
+  } catch (err) {
+    console.error(`Failed to set up roles for guild ${guild.name}:`, err);
+  }
+});
+
 /* ---------------- Memory ---------------- */
 const cooldowns = new Map();
 
@@ -92,10 +147,21 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (!(await isDirectToBot(message))) return;
 
-  const MALE_ROLE_ID = "1283084809912193055";
-  const FEMALE_ROLE_ID = "1283084870431805561";
-
   const member = message.member;
+  const guild = message.guild;
+
+  let maleRoleId = null;
+  let femaleRoleId = null;
+
+  if (guild) {
+    try {
+      const roles = await ensureGuildRoles(guild);
+      maleRoleId = roles.maleRoleId;
+      femaleRoleId = roles.femaleRoleId;
+    } catch (err) {
+      console.error("Failed to fetch guild settings:", err);
+    }
+  }
 
   const mentionedUsers = message.mentions.users;
   const hasRoastKeyword = /\broast\b/i.test(message.content);
@@ -157,9 +223,9 @@ client.on("messageCreate", async (message) => {
 
     let toneProfile = "neutral";
 
-    if (member?.roles?.cache?.has(MALE_ROLE_ID)) {
+    if (maleRoleId && member?.roles?.cache?.has(maleRoleId)) {
       toneProfile = "alpha-homie";
-    } else if (member?.roles?.cache?.has(FEMALE_ROLE_ID)) {
+    } else if (femaleRoleId && member?.roles?.cache?.has(femaleRoleId)) {
       toneProfile = "smooth-dominant";
     }
 

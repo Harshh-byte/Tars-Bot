@@ -54,3 +54,26 @@ export async function updateProfile(userId, key, value) {
     console.error("Firebase Profile Update Error:", error);
   }
 }
+
+const guildsRef = db.ref("guilds");
+
+export async function getGuildSettings(guildId) {
+  try {
+    const snapshot = await guildsRef.child(guildId).get();
+    if (snapshot.exists()) {
+      return snapshot.val();
+    }
+    return {};
+  } catch (error) {
+    console.error("Firebase Guild Get Error:", error);
+    return {};
+  }
+}
+
+export async function saveGuildSettings(guildId, data) {
+  try {
+    await guildsRef.child(guildId).update(data);
+  } catch (error) {
+    console.error("Firebase Guild Save Error:", error);
+  }
+}
