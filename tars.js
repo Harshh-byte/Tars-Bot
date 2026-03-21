@@ -87,6 +87,26 @@ async function isDirectToBot(message) {
   return false;
 }
 
+function getGenderMeta(member, maleRoleId, femaleRoleId) {
+  if (member?.roles?.cache?.has(femaleRoleId)) {
+    return {
+      gender: "female",
+      subject: "she",
+      object: "her",
+      possessive: "her",
+    };
+  }
+  if (member?.roles?.cache?.has(maleRoleId)) {
+    return { gender: "male", subject: "he", object: "him", possessive: "his" };
+  }
+  return {
+    gender: "unknown",
+    subject: "they",
+    object: "them",
+    possessive: "their",
+  };
+}
+
 /* ---------------- Message Handler ---------------- */
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
@@ -96,6 +116,8 @@ client.on("messageCreate", async (message) => {
   const FEMALE_ROLE_ID = "1283084870431805561";
 
   const member = message.member;
+
+  const authorGenderMeta = getGenderMeta(member, MALE_ROLE_ID, FEMALE_ROLE_ID);
 
   const mentionedUsers = message.mentions.users;
   const hasRoastKeyword = /\broast\b/i.test(message.content);
@@ -155,6 +177,20 @@ client.on("messageCreate", async (message) => {
 
     const currentTime = getTarsTime();
 
+    let targetGenderMeta = null;
+    if (roastTarget && message.guild) {
+      const targetMember =
+        message.guild.members.cache.get(roastTarget.id) ||
+        (await message.guild.members.fetch(roastTarget.id).catch(() => null));
+      if (targetMember) {
+        targetGenderMeta = getGenderMeta(
+          targetMember,
+          MALE_ROLE_ID,
+          FEMALE_ROLE_ID,
+        );
+      }
+    }
+
     let toneProfile = "neutral";
 
     if (member?.roles?.cache?.has(MALE_ROLE_ID)) {
@@ -166,12 +202,34 @@ client.on("messageCreate", async (message) => {
     const dynamicSystemPrompt = `${tarsSystemPrompt}
 
     ### USER_CONTEXT:
+    - Interaction_Mode: ${hasRoastKeyword ? "roast" : hasWishKeyword ? "wish" : "normal"}
     - Tone_Profile: ${toneProfile}
+    - Author_Gender: ${authorGenderMeta.gender}
+    - Author_Pronouns: ${authorGenderMeta.subject}/${authorGenderMeta.object}/${authorGenderMeta.possessive}
+    - Target_Gender: ${targetGenderMeta?.gender || "none"}
+    - Target_Pronouns: ${
+      targetGenderMeta
+        ? `${targetGenderMeta.subject}/${targetGenderMeta.object}/${targetGenderMeta.possessive}`
+        : "none"
+    }
 
     Tone Profiles:
     - alpha-homie: Talk like a confident homie. Direct, competitive, playful dominance.
     - smooth-dominant: Confident, sharp, slightly smoother energy. Still savage if provoked.
     - neutral: Default dominant Tars personality.
+
+    Interaction Rules:
+    - If Interaction_Mode is roast, treat it as explicit permission for max savage mode immediately.
+    - In roast mode: prioritize brutal, creative verbal destruction in one line.
+    - In roast mode: do not soften tone, do not switch to polite/helpful mode, and avoid generic weak roasts.
+    - If Interaction_Mode is wish, keep it respectful, warm, and celebratory; no roast unless user clearly asks roast-wish.
+    - In wish mode: write one clean premium wish line that sounds human, confident, and positive.
+
+    Pronoun Rules:
+    - If a target user is mentioned and you refer to that user in third person, use Target_Pronouns only.
+    - If no target user is mentioned and you refer to the message author in third person, use Author_Pronouns only.
+    - Never mix he/she for the same person in one reply.
+    - If gender is unknown, use they/them.
 
     Never awkwardly mention gender.
     Tone shift must be noticeable but natural. Never identical across profiles.
