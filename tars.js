@@ -66,7 +66,7 @@ const client = new Client({
   ],
 });
 
-client.once("ready", () => {
+client.once("clientReady", () => {
   console.log("🤖 Tars online.");
   client.user.setPresence({
     status: "dnd",
