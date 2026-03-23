@@ -35,7 +35,6 @@ async function generateContent(contents, systemInstruction, temperature = 1.0) {
 
 function cleanReplyText(text) {
   return text
-    .replace(/[\p{Extended_Pictographic}\uFE0F]/gu, "")
     .replace(/\[.*?\]/g, "")
     .replace(/\s{2,}/g, " ")
     .trim();
