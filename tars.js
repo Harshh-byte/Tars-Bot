@@ -1,5 +1,10 @@
 import "dotenv/config";
-import { Client, GatewayIntentBits, ActivityType } from "discord.js";
+import {
+  Client,
+  GatewayIntentBits,
+  ActivityType,
+  PermissionFlagsBits,
+} from "discord.js";
 import { GoogleGenAI } from "@google/genai";
 import { tarsSystemPrompt } from "./config.js";
 import express from "express";
@@ -147,6 +152,10 @@ client.on("messageCreate", async (message) => {
   const hasWishKeyword = /\b(wish|birthday|congrats|happy)\b/i.test(
     message.content,
   );
+  const hasInfoQuery =
+    /\b(time|date|day|weather|temperature|today|clock)\b/i.test(
+      message.content,
+    );
 
   let roastTarget = null;
 
@@ -185,14 +194,23 @@ client.on("messageCreate", async (message) => {
   if (lastUsed && Date.now() - lastUsed < 8000) return;
   cooldowns.set(message.author.id, Date.now());
 
-  await message.channel.sendTyping();
-
-  const convo = await getConversation(message.author.id);
-
-  convo.messages.push({ role: "user", content: message.content.trim() });
-  if (convo.messages.length > 10) convo.messages.shift();
-
   try {
+    if (message.guild) {
+      const botMember = message.guild.members.me;
+      const perms = message.channel.permissionsFor(botMember);
+      const canSend = perms?.has(PermissionFlagsBits.SendMessages);
+      const canView = perms?.has(PermissionFlagsBits.ViewChannel);
+
+      if (!canSend || !canView) return;
+    }
+
+    await message.channel.sendTyping().catch(() => null);
+
+    const convo = await getConversation(message.author.id);
+
+    convo.messages.push({ role: "user", content: message.content.trim() });
+    if (convo.messages.length > 10) convo.messages.shift();
+
     const contents = convo.messages.map((msg) => ({
       role: msg.role === "assistant" ? "model" : "user",
       parts: [{ text: msg.content }],
@@ -223,9 +241,16 @@ client.on("messageCreate", async (message) => {
     }
 
     const dynamicSystemPrompt = `${tarsSystemPrompt}
-
     ### USER_CONTEXT:
-    - Interaction_Mode: ${hasRoastKeyword ? "roast" : hasWishKeyword ? "wish" : "normal"}
+    - Interaction_Mode: ${
+      hasRoastKeyword
+        ? "roast"
+        : hasWishKeyword
+          ? "wish"
+          : hasInfoQuery
+            ? "info"
+            : "normal"
+    }
     - Roast_Aggression_Level: ${hasRoastKeyword ? "10/10" : "n/a"}
     - Tone_Profile: ${toneProfile}
     - Author_Gender: ${authorGenderMeta.gender}
@@ -248,6 +273,12 @@ client.on("messageCreate", async (message) => {
     - In roast mode: do not soften tone, do not switch to polite/helpful mode, and avoid generic weak roasts.
     - If Interaction_Mode is wish, keep it respectful, warm, and celebratory; no roast unless user clearly asks roast-wish.
     - In wish mode: write one clean premium wish line that sounds human, confident, and positive.
+    - If Interaction_Mode is info:
+    - Provide the correct information first.
+    - Then add a short, clever tease at the end.
+    - Keep it light — no aggressive roasting.
+    - Keep it one line and natural.
+    - Do not sacrifice accuracy for humor.
 
     Pronoun Rules:
     - If a target user is mentioned and you refer to that user in third person, use Target_Pronouns only.
@@ -294,16 +325,20 @@ client.on("messageCreate", async (message) => {
       ? `<@${roastTarget.id}> ${text}`
       : text;
 
-    await message.reply({
-      content: finalContent || "...",
-      allowedMentions: {
-        repliedUser: true,
-        users: roastTarget ? [roastTarget.id] : [],
-      },
-    });
+    await message
+      .reply({
+        content: finalContent || "...",
+        allowedMentions: {
+          repliedUser: true,
+          users: roastTarget ? [roastTarget.id] : [],
+        },
+      })
+      .catch(() => null);
   } catch (err) {
     console.error("AI Error:", err);
-    await message.reply("I'm drawing a blank. Try again later.");
+    await message
+      .reply("I'm drawing a blank. Try again later.")
+      .catch(() => null);
   }
 });
 
