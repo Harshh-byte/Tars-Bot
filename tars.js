@@ -439,6 +439,4 @@ app.get("/", (req, res) => {
 });
 app.listen(process.env.PORT || 3000, () => console.log(`🌐 Server running.`));
 
-client.login(process.env.DISCORD_BOT_TOKEN).catch((err) => {
-  console.error("❌ CRITICAL: Failed to login to Discord:", err);
-});
+client.login(process.env.DISCORD_BOT_TOKEN);
