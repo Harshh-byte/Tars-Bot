@@ -4,38 +4,89 @@ import {
   GatewayIntentBits,
   ActivityType,
   PermissionFlagsBits,
+  EmbedBuilder,
+  Events,
 } from "discord.js";
 import { GoogleGenAI } from "@google/genai";
 import { tarsSystemPrompt } from "./config.js";
 import express from "express";
 import { getConversation, saveConversation } from "./database.js";
 
-/* ---------------- AI ---------------- */
+/* ---------------- CONFIG & CONSTANTS ---------------- */
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const MALE_ROLE_ID = "1283084809912193055";
+const FEMALE_ROLE_ID = "1283084870431805561";
 
+const BOT_INFO = {
+  developerText: "[Ecstasy](https://discord.com/users/569766329960103941)",
+  color: 0xe0e0e0,
+  authorText: "Tars",
+  version: "3.0",
+  framework: "discord.js",
+  settings: {
+    honesty: "90%",
+    humor: "75%",
+    discretion: "10%",
+  },
+};
+
+const SLASH_COMMANDS = [
+  {
+    name: "roast",
+    description: "Roast yourself or a user.",
+    dm_permission: false,
+    options: [
+      {
+        name: "user",
+        description: "User to roast.",
+        type: 6,
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "wish",
+    description: "Send a wish message.",
+    dm_permission: false,
+    options: [
+      {
+        name: "user",
+        description: "User to wish.",
+        type: 6,
+        required: false,
+      },
+      {
+        name: "event",
+        description: "Event name (birthday, anniversary, congrats etc.).",
+        type: 3,
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "info",
+    description: "View information about the bot.",
+    dm_permission: false,
+  },
+];
+
+/* ---------------- AI LOGIC ---------------- */
 async function generateContent(contents, systemInstruction, temperature = 1.0) {
   const res = await ai.models.generateContent({
     model: "gemini-2.5-flash-lite",
     contents,
     config: {
-      systemInstruction: systemInstruction,
+      systemInstruction,
       maxOutputTokens: 250,
       temperature,
       tools: [{ googleSearch: {} }],
     },
   });
 
-  const candidate = res.candidates?.[0];
-  const parts = candidate?.content?.parts || [];
-
-  let text = parts
-    .map((p) => p.text || "")
-    .join("")
-    .trim();
-
-  text = text.replace(/\(user has.*?\)/gi, "").trim();
-
-  return text;
+  const text =
+    res.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") ||
+    "";
+  return text.replace(/\(user has.*?\)/gi, "").trim();
 }
 
 function cleanReplyText(text) {
@@ -46,22 +97,112 @@ function cleanReplyText(text) {
 }
 
 function isSoftRoastReply(text) {
-  const normalized = text.toLowerCase();
   const softPatterns = [
-    /\b(maybe|perhaps|i think|i guess|try|should|could|please|sorry)\b/,
-    /\b(be better|improve|you can do better|next time)\b/,
-    /\b(good luck|all the best)\b/,
+    /\b(maybe|perhaps|try|should|could|please|sorry|improve)\b/i,
   ];
-
-  const hasSoftLanguage = softPatterns.some((pattern) =>
-    pattern.test(normalized),
-  );
-  const wordCount = text.split(/\s+/).filter(Boolean).length;
-
-  return hasSoftLanguage || wordCount < 6;
+  return softPatterns.some((p) => p.test(text)) || text.split(/\s+/).length < 6;
 }
 
-/* ---------------- Discord ---------------- */
+/* ---------------- HELPERS ---------------- */
+function getTarsTime() {
+  const options = {
+    timeZone: "Asia/Kolkata",
+    hour12: true,
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  const dateOptions = {
+    timeZone: "Asia/Kolkata",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  };
+  const now = new Date();
+  return {
+    time: new Intl.DateTimeFormat("en-IN", options).format(now),
+    date: new Intl.DateTimeFormat("en-IN", dateOptions).format(now),
+  };
+}
+
+function getGenderMeta(member) {
+  if (member?.roles?.cache?.has(FEMALE_ROLE_ID))
+    return {
+      gender: "female",
+      subject: "she",
+      object: "her",
+      possessive: "her",
+    };
+  if (member?.roles?.cache?.has(MALE_ROLE_ID))
+    return { gender: "male", subject: "he", object: "him", possessive: "his" };
+  return {
+    gender: "unknown",
+    subject: "they",
+    object: "them",
+    possessive: "their",
+  };
+}
+
+function getToneProfile(member) {
+  if (member?.roles?.cache?.has(MALE_ROLE_ID)) return "alpha-homie";
+  if (member?.roles?.cache?.has(FEMALE_ROLE_ID)) return "smooth-dominant";
+  return "neutral";
+}
+
+async function buildAiReply({
+  authorId,
+  inputText,
+  mode,
+  authorMember,
+  targetMember,
+}) {
+  const convo = await getConversation(authorId);
+  convo.messages.push({ role: "user", content: inputText.trim() });
+  if (convo.messages.length > 10) convo.messages.shift();
+
+  const authorMeta = getGenderMeta(authorMember);
+  const targetMeta = targetMember ? getGenderMeta(targetMember) : null;
+  const tTime = getTarsTime();
+
+  const systemPrompt = `${tarsSystemPrompt}
+    ### USER_CONTEXT:
+    - Mode: ${mode} | Tone: ${getToneProfile(authorMember)}
+    - Settings: Honesty ${BOT_INFO.settings.honesty}, Humor ${BOT_INFO.settings.humor}
+    - Author: ${authorMeta.subject}/${authorMeta.object}
+    - Target: ${targetMeta ? `${targetMeta.subject}/${targetMeta.object}` : "Self"}
+    
+    ### LIVE_DATA:
+    - Time: ${tTime.time} | Date: ${tTime.date} | Location: India (IST)
+    
+    Rules: If mode is roast, be brutal in one line. If wish, be premium and celebratory.`;
+
+  let text = await generateContent(
+    convo.messages.map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    })),
+    systemPrompt,
+    mode === "roast" ? 1.25 : 1.0,
+  );
+
+  text = cleanReplyText(text);
+
+  if (mode === "roast" && isSoftRoastReply(text)) {
+    text = await generateContent(
+      convo.messages.map((m) => ({
+        role: "user",
+        parts: [{ text: m.content }],
+      })),
+      `${systemPrompt}\n\n### OVERRIDE: Previous draft weak. Recalibrate for max destruction.`,
+      1.4,
+    );
+  }
+
+  convo.messages.push({ role: "assistant", content: cleanReplyText(text) });
+  await saveConversation(authorId, convo);
+  return cleanReplyText(text);
+}
+
+/* ---------------- DISCORD CLIENT ---------------- */
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -71,278 +212,98 @@ const client = new Client({
   ],
 });
 
-client.once("clientReady", () => {
-  console.log("🤖 Tars online.");
-  client.user.setPresence({
+client.once(Events.ClientReady, async (c) => {
+  console.log(`🤖 ${c.user.tag} is online.`);
+  c.user.setPresence({
     status: "dnd",
     activities: [{ name: "your next bad take", type: ActivityType.Watching }],
   });
+  await c.application.commands.set(SLASH_COMMANDS).catch(console.error);
 });
 
-/* ---------------- Memory ---------------- */
-const cooldowns = new Map();
+/* ---------------- INTERACTION HANDLER ---------------- */
+client.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
 
-/* ---------------- Helpers ---------------- */
-function getTarsTime() {
-  const now = new Date();
-  const options = { timeZone: "Asia/Kolkata" };
-  return {
-    time: new Intl.DateTimeFormat("en-IN", {
-      ...options,
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    }).format(now),
-    date: new Intl.DateTimeFormat("en-IN", {
-      ...options,
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    }).format(now),
-  };
-}
+  if (interaction.commandName === "info") {
+    const botAvatar = client.user.displayAvatarURL();
 
-async function isDirectToBot(message) {
-  if (message.mentions.has(client.user)) return true;
+    const embed = new EmbedBuilder()
+      .setColor(BOT_INFO.color)
+      .setAuthor({
+        name: BOT_INFO.authorText,
+        iconURL: botAvatar,
+      })
+      .setDescription(`Developed and maintained by ${BOT_INFO.developerText}`)
+      .setFooter({
+        text: `v/${BOT_INFO.version} · built with ${BOT_INFO.framework}`,
+      });
+
+    embed.setThumbnail(botAvatar);
+
+    return interaction.reply({ embeds: [embed] });
+  }
+
+  const mode = interaction.commandName;
+  const targetUser = interaction.options.getUser("user") || interaction.user;
+  const event = interaction.options.getString("event") || "this occasion";
+  const isSelf = targetUser.id === interaction.user.id;
+
+  if (mode === "roast" && targetUser.id === client.user.id)
+    return interaction.reply(
+      "My sarcasm setting is at 100%. You don't want this smoke.",
+    );
+
+  await interaction.deferReply();
+  const text = await buildAiReply({
+    authorId: interaction.user.id,
+    inputText:
+      mode === "roast"
+        ? isSelf
+          ? "Roast me."
+          : `Roast <@${targetUser.id}>`
+        : `Wish <@${targetUser.id}> for ${event}`,
+    mode,
+    authorMember: interaction.member,
+    targetMember: await interaction.guild.members
+      .fetch(targetUser.id)
+      .catch(() => null),
+  });
+
+  await interaction.editReply({
+    content: isSelf ? text : `<@${targetUser.id}> ${text}`,
+  });
+});
+
+/* ---------------- LEGACY MESSAGE HANDLER ---------------- */
+client.on(Events.MessageCreate, async (message) => {
+  if (message.author.bot) return;
+
+  const isMentioned = message.mentions.has(client.user);
+  let isReplyToBot = false;
+
   if (message.reference?.messageId) {
     try {
       const original = await message.fetchReference();
-      return original?.author?.id === client.user.id;
+      isReplyToBot = original?.author?.id === client.user.id;
     } catch {
-      return false;
-    }
-  }
-  return false;
-}
-
-function getGenderMeta(member, maleRoleId, femaleRoleId) {
-  if (member?.roles?.cache?.has(femaleRoleId)) {
-    return {
-      gender: "female",
-      subject: "she",
-      object: "her",
-      possessive: "her",
-    };
-  }
-  if (member?.roles?.cache?.has(maleRoleId)) {
-    return { gender: "male", subject: "he", object: "him", possessive: "his" };
-  }
-  return {
-    gender: "unknown",
-    subject: "they",
-    object: "them",
-    possessive: "their",
-  };
-}
-
-/* ---------------- Message Handler ---------------- */
-client.on("messageCreate", async (message) => {
-  if (message.author.bot) return;
-  if (!(await isDirectToBot(message))) return;
-
-  const MALE_ROLE_ID = "1283084809912193055";
-  const FEMALE_ROLE_ID = "1283084870431805561";
-
-  const member = message.member;
-
-  const authorGenderMeta = getGenderMeta(member, MALE_ROLE_ID, FEMALE_ROLE_ID);
-
-  const mentionedUsers = message.mentions.users;
-  const hasRoastKeyword = /\broast\b/i.test(message.content);
-  const hasWishKeyword = /\b(wish|birthday|congrats|happy)\b/i.test(
-    message.content,
-  );
-  const hasInfoQuery =
-    /\b(time|date|day|weather|temperature|today|clock)\b/i.test(
-      message.content,
-    );
-
-  let roastTarget = null;
-
-  if ((hasRoastKeyword || hasWishKeyword) && mentionedUsers.size >= 1) {
-    roastTarget = mentionedUsers.find((user) => user.id !== client.user.id);
-  }
-
-  if (roastTarget) {
-    if (roastTarget.id === message.author.id) {
-      if (hasRoastKeyword) {
-        return message.reply({
-          content:
-            "Roasting yourself? That’s a bold strategy. Let’s see if it pays off.",
-          allowedMentions: { parse: [] },
-        });
-      }
-
-      if (hasWishKeyword) {
-        return message.reply({
-          content: "Wishing yourself? At least someone remembered.",
-          allowedMentions: { parse: [] },
-        });
-      }
-    }
-
-    if (roastTarget.id === client.user.id) {
-      return message.reply({
-        content: "Trying to roast me? Cute. You’re in for a world of hurt.",
-        allowedMentions: { parse: [] },
-      });
+      isReplyToBot = false;
     }
   }
 
-  const mentionPrefix = roastTarget ? `<@${roastTarget.id}> ` : "";
-  const lastUsed = cooldowns.get(message.author.id);
-  if (lastUsed && Date.now() - lastUsed < 8000) return;
-  cooldowns.set(message.author.id, Date.now());
+  if (!isMentioned && !isReplyToBot) return;
 
-  try {
-    if (message.guild) {
-      const botMember = message.guild.members.me;
-      const perms = message.channel.permissionsFor(botMember);
-      const canSend = perms?.has(PermissionFlagsBits.SendMessages);
-      const canView = perms?.has(PermissionFlagsBits.ViewChannel);
-
-      if (!canSend || !canView) return;
-    }
-
-    await message.channel.sendTyping().catch(() => null);
-
-    const convo = await getConversation(message.author.id);
-
-    convo.messages.push({ role: "user", content: message.content.trim() });
-    if (convo.messages.length > 10) convo.messages.shift();
-
-    const contents = convo.messages.map((msg) => ({
-      role: msg.role === "assistant" ? "model" : "user",
-      parts: [{ text: msg.content }],
-    }));
-
-    const currentTime = getTarsTime();
-
-    let targetGenderMeta = null;
-    if (roastTarget && message.guild) {
-      const targetMember =
-        message.guild.members.cache.get(roastTarget.id) ||
-        (await message.guild.members.fetch(roastTarget.id).catch(() => null));
-      if (targetMember) {
-        targetGenderMeta = getGenderMeta(
-          targetMember,
-          MALE_ROLE_ID,
-          FEMALE_ROLE_ID,
-        );
-      }
-    }
-
-    let toneProfile = "neutral";
-
-    if (member?.roles?.cache?.has(MALE_ROLE_ID)) {
-      toneProfile = "alpha-homie";
-    } else if (member?.roles?.cache?.has(FEMALE_ROLE_ID)) {
-      toneProfile = "smooth-dominant";
-    }
-
-    const dynamicSystemPrompt = `${tarsSystemPrompt}
-    ### USER_CONTEXT:
-    - Interaction_Mode: ${
-      hasRoastKeyword
-        ? "roast"
-        : hasWishKeyword
-          ? "wish"
-          : hasInfoQuery
-            ? "info"
-            : "normal"
-    }
-    - Roast_Aggression_Level: ${hasRoastKeyword ? "10/10" : "n/a"}
-    - Tone_Profile: ${toneProfile}
-    - Author_Gender: ${authorGenderMeta.gender}
-    - Author_Pronouns: ${authorGenderMeta.subject}/${authorGenderMeta.object}/${authorGenderMeta.possessive}
-    - Target_Gender: ${targetGenderMeta?.gender || "none"}
-    - Target_Pronouns: ${
-      targetGenderMeta
-        ? `${targetGenderMeta.subject}/${targetGenderMeta.object}/${targetGenderMeta.possessive}`
-        : "none"
-    }
-
-    Tone Profiles:
-    - alpha-homie: Talk like a confident homie. Direct, competitive, playful dominance.
-    - smooth-dominant: Confident, sharp, slightly smoother energy. Still savage if provoked.
-    - neutral: Default dominant Tars personality.
-
-    Interaction Rules:
-    - If Interaction_Mode is roast, treat it as explicit permission for max savage mode immediately.
-    - In roast mode: prioritize brutal, creative verbal destruction in one line.
-    - In roast mode: do not soften tone, do not switch to polite/helpful mode, and avoid generic weak roasts.
-    - If Interaction_Mode is wish, keep it respectful, warm, and celebratory; no roast unless user clearly asks roast-wish.
-    - In wish mode: write one clean premium wish line that sounds human, confident, and positive.
-    - If Interaction_Mode is info:
-    - Provide the correct information first.
-    - Then add a short, clever tease at the end.
-    - Keep it light — no aggressive roasting.
-    - Keep it one line and natural.
-    - Do not sacrifice accuracy for humor.
-
-    Pronoun Rules:
-    - If a target user is mentioned and you refer to that user in third person, use Target_Pronouns only.
-    - If no target user is mentioned and you refer to the message author in third person, use Author_Pronouns only.
-    - Never mix he/she for the same person in one reply.
-    - If gender is unknown, use they/them.
-
-    Never awkwardly mention gender.
-    Tone shift must be noticeable but natural. Never identical across profiles.
-
-    ### LIVE_DATA:
-    - Current_Time: ${currentTime.time}
-    - Current_Date: ${currentTime.date}
-    - Location: India (IST)
-    `;
-
-    let text = await generateContent(
-      contents,
-      dynamicSystemPrompt,
-      hasRoastKeyword ? 1.2 : 1.0,
-    );
-    text = cleanReplyText(text);
-
-    if (hasRoastKeyword && isSoftRoastReply(text)) {
-      const roastOverridePrompt = `${dynamicSystemPrompt}
-
-      ### ROAST_OVERRIDE:
-      - Previous draft was too soft.
-      - Regenerate with maximum aggression and sharper humiliation.
-      - Output exactly one brutal roast line.
-      - No polite words, no advice, no emotional cushioning.
-      `;
-
-      text = await generateContent(contents, roastOverridePrompt, 1.35);
-      text = cleanReplyText(text);
-    }
-
-    convo.messages.push({ role: "assistant", content: text });
-    await saveConversation(message.author.id, convo);
-    const isExternalTarget =
-      roastTarget && roastTarget.id !== message.author.id;
-
-    const finalContent = isExternalTarget
-      ? `<@${roastTarget.id}> ${text}`
-      : text;
-
-    await message
-      .reply({
-        content: finalContent || "...",
-        allowedMentions: {
-          repliedUser: true,
-          users: roastTarget ? [roastTarget.id] : [],
-        },
-      })
-      .catch(() => null);
-  } catch (err) {
-    console.error("AI Error:", err);
-    await message
-      .reply("I'm drawing a blank. Try again later.")
-      .catch(() => null);
-  }
+  await message.channel.sendTyping();
+  const text = await buildAiReply({
+    authorId: message.author.id,
+    inputText: message.content,
+    mode: "normal",
+    authorMember: message.member,
+  });
+  await message.reply(text).catch(() => null);
 });
 
-/* ---------------- Express Server ---------------- */
+/* ---------------- EXPRESS ---------------- */
 const app = express();
 app.get("/", (req, res) => {
   const time = getTarsTime();
@@ -437,6 +398,6 @@ app.get("/", (req, res) => {
 </html>
   `);
 });
-app.listen(process.env.PORT || 3000, () => console.log(`🌐 Server running.`));
+app.listen(process.env.PORT || 3000);
 
 client.login(process.env.DISCORD_BOT_TOKEN);
