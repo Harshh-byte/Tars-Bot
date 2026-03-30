@@ -161,7 +161,7 @@ async function buildAiReply({
 
   const authorMeta = getGenderMeta(authorMember);
   const targetMeta = targetMember ? getGenderMeta(targetMember) : null;
-  const tTime = getTarsTime();
+  const Time = getTarsTime();
 
   const systemPrompt = `${tarsSystemPrompt}
     ### USER_CONTEXT:
@@ -171,7 +171,7 @@ async function buildAiReply({
     - Target: ${targetMeta ? `${targetMeta.subject}/${targetMeta.object}` : "Self"}
     
     ### LIVE_DATA:
-    - Time: ${tTime.time} | Date: ${tTime.date} | Location: India (IST)
+    - Time: ${Time.time} | Date: ${Time.date} | Location: India (IST)
     
     Rules: If mode is roast, be brutal in one line. If wish, be premium and celebratory.`;
 
