@@ -398,6 +398,6 @@ app.get("/", (req, res) => {
 </html>
   `);
 });
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 10000);
 
 client.login(process.env.DISCORD_BOT_TOKEN);
