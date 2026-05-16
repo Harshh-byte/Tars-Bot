@@ -3,7 +3,6 @@ import {
   Client,
   GatewayIntentBits,
   ActivityType,
-  PermissionFlagsBits,
   EmbedBuilder,
   Events,
 } from "discord.js";
@@ -12,7 +11,6 @@ import { tarsSystemPrompt } from "./config.js";
 import express from "express";
 import { getConversation, saveConversation } from "./database.js";
 
-/* ---------------- CONFIG & CONSTANTS ---------------- */
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const MALE_ROLE_ID = "1283084809912193055";
 const FEMALE_ROLE_ID = "1283084870431805561";
@@ -31,6 +29,11 @@ const BOT_INFO = {
 };
 
 const SLASH_COMMANDS = [
+  {
+    name: "ping",
+    description: "Check the bot's latency.",
+    dm_permission: false,
+  },
   {
     name: "roast",
     description: "Roast yourself or a user.",
@@ -64,13 +67,12 @@ const SLASH_COMMANDS = [
     ],
   },
   {
-    name: "info",
+    name: "about",
     description: "View information about the bot.",
     dm_permission: false,
   },
 ];
 
-/* ---------------- AI LOGIC ---------------- */
 async function generateContent(contents, systemInstruction, temperature = 1.0) {
   const res = await ai.models.generateContent({
     model: "gemini-2.5-flash-lite",
@@ -103,7 +105,6 @@ function isSoftRoastReply(text) {
   return softPatterns.some((p) => p.test(text)) || text.split(/\s+/).length < 6;
 }
 
-/* ---------------- HELPERS ---------------- */
 function getTarsTime() {
   const options = {
     timeZone: "Asia/Kolkata",
@@ -202,7 +203,6 @@ async function buildAiReply({
   return cleanReplyText(text);
 }
 
-/* ---------------- DISCORD CLIENT ---------------- */
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -221,11 +221,38 @@ client.once(Events.ClientReady, async (c) => {
   await c.application.commands.set(SLASH_COMMANDS).catch(console.error);
 });
 
-/* ---------------- INTERACTION HANDLER ---------------- */
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
-  if (interaction.commandName === "info") {
+  if (interaction.commandName === "ping") {
+    const response = await interaction.reply({
+      content: "Pinging...",
+      withResponse: true,
+    });
+
+    const sent = response.resource.message;
+    const gatewayLatency = sent.createdTimestamp - interaction.createdTimestamp;
+    const rawHeartbeat = client.ws.ping;
+
+    const heartbeatLatency =
+      rawHeartbeat === -1 ? `${gatewayLatency} (est.)` : `${rawHeartbeat}ms`;
+
+    let totalSeconds = Math.floor(client.uptime / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    totalSeconds %= 86400;
+    const hours = Math.floor(totalSeconds / 3600);
+    totalSeconds %= 3600;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    const uptimeString = `${days}d${hours}h${minutes}m${seconds}s`;
+
+    return interaction.editReply({
+      content: `🏓 **Pong!**\n Gateway latency is \`${gatewayLatency}ms\`, heartbeat latency is \`${heartbeatLatency}\` and my uptime is \`${uptimeString}\`.`,
+    });
+  }
+
+  if (interaction.commandName === "about") {
     const botAvatar = client.user.displayAvatarURL();
 
     const embed = new EmbedBuilder()
@@ -275,7 +302,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
   });
 });
 
-/* ---------------- LEGACY MESSAGE HANDLER ---------------- */
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot) return;
 
@@ -303,101 +329,30 @@ client.on(Events.MessageCreate, async (message) => {
   await message.reply(text).catch(() => null);
 });
 
-/* ---------------- EXPRESS ---------------- */
 const app = express();
 app.get("/", (req, res) => {
-  const time = getTarsTime();
-
   res.send(`
     <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tars Status</title>
-    <link rel="icon" type="image/png" href="https://img.icons8.com/color/144/FFFFFF/grok--v2.png">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background: #000;
-            color: #fff;
-            font-family: 'JetBrains Mono', monospace;
-            padding: 40px;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 80vh;
-        }
-
-        #status-container {
-            border-left: 3px solid #fff;
-            padding-left: 20px;
-        }
-
-        .status-line {
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
-
-        #timestamp {
-            color: #888;
-            font-size: 1.2rem;
-        }
-
-        /* Subtle blinking cursor effect for that terminal feel */
-        .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 1.2rem;
-            background: #fff;
-            animation: blink 1s infinite;
-            vertical-align: middle;
-            margin-left: 5px;
-        }
-
-        @keyframes blink {
-            0% { opacity: 0; }
-            50% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-    </style>
-</head>
-<body>
-
-    <div id="status-container">
-        <div class="status-line">TARS IS ALIVE<span class="cursor"></span></div>
-        <div id="timestamp">INITIALIZING SYSTEM CLOCK...</div>
-    </div>
-
-    <script>
-        function updateTarsTime() {
-            const now = new Date();
-            
-            const options = { 
-                weekday: 'short', 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit',
-                hour12: false
-            };
-
-            const timeString = now.toLocaleString('en-US', options).toUpperCase();
-            document.getElementById('timestamp').innerText = "SYSTEM TIME: " + timeString;
-        }
-
-        updateTarsTime();
-        
-        setInterval(updateTarsTime, 1000);
-    </script>
-</body>
-</html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TARS Status</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+        <style>
+            body {
+                background-color: #000000;
+                color: #ffffff;
+                font-family: 'Inter', sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <p>Tars is online</p>
+    </body>
+    </html>
   `);
 });
-app.listen(process.env.PORT || 10000);
+app.listen(process.env.PORT);
 
 client.login(process.env.DISCORD_BOT_TOKEN);
