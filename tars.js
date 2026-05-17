@@ -13,7 +13,7 @@ import { getConversation, saveConversation } from "./database.js";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const MALE_ROLE_ID = "1283084809912193055";
-const FEMALE_ROLE_ID = "1283084870431805561";
+const FEMALE_ROLE_IDS = ["1283084870431805561", "1494305758349889557"];
 
 const BOT_INFO = {
   developerText: "[Ecstasy](https://discord.com/users/569766329960103941)",
@@ -126,7 +126,7 @@ function getTarsTime() {
 }
 
 function getGenderMeta(member) {
-  if (member?.roles?.cache?.has(FEMALE_ROLE_ID))
+  if (FEMALE_ROLE_IDS.some((id) => member?.roles?.cache?.has(id)))
     return {
       gender: "female",
       subject: "she",
@@ -145,7 +145,8 @@ function getGenderMeta(member) {
 
 function getToneProfile(member) {
   if (member?.roles?.cache?.has(MALE_ROLE_ID)) return "alpha-homie";
-  if (member?.roles?.cache?.has(FEMALE_ROLE_ID)) return "smooth-dominant";
+  if (FEMALE_ROLE_IDS.some((id) => member?.roles?.cache?.has(id)))
+    return "smooth-dominant";
   return "neutral";
 }
 
@@ -225,15 +226,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === "ping") {
-    const response = await interaction.reply({
+    const sent = await interaction.reply({
       content: "Pinging...",
-      withResponse: true,
+      fetchReply: true,
     });
 
-    const sent = response.resource.message;
     const gatewayLatency = sent.createdTimestamp - interaction.createdTimestamp;
     const rawHeartbeat = client.ws.ping;
-
     const heartbeatLatency =
       rawHeartbeat === -1 ? `${gatewayLatency} (est.)` : `${rawHeartbeat}ms`;
 
@@ -245,10 +244,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
 
-    const uptimeString = `${days}d${hours}h${minutes}m${seconds}s`;
+    const uptimeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
     return interaction.editReply({
-      content: `🏓 **Pong!**\n Gateway latency is \`${gatewayLatency}ms\`, heartbeat latency is \`${heartbeatLatency}\` and my uptime is \`${uptimeString}\`.`,
+      content: `🏓 **Pong!**\nGateway latency is \`${gatewayLatency}ms\`, heartbeat latency is \`${heartbeatLatency}\` and my uptime is \`${uptimeString}\`.`,
     });
   }
 
