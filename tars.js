@@ -5,6 +5,9 @@ import {
   ActivityType,
   EmbedBuilder,
   Events,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
 } from "discord.js";
 import { GoogleGenAI } from "@google/genai";
 import { tarsSystemPrompt } from "./config.js";
@@ -16,7 +19,7 @@ const MALE_ROLE_ID = "1283084809912193055";
 const FEMALE_ROLE_IDS = ["1283084870431805561", "1494305758349889557"];
 
 const BOT_INFO = {
-  developerText: "[Ecstasy](https://discord.com/users/569766329960103941)",
+  developerText: "Ecstasy",
   color: 0xe0e0e0,
   authorText: "Tars",
   version: "3.0",
@@ -75,7 +78,7 @@ const SLASH_COMMANDS = [
 
 async function generateContent(contents, systemInstruction, temperature = 1.0) {
   const res = await ai.models.generateContent({
-    model: "gemini-2.5-flash-lite",
+    model: "gemini-2.5-pro",
     contents,
     config: {
       systemInstruction,
@@ -123,6 +126,24 @@ function getTarsTime() {
     time: new Intl.DateTimeFormat("en-IN", options).format(now),
     date: new Intl.DateTimeFormat("en-IN", dateOptions).format(now),
   };
+}
+
+function getUptimeString() {
+  let totalSeconds = Math.floor(client.uptime / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  totalSeconds %= 86400;
+  const hours = Math.floor(totalSeconds / 3600);
+  totalSeconds %= 3600;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+
+function createProgressBar(valueString) {
+  const percent = parseInt(valueString) || 0;
+  const progress = Math.round(percent / 10);
+  const empty = 10 - progress;
+  return `\`${"▰".repeat(progress)}${"▱".repeat(empty)}\` **${percent}%**`;
 }
 
 function getGenderMeta(member) {
@@ -219,35 +240,21 @@ client.once(Events.ClientReady, async (c) => {
     status: "dnd",
     activities: [{ name: "your next bad take", type: ActivityType.Watching }],
   });
-  await c.application.commands.set(SLASH_COMMANDS).catch(console.error);
+
+  console.log("Registering global commands to profile launcher...");
+  await c.application.commands
+    .set(SLASH_COMMANDS)
+    .then(() => console.log("Profile sync complete!"))
+    .catch(console.error);
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === "ping") {
-    const sent = await interaction.reply({
-      content: "Pinging...",
-      fetchReply: true,
-    });
-
-    const gatewayLatency = sent.createdTimestamp - interaction.createdTimestamp;
-    const rawHeartbeat = client.ws.ping;
-    const heartbeatLatency =
-      rawHeartbeat === -1 ? `${gatewayLatency} (est.)` : `${rawHeartbeat}ms`;
-
-    let totalSeconds = Math.floor(client.uptime / 1000);
-    const days = Math.floor(totalSeconds / 86400);
-    totalSeconds %= 86400;
-    const hours = Math.floor(totalSeconds / 3600);
-    totalSeconds %= 3600;
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-
-    const uptimeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-
-    return interaction.editReply({
-      content: `🏓 **Pong!**\nGateway latency is \`${gatewayLatency}ms\`, heartbeat latency is \`${heartbeatLatency}\` and my uptime is \`${uptimeString}\`.`,
+    const gatewayLatency = Date.now() - interaction.createdTimestamp;
+    return interaction.reply({
+      content: `🏓 **Pong!**\nGateway latency is \`${gatewayLatency}ms\` and my uptime is \`${getUptimeString()}\`.`,
     });
   }
 
@@ -257,17 +264,48 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const embed = new EmbedBuilder()
       .setColor(BOT_INFO.color)
       .setAuthor({
-        name: BOT_INFO.authorText,
+        name: `${BOT_INFO.authorText}`,
         iconURL: botAvatar,
       })
-      .setDescription(`Developed and maintained by ${BOT_INFO.developerText}`)
+      .setDescription(
+        `Hey, I'm **Tars**!\n*A sarcasm-packed AI companion ready to roast or wish on demand.*`,
+      )
+      .setThumbnail(botAvatar)
+      .addFields({
+        name: "🧬 Cognitive Core Parameters",
+        value: [
+          `• **Honesty:** ${createProgressBar(BOT_INFO.settings.honesty)}`,
+          `• **Humor:** ${createProgressBar(BOT_INFO.settings.humor)}`,
+          `• **Discretion:** ${createProgressBar(BOT_INFO.settings.discretion)}`,
+        ].join("\n"),
+        inline: false,
+      })
       .setFooter({
-        text: `v/${BOT_INFO.version} · built with ${BOT_INFO.framework}`,
+        text: `v/${BOT_INFO.version} · built with discord.js`,
       });
 
-    embed.setThumbnail(botAvatar);
+    const inviteUrl = `https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=bot%20applications.commands`;
 
-    return interaction.reply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setLabel("Invite Tars")
+        .setURL(inviteUrl)
+        .setStyle(ButtonStyle.Link),
+      new ButtonBuilder()
+        .setLabel("Developer Profile")
+        .setURL("https://discord.com/users/569766329960103941")
+        .setStyle(ButtonStyle.Link),
+    );
+
+    return interaction.reply({ embeds: [embed], components: [row] });
+  }
+
+  const musicCommands = ["play", "skip", "volume", "stop"];
+  if (musicCommands.includes(interaction.commandName)) {
+    return interaction.reply({
+      content: `🎵 The \`/${interaction.commandName}\` feature is currently under maintenance.`,
+      ephemeral: true,
+    });
   }
 
   const mode = interaction.commandName;
