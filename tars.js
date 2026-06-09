@@ -78,7 +78,7 @@ const SLASH_COMMANDS = [
 
 async function generateContent(contents, systemInstruction, temperature = 1.0) {
   const res = await ai.models.generateContent({
-    model: "gemini-2.5-pro",
+    model: "gemini-2.5-flash-lite",
     contents,
     config: {
       systemInstruction,
