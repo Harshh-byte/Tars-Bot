@@ -241,10 +241,8 @@ client.once(Events.ClientReady, async (c) => {
     activities: [{ name: "your next bad take", type: ActivityType.Watching }],
   });
 
-  console.log("Registering global commands to profile launcher...");
   await c.application.commands
     .set(SLASH_COMMANDS)
-    .then(() => console.log("Profile sync complete!"))
     .catch(console.error);
 });
 
