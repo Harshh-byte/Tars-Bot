@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tars | The Intelligent Discord Companion</title>
+    <meta name="title" content="Tars | The Intelligent Discord Companion" />
+    <meta name="description" content="Add Tars to your Discord server—a premium cognitive companion featuring advanced context retention, savage roasts, dynamic tone adjustment, and interactive playground simulations." />
+    <meta name="keywords" content="Discord Bot, Tars Bot, AI Companion, Discord AI, Discord Roaster, Discord Congratulator, SaaS Discord Bot" />
+    <meta name="author" content="Harshh-byte" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tars-discord-bot.onrender.com/" />
+    <meta property="og:title" content="Tars | The Intelligent Discord Companion" />
+    <meta property="og:description" content="Add Tars to your Discord server—a premium cognitive companion featuring advanced context retention, savage roasts, dynamic tone adjustment, and interactive playground simulations." />
+    <meta property="og:image" content="/assets/Icon.png" />
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:title" content="Tars | The Intelligent Discord Companion" />
+    <meta property="twitter:description" content="Add Tars to your Discord server—a premium cognitive companion featuring advanced context retention, savage roasts, dynamic tone adjustment, and interactive playground simulations." />
+    <meta property="twitter:image" content="/assets/Icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/png" href="/assets/Icon.png" />
+  </head>
+  <body>
+    <div class="ambient-background">
+      <div class="ambient-orb orb-primary"></div>
+      <div class="ambient-orb orb-secondary"></div>
+      <div class="ambient-orb orb-tertiary"></div>
+      <div class="noise-overlay"></div>
+    </div>
+    <nav class="navbar reveal-on-scroll">
+      <div class="nav-container">
+        <a href="#" class="logo-area">
+          <img src="/assets/Icon.png" alt="Tars Logo" class="nav-logo" />
+          <span class="brand-name">TARS</span>
+        </a>
+        <div class="nav-links">
+          <a href="#features">Capabilities</a>
+          <a href="#playground">Playground</a>
+          <a href="#parameters">Core Settings</a>
+        </div>
+        <div class="nav-actions">
+          <a href="https://discord.com/oauth2/authorize?client_id=1413246880954978417&permissions=2415938560&integration_type=0&scope=bot+applications.commands" class="btn btn-primary btn-glow" id="invite-btn-nav">Invite Tars</a>
+        </div>
+      </div>
+    </nav>
+    <main>
+      <section class="hero">
+        <div class="hero-content reveal-on-scroll">
+          <div class="badge-container">
+            <div class="status-badge badge-offline" id="status-badge">
+              <span class="status-dot"></span>
+              <span class="status-text">Status: Offline</span>
+            </div>
+          </div>
+          <h1 class="hero-title">Meet <span class="text-gradient">TARS</span></h1>
+          <p class="hero-subtitle" id="typewriter-text"></p>
+          <div class="hero-buttons">
+            <a href="https://discord.com/oauth2/authorize?client_id=1413246880954978417&permissions=2415938560&integration_type=0&scope=bot+applications.commands" class="btn btn-primary btn-large btn-glow" id="invite-btn-hero">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" />
+              </svg>
+              Add to Discord
+            </a>
+            <a href="#playground" class="btn btn-secondary btn-large">Try Playground</a>
+          </div>
+        </div>
+        <div class="hero-visual reveal-on-scroll delay-1">
+          <div class="glass-avatar-container">
+            <div class="avatar-glow"></div>
+            <img src="/assets/Icon.png" alt="Tars Avatar" class="tars-avatar-hero" />
+          </div>
+        </div>
+      </section>
+      <section id="features" class="section bento-section">
+        <div class="section-header reveal-on-scroll">
+          <span class="section-tag">Capabilities</span>
+          <h2 class="section-title">Built for Menace & Wholesomeness</h2>
+          <p class="section-desc">Loaded with advanced cognitive parameters to adjust dynamically from supportive homie to verbal wrecking ball.</p>
+        </div>
+        <div class="bento-grid">
+          <div class="bento-card bento-wide reveal-on-scroll delay-1">
+            <div class="bento-icon">🧠</div>
+            <div class="bento-content">
+              <h3>Context Retention</h3>
+              <p>Unlike simple reply bots, Tars maintains context up to 10 messages deep, naturally tracking the flow of conversations and remembering past roasts.</p>
+            </div>
+          </div>
+          <div class="bento-card reveal-on-scroll delay-2">
+            <div class="bento-icon">🤬</div>
+            <div class="bento-content">
+              <h3>Savage Roasts</h3>
+              <p>Proactive and reactive verbal execution. Will roast you or your targets in one line of absolute destruction if provoked.</p>
+            </div>
+          </div>
+          <div class="bento-card reveal-on-scroll delay-3">
+            <div class="bento-icon">🛡️</div>
+            <div class="bento-content">
+              <h3>Tone Adjuster</h3>
+              <p>Automatically adapts pronouns and personality tones based on specific roles in your server (e.g. <i>alpha-homie</i> or <i>smooth-dominant</i>).</p>
+            </div>
+          </div>
+          <div class="bento-card bento-wide reveal-on-scroll delay-1">
+            <div class="bento-icon">💖</div>
+            <div class="bento-content">
+              <h3>Premium Wishes</h3>
+              <p>Need to congratulate a friend? Tars switches to "Smooth Alpha" mode—charming, cool, heartfelt, and memorable.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="playground" class="section">
+        <div class="section-header reveal-on-scroll">
+          <span class="section-tag">Playground</span>
+          <h2 class="section-title">Interactive CLI Simulation</h2>
+          <p class="section-desc">Experience Tars' response patterns directly in your browser without leaving the page.</p>
+        </div>
+        <div class="playground-layout reveal-on-scroll delay-1">
+          <div class="playground-sidebar">
+            <div class="command-group">
+              <span class="sidebar-label">Select Command</span>
+              <button class="cmd-btn active" data-cmd="roast"><span class="cmd-icon">/</span>roast</button>
+              <button class="cmd-btn" data-cmd="wish"><span class="cmd-icon">/</span>wish</button>
+              <button class="cmd-btn" data-cmd="about"><span class="cmd-icon">/</span>about</button>
+              <button class="cmd-btn" data-cmd="ping"><span class="cmd-icon">/</span>ping</button>
+            </div>
+          </div>
+          <div class="playground-terminal">
+            <div class="terminal-header">
+              <div class="mac-buttons">
+                <span class="mac-btn close"></span>
+                <span class="mac-btn minimize"></span>
+                <span class="mac-btn maximize"></span>
+              </div>
+              <div class="terminal-title">tars-runtime.sh — zsh — 80x24</div>
+            </div>
+            <div class="terminal-body" id="playground-screen"></div>
+          </div>
+        </div>
+      </section>
+      <section id="parameters" class="section">
+        <div class="section-header reveal-on-scroll">
+          <span class="section-tag">Core Settings</span>
+          <h2 class="section-title">Cognitive Architecture</h2>
+          <p class="section-desc">The precise internal weights injected into TARS' logic prompts.</p>
+        </div>
+        <div class="params-grid">
+          <div class="param-card reveal-on-scroll delay-1">
+            <div class="param-header">
+              <span class="param-name">Honesty</span>
+              <span class="param-val" style="color: #06b6d4">90%</span>
+            </div>
+            <div class="param-bar-bg">
+              <div class="param-bar-fill" style="width: 90%; background: linear-gradient(90deg, #06b6d4, #3b82f6);"></div>
+            </div>
+            <p class="param-desc">Brutally honest. Zero fluff or fake affirmations.</p>
+          </div>
+          <div class="param-card reveal-on-scroll delay-2">
+            <div class="param-header">
+              <span class="param-name">Humor</span>
+              <span class="param-val" style="color: #a855f7">75%</span>
+            </div>
+            <div class="param-bar-bg">
+              <div class="param-bar-fill" style="width: 75%; background: linear-gradient(90deg, #8b5cf6, #a855f7);"></div>
+            </div>
+            <p class="param-desc">Sarcastic, dry, and sharp responses.</p>
+          </div>
+          <div class="param-card reveal-on-scroll delay-3">
+            <div class="param-header">
+              <span class="param-name">Discretion</span>
+              <span class="param-val" style="color: #ef4444">10%</span>
+            </div>
+            <div class="param-bar-bg">
+              <div class="param-bar-fill" style="width: 10%; background: linear-gradient(90deg, #f43f5e, #ef4444);"></div>
+            </div>
+            <p class="param-desc">Will hold absolutely nothing back if provoked.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer reveal-on-scroll">
+      <div class="footer-container">
+        <div class="footer-brand">
+          <img src="/assets/Icon.png" alt="Tars Logo" class="footer-logo" />
+          <span class="footer-name">TARS</span>
+        </div>
+        <p class="footer-copyright">© <span id="current-year">2026</span> Tars Bot. Built for the community.</p>
+        <p class="footer-author">Build with ❤️ by Ecstasy.</p>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>
