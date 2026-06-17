@@ -282,7 +282,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         text: `v/${BOT_INFO.version} · built with discord.js`,
       });
 
-    const inviteUrl = `https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=bot%20applications.commands`;
+    const inviteUrl = `https://discord.com/oauth2/authorize?client_id=${client.user.id}&permissions=2415938560&integration_type=0&scope=bot+applications.commands`;
 
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
@@ -365,29 +365,34 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 const app = express();
-app.get("/", (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>TARS Status</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-        <style>
-            body {
-                background-color: #000000;
-                color: #ffffff;
-                font-family: 'Inter', sans-serif;
-            }
-        </style>
-    </head>
-    <body>
-        <p>Tars is online</p>
-    </body>
-    </html>
-  `);
+app.use(express.json());
+app.use(express.static("public"));
+app.use("/assets", express.static("assets"));
+
+app.get("/api/info", (req, res) => {
+  let clientId = client.user?.id || "";
+  if (!clientId && process.env.DISCORD_BOT_TOKEN) {
+    try {
+      const parts = process.env.DISCORD_BOT_TOKEN.split(".");
+      if (parts[0]) {
+        clientId = Buffer.from(parts[0], "base64").toString("utf-8");
+      }
+    } catch (e) {
+      console.error("Failed to decode token for clientId", e);
+    }
+  }
+
+  res.json({
+    clientId: clientId,
+    tag: client.user?.tag || "Tars#0000",
+    avatar: client.user?.displayAvatarURL() || "/assets/Icon.png",
+    uptime: getUptimeString()
+  });
 });
-app.listen(process.env.PORT);
+
+
+app.listen(process.env.PORT, () => {
+  console.log(`🌐 Website server is running on port ${process.env.PORT}`);
+});
 
 client.login(process.env.DISCORD_BOT_TOKEN);
