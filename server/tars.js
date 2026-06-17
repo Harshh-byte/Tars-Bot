@@ -1,4 +1,6 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+dotenv.config({ path: fileURLToPath(new URL(".env", import.meta.url)) });
 import {
   Client,
   GatewayIntentBits,
@@ -366,8 +368,8 @@ client.on(Events.MessageCreate, async (message) => {
 
 const app = express();
 app.use(express.json());
-app.use(express.static("public"));
-app.use("/assets", express.static("assets"));
+app.use(express.static(fileURLToPath(new URL("../client/public", import.meta.url))));
+app.use("/assets", express.static(fileURLToPath(new URL("../client/assets", import.meta.url))));
 
 app.get("/api/info", (req, res) => {
   let clientId = client.user?.id || "";

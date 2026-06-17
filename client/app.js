@@ -75,16 +75,16 @@ const cmdSimulations = {
   roast: {
     command: "tars run roast --target @Ecstasy",
     output: `<span class="term-output">Analyzing target vulnerabilities... [100%]</span>
-<div class="d-message"><div class="d-message-header"><img src="/public/Icon.png" alt="Tars" class="d-avatar" style="width:32px; height:32px;"><span class="d-author bot-tag-name">TARS</span><span class="bot-badge">BOT</span></div><div class="d-msg-body"><span style="color:var(--accent-blue);">@Ecstasy</span> built a beautiful website just to check if I would validate his life choices. Error 404: attention span not found. 🙄</div></div>`
+<div class="d-message"><div class="d-message-header"><img src="/assets/Icon.png" alt="Tars" class="d-avatar" style="width:32px; height:32px;"><span class="d-author bot-tag-name">TARS</span><span class="bot-badge">BOT</span></div><div class="d-msg-body"><span style="color:var(--accent-blue);">@Ecstasy</span> built a beautiful website just to check if I would validate his life choices. Error 404: attention span not found. 🙄</div></div>`
   },
   wish: {
     command: "tars run wish --target @Ecstasy --event launch",
     output: `<span class="term-output">Synthesizing premium dopamine boosters... [100%]</span>
-<div class="d-message"><div class="d-message-header"><img src="/public/Icon.png" alt="Tars" class="d-avatar" style="width:32px; height:32px;"><span class="d-author bot-tag-name">TARS</span><span class="bot-badge">BOT</span></div><div class="d-msg-body"><span style="color:var(--accent-blue);">@Ecstasy</span> Huge congratulations on the launch! I hope your code compiles on the first try today, you absolute legend. Keep winning. 🥂</div></div>`
+<div class="d-message"><div class="d-message-header"><img src="/assets/Icon.png" alt="Tars" class="d-avatar" style="width:32px; height:32px;"><span class="d-author bot-tag-name">TARS</span><span class="bot-badge">BOT</span></div><div class="d-msg-body"><span style="color:var(--accent-blue);">@Ecstasy</span> Huge congratulations on the launch! I hope your code compiles on the first try today, you absolute legend. Keep winning. 🥂</div></div>`
   },
   about: {
     command: "tars fetch info",
-    output: `<div class="discord-embed-sim"><div class="embed-author"><img src="/public/Icon.png" alt="Tars Logo" class="d-avatar" style="width:20px; height:20px;"><span>Tars</span></div><div class="embed-desc">Hey, I'm <b>Tars</b>!
+    output: `<div class="discord-embed-sim"><div class="embed-author"><img src="/assets/Icon.png" alt="Tars Logo" class="d-avatar" style="width:20px; height:20px;"><span>Tars</span></div><div class="embed-desc">Hey, I'm <b>Tars</b>!
 The ultimate cognitive powerhouse for your Discord server.
   
 🧬 <b>Core Parameters:</b>
