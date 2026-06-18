@@ -367,32 +367,6 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 const app = express();
-app.use(express.json());
-app.use(express.static(fileURLToPath(new URL("../client/public", import.meta.url))));
-app.use("/assets", express.static(fileURLToPath(new URL("../client/assets", import.meta.url))));
-
-app.get("/api/info", (req, res) => {
-  let clientId = client.user?.id || "";
-  if (!clientId && process.env.DISCORD_BOT_TOKEN) {
-    try {
-      const parts = process.env.DISCORD_BOT_TOKEN.split(".");
-      if (parts[0]) {
-        clientId = Buffer.from(parts[0], "base64").toString("utf-8");
-      }
-    } catch (e) {
-      console.error("Failed to decode token for clientId", e);
-    }
-  }
-
-  res.json({
-    clientId: clientId,
-    tag: client.user?.tag || "Tars#0000",
-    avatar: client.user?.displayAvatarURL() || "/assets/Icon.png",
-    uptime: getUptimeString()
-  });
-});
-
-
 app.listen(process.env.PORT, () => {
   console.log(`🌐 Website server is running on port ${process.env.PORT}`);
 });
