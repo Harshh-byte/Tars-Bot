@@ -367,8 +367,6 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 const app = express();
-app.listen(process.env.PORT, () => {
-  console.log(`🌐 Website server is running on port ${process.env.PORT}`);
-});
+app.listen(process.env.PORT);
 
 client.login(process.env.DISCORD_BOT_TOKEN);
