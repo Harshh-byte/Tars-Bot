@@ -141,13 +141,6 @@ function getUptimeString() {
   return `${days}d ${hours}h ${minutes}m ${seconds}s`;
 }
 
-function createProgressBar(valueString) {
-  const percent = parseInt(valueString) || 0;
-  const progress = Math.round(percent / 10);
-  const empty = 10 - progress;
-  return `\`${"▰".repeat(progress)}${"▱".repeat(empty)}\` **${percent}%**`;
-}
-
 function getGenderMeta(member) {
   if (FEMALE_ROLE_IDS.some((id) => member?.roles?.cache?.has(id)))
     return {
@@ -271,15 +264,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
         `Hey, I'm **Tars**!\n*A sarcasm-packed AI companion ready to roast or wish on demand.*`,
       )
       .setThumbnail(botAvatar)
-      .addFields({
-        name: "🧬 Cognitive Core Parameters",
-        value: [
-          `• **Honesty:** ${createProgressBar(BOT_INFO.settings.honesty)}`,
-          `• **Humor:** ${createProgressBar(BOT_INFO.settings.humor)}`,
-          `• **Discretion:** ${createProgressBar(BOT_INFO.settings.discretion)}`,
-        ].join("\n"),
-        inline: false,
-      })
       .setFooter({
         text: `v/${BOT_INFO.version} · built with discord.js`,
       });
