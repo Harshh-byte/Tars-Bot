@@ -164,11 +164,10 @@ function resolveEmoji(emojiInput, guild) {
   
   return emojiInput.trim();
 }
-
 function replaceEmojiNamesWithTags(text, guild) {
   if (!guild || !text) return text;
   
-  return text.replace(/:(\w+):/g, (match, emojiName) => {
+  return text.replace(/(?<!<a?):(\w+):(?!\d+>)/g, (match, emojiName) => {
     const customEmoji = guild.emojis.cache.find(e => e.name.toLowerCase() === emojiName.toLowerCase());
     return customEmoji ? customEmoji.toString() : match;
   });
@@ -188,7 +187,7 @@ async function generateContentJson(contents, systemInstruction, temperature = 1.
         properties: {
           text: {
             type: "STRING",
-            description: "The text response, keeping it short (max 1 line, under 25 words). You can include standard unicode emojis or custom server emojis in Code format (e.g. <:name:id> or <a:name:id>)."
+            description: "The text response, keeping it short (max 1 line, under 25 words). You can include standard unicode emojis or custom server emojis in Code format (e.g. :emoji_name:)."
           },
           reactions: {
             type: "ARRAY",
@@ -240,15 +239,20 @@ async function generateContentJson(contents, systemInstruction, temperature = 1.
   }
 }
 
-function cleanReplyText(text) {
+function sanitizeEmojiTags(text) {
   if (!text) return text;
   return text
-    .replace(/\[.*?\]/g, "")
-    .replace(/\s{2,}/g, " ")
-    .replace(/<(a)?:?([^:\s>]+?):?(\d+)>/g, (match, isAnimated, name, id) => {
-      return `<${isAnimated ? "a" : ""}:${name}:${id}>`;
-    })
-    .trim();
+    .replace(/<+a?:?([^:\s>]+?):?\d*>+\d*>?/g, ":$1:")
+    .replace(/:(\w+)::?\d*>?/g, ":$1:");
+}
+
+function cleanReplyText(text) {
+  if (!text) return text;
+  return sanitizeEmojiTags(
+    text
+      .replace(/\[.*?\]/g, "")
+      .replace(/\s{2,}/g, " ")
+  ).trim();
 }
 
 function isSoftRoastReply(text) {
@@ -313,8 +317,8 @@ async function buildAiReply({
       logger.info(`Guild: ${guild.name} | Found ${availableEmojis.length} custom emojis.`);
       if (availableEmojis.length > 0) {
         emojisContext = `\n### CUSTOM SERVER EMOJIS:\n` +
-          availableEmojis.map(e => `- Name: "${e.name}", ID: "${e.id}", Code: "${e.toString()}" (${e.animated ? "animated" : "static"})`).join("\n") +
-          `\n\nInstructions: You can include custom emojis in your text reply using their "Code" (e.g., <:name:id> or <a:name:id>). You can react to the user's message using the exact custom emoji name or ID in the "reactions" array. Match your savage, witty persona with these server emojis.`;
+          availableEmojis.map(e => `- Name: "${e.name}", Code: ":${e.name}:"`).join("\n") +
+          `\n\nInstructions: You can include custom emojis in your text reply using their "Code" (e.g., :emoji_name:). You can react to the user's message using the exact custom emoji name in the "reactions" array. Match your savage, witty persona with these server emojis.`;
       }
     } catch (e) {
       logger.warn("Could not fetch guild emojis:", e);
@@ -341,7 +345,7 @@ async function buildAiReply({
   let replyObj = await generateContentJson(
     convo.messages.map((m) => ({
       role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
+      parts: [{ text: sanitizeEmojiTags(m.content) }],
     })),
     systemPrompt,
     mode === "roast" ? 1.25 : 1.0,
@@ -353,7 +357,7 @@ async function buildAiReply({
     replyObj = await generateContentJson(
       convo.messages.map((m) => ({
         role: "user",
-        parts: [{ text: m.content }],
+        parts: [{ text: sanitizeEmojiTags(m.content) }],
       })),
       `${systemPrompt}\n\n### OVERRIDE: Previous draft weak. Recalibrate for max destruction.`,
       1.4,
