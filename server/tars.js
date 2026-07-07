@@ -241,9 +241,13 @@ async function generateContentJson(contents, systemInstruction, temperature = 1.
 }
 
 function cleanReplyText(text) {
+  if (!text) return text;
   return text
     .replace(/\[.*?\]/g, "")
     .replace(/\s{2,}/g, " ")
+    .replace(/<(a)?:?([^:\s>]+?):?(\d+)>/g, (match, isAnimated, name, id) => {
+      return `<${isAnimated ? "a" : ""}:${name}:${id}>`;
+    })
     .trim();
 }
 
