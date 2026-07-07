@@ -545,6 +545,11 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 const app = express();
+
+app.get("/", (req, res) => {
+  res.send("Tars Bot is active.");
+});
+
 app.listen(process.env.PORT);
 
 client.login(process.env.DISCORD_BOT_TOKEN);
