@@ -233,7 +233,7 @@ export default function Hero() {
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center lg:justify-start">
             <a
-              href="https://discord.com/oauth2/authorize?client_id=1413246880954978417&permissions=2415938560&integration_type=0&scope=bot+applications.commands"
+              href="https://discord.com/oauth2/authorize?client_id=1413246880954978417&permissions=274878286912&integration_type=0&scope=bot+applications.commands"
               className="btn-primary flex items-center justify-center gap-2.5"
             >
               <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
