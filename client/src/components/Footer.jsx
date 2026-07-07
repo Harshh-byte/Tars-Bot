@@ -1,4 +1,4 @@
-export default function Footer() {
+export default function Footer({ onOpenPrivacy, onOpenTerms }) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -14,9 +14,25 @@ export default function Footer() {
             Tars.
           </span>
         </a>
-        <p className="text-ds-muted text-xs">
-          &copy; {currentYear} Tars Bot. Sarcastic Core Active.
-        </p>
+        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
+          <p className="text-ds-muted text-xs">
+            &copy; {currentYear} Tars Bot.
+          </p>
+          <div className="flex gap-4">
+            <button
+              onClick={onOpenPrivacy}
+              className="text-ds-muted hover:text-ds-text text-xs cursor-pointer transition-colors"
+            >
+              Privacy Policy
+            </button>
+            <button
+              onClick={onOpenTerms}
+              className="text-ds-muted hover:text-ds-text text-xs cursor-pointer transition-colors"
+            >
+              Terms of Service
+            </button>
+          </div>
+        </div>
         <span className="text-ds-muted text-xs">
           Built with <span style={{ color: "var(--accent)" }}>♥</span> from Space.
         </span>

@@ -10,7 +10,7 @@ export default function FAQs() {
     },
     {
       question: "How do I invite Tars to my server?",
-      answer: "Click 'Contact Developer' at the top of the page to message the developer. We keep server deployments curated."
+      answer: "Simply click the invite button on Tars' Discord profile or server settings under the App Directory. Make sure to grant the required 'Message Content' and 'Send Messages' permissions."
     },
     {
       question: "Does Tars detect different languages?",
@@ -23,6 +23,10 @@ export default function FAQs() {
     {
       question: "Can Tars roast admin roles?",
       answer: "Tars operates on cognitive logic, not server hierarchy. Admins get roasted with the same mathematical precision as everyone else."
+    },
+    {
+      question: "Can Tars express emotions visually?",
+      answer: "Tars has full access to your server's custom emojis (static and animated) and can search Giphy to attach context-relevant GIFs to roasts, wishes, or chats."
     }
   ];
 
