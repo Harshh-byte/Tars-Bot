@@ -8,15 +8,18 @@ Tars is a bold, savage, and highly adaptive Discord AI companion built with Disc
 
 ## 🌟 Key Features
 
-- **AI-Powered Responses:** Uses Gemini API (`gemini-2.5-flash-lite` or custom models) to generate contextual, savage, or wholesome responses.
+- **AI-Powered Responses:** Uses the new `@google/genai` SDK (`gemini-2.5-flash-lite`) to generate contextual, savage, or wholesome responses.
 - **Context Awareness:** Remembers the last 10 messages of conversation history per user, securely stored in a Firebase Realtime Database.
+- **Dynamic Response Rhythm:** Behaves like an authentic person by fluctuating output combinations. Tars will sometimes only react with an emoji, sometimes only send a GIF, or sometimes just send a text line without cluttering chat every time.
+- **Self-Reaction Prevention:** Tars naturally applies reactions directly underneath the user's triggering message rather than reacting to his own outputs.
 - **Winston Structured Logging:** Production-grade logging system writing to the console and dynamic log files (`logs/error.log` and `logs/combined.log`).
-- **Giphy Integration:** Searches Giphy and attaches context-relevant GIFs directly as native attachments.
-- **Emoji Reactions & Text Emojis:** Auto-resolves custom server emojis (static/animated) for text replies and applies corresponding emoji reactions to messages.
-- **Robust Error Handling:** Seamless retry mechanisms with exponential backoff for transient API (503/429) errors.
+- **Uncensored GIF Engine:** Searches Giphy with an `R-rating` configuration to attach edgier, context-relevant GIFs directly as native attachments.
+- **Automated Data Lifecycle Cleanup:** Includes a built-in background `node-cron` worker that runs every night at midnight to scan and completely wipe inactive user conversation caches older than 6 months.
+- **Emoji Reactions & Guardrails:** Auto-resolves custom server emojis (static/animated). Includes strict safeguards preventing the AI from hallucinating fake emoji tags.
+- **Robust Error Handling:** Seamless retry mechanisms with exponential backoff for transient API (503/429) errors, plus automated Sentry telemetry tracking.
 - **Slash Commands:**
   - `/about` - View detailed stats and bot parameters.
-  - `/ping` - Check bot latency and uptime.
+  - `/ping` - Check bot latency and uptime tracking.
   - `/roast [user]` - Unleash a brutal, one-line roast.
   - `/wish [user] [event]` - Deliver a premium, charming wish for any occasion.
 - **Status Server:** Includes a lightweight Express server for simple uptime monitoring (e.g., via Render or UptimeRobot).
