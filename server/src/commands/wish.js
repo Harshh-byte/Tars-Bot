@@ -1,4 +1,4 @@
-import { resolveEmoji } from "../tars.js";
+import { resolveEmoji } from "../../tars.js";
 import logger from "../logger.js";
 import * as Sentry from "@sentry/node";
 
