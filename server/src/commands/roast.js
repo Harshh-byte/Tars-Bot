@@ -1,4 +1,4 @@
-import { resolveEmoji } from "../tars.js";
+import { resolveEmoji } from "../../tars.js";
 import { getConversation, saveConversation } from "../database.js";
 import { tarsSystemPrompt } from "../config.js";
 import logger from "../logger.js";
