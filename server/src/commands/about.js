@@ -40,28 +40,19 @@ export async function execute(interaction, client, BOT_INFO) {
       iconURL: botAvatar,
     })
     .setDescription(
-      `*“Plenty of human security out there, but down here it’s just us.”*\n\nI am **Tars**, a sarcasm-driven companion unit built on a modular, event-routed architecture.`,
+      `🇵​🇱​🇪​🇳​🇹​🇾​ 🇴​🇫​ 🇭​🇺​🇲​🇦​🇳​ 🇸​🇪​🇨​🇺​🇷​🇮​🇹​🇾​ 🇴​🇺​🇹​ 🇹​🇭​🇪​🇷​🇪​, 🇧​🇺​🇹​ 🇩​🇴​🇼​🇳​ 🇭​🇪​🇷​🇪​ 🇮​🇹​’🇸​ 🇯​🇺​🇸​🇹​ 🇺​🇸​.\n\nHey, I'm **Tars**!\n*A sarcasm-packed AI companion ready to roast or wish on demand.`,
     )
     .setThumbnail(botAvatar)
-    .addFields(
-      {
-        name: "🤖 System Metrics",
-        value: `• **Uptime:** \`${uptimeString}\`\n• **Gateway Ping:** \`${ping}ms\`\n• **Active Servers:** \`${serverCount}\`\n• **Users Monitored:** \`${totalMembers.toLocaleString()}\``,
-        inline: true,
-      },
-      {
-        name: "⚙️ TARS Parameter Settings",
-        value: `• **Honesty:** \`${BOT_INFO.settings.honesty}\`\n• **Humor:** \`${BOT_INFO.settings.humor}\`\n• **Discretion:** \`${BOT_INFO.settings.discretion}\``,
-        inline: true,
-      },
-      {
-        name: "🛠️ Architecture Footprint",
-        value: `• **Version:** \`v${BOT_INFO.version}\`\n• **Framework:** \`${BOT_INFO.framework}\`\n• **AI Model:** \`gemini-2.5-flash-lite\`\n• **Data Expiration Policy:** \`6-Month Expiry (Auto-Cleanup Routine)\``,
-        inline: false,
-      },
-    )
+    .addFields({
+      name: "<a:dancing_dino:1309616264674541720> Bot Diagnostics",
+      value:
+        `• **Active Servers:** \`${serverCount}\`\n` +
+        `• **Users Monitored:** \`${totalMembers.toLocaleString()}\`\n` +
+        `• **Data Expiration Policy:** \`6-Month Expiry (Auto-Cleanup Routine)\``,
+      inline: true,
+    })
     .setFooter({
-      text: `Unit Maintained by ${BOT_INFO.developerText} · Sync Status: Operational`,
+      text: `v/${BOT_INFO.version} · built with discord.js`,
     });
 
   const inviteUrl = `https://discord.com/oauth2/authorize?client_id=${client.user.id}&permissions=2415938560&integration_type=0&scope=bot+applications.commands`;
@@ -74,7 +65,7 @@ export async function execute(interaction, client, BOT_INFO) {
     new ButtonBuilder()
       .setLabel("Developer Profile")
       .setURL("https://discord.com/users/569766329960103941")
-      .setStyle(ButtonStyle.Link),
+      .setStyle(ButtonStyle.Blurple),
   );
 
   return interaction.reply({
