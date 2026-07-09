@@ -8,7 +8,7 @@ import {
 export const data = {
   name: "about",
   description:
-    "View detailed statistics and configuration parameters for Tars.",
+    "View information about the bot.",
   dm_permission: false,
 };
 
