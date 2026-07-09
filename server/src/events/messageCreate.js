@@ -23,7 +23,6 @@ export async function execute(message, client, { buildAiReply }) {
   if (!isMentioned && !isReplyToBot) return;
 
   try {
-    await message.channel.sendTyping();
     const replyData = await buildAiReply({
       authorId: message.author.id,
       inputText: message.content,
@@ -32,14 +31,10 @@ export async function execute(message, client, { buildAiReply }) {
       guild: message.guild,
     });
 
-    const messagePayload = {};
-    if (replyData.text && replyData.text.trim() !== "") {
-      messagePayload.content = replyData.text;
-    }
-    if (replyData.gifUrl) {
-      messagePayload.files = [
-        { attachment: replyData.gifUrl, name: "tars.gif" },
-      ];
+    if ((replyData.text && replyData.text.trim() !== "") || replyData.gifUrl) {
+      await message.channel.sendTyping();
+
+      await new Promise((resolve) => setTimeout(resolve, 800));
     }
 
     if (replyData.reactions && replyData.reactions.length > 0) {
@@ -49,6 +44,21 @@ export async function execute(message, client, { buildAiReply }) {
           await message.react(resolved).catch(() => null);
         }
       }
+    }
+
+    const messagePayload = {};
+
+    if (replyData.text && replyData.text.trim() !== "") {
+      messagePayload.content = replyData.text;
+    }
+
+    if (replyData.gifUrl) {
+      messagePayload.files = [
+        {
+          attachment: replyData.gifUrl,
+          name: "tars.gif",
+        },
+      ];
     }
 
     if (messagePayload.content || messagePayload.files) {

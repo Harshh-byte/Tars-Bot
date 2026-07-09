@@ -123,7 +123,7 @@ export default function Sandbox() {
       <div className="max-w-4xl mx-auto px-6">
         <div className="text-center mb-8 md:mb-12">
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-black uppercase text-ds-text">
-            Test Tars <span className="text-gradient">Live</span>
+            Test <span className="text-gradient">Tars</span>
           </h2>
           <p className="text-ds-muted text-sm md:text-base max-w-xl mx-auto mt-4 font-medium">
             Interact with Tars in the testing chamber below. Type a message or click one of the quick suggestions.
