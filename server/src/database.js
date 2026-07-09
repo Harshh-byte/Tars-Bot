@@ -15,9 +15,9 @@ admin.initializeApp({
 const db = admin.database();
 const usersRef = db.ref("users");
 
-export async function getConversation(userId) {
+export async function getConversation(serverId, userId) {
   try {
-    const snapshot = await usersRef.child(userId).get();
+    const snapshot = await usersRef.child(`${serverId}/${userId}`).get();
     if (snapshot.exists()) {
       const data = snapshot.val();
       if (!data.messages) data.messages = [];
@@ -25,7 +25,7 @@ export async function getConversation(userId) {
       return data;
     } else {
       const newUser = { messages: [], profile: {}, updatedAt: Date.now() };
-      await usersRef.child(userId).set(newUser);
+      await usersRef.child(`${serverId}/${userId}`).set(newUser);
       return newUser;
     }
   } catch (error) {
@@ -34,7 +34,7 @@ export async function getConversation(userId) {
   }
 }
 
-export async function saveConversation(userId, data) {
+export async function saveConversation(serverId, userId, data) {
   try {
     if (data.messages && Array.isArray(data.messages)) {
       if (data.messages.length > 10) {
@@ -43,16 +43,20 @@ export async function saveConversation(userId, data) {
     }
 
     data.updatedAt = Date.now();
-    await usersRef.child(userId).update(data);
+    await usersRef.child(`${serverId}/${userId}`).update(data);
   } catch (error) {
     console.error("Firebase Save Error:", error);
   }
 }
 
-export async function updateProfile(userId, key, value) {
+export async function updateProfile(serverId, userId, key, value) {
   try {
-    await usersRef.child(`${userId}/profile`).update({ [key]: value });
-    await usersRef.child(userId).update({ updatedAt: Date.now() });
+    await usersRef
+      .child(`${serverId}/${userId}/profile`)
+      .update({ [key]: value });
+    await usersRef
+      .child(`${serverId}/${userId}`)
+      .update({ updatedAt: Date.now() });
   } catch (error) {
     console.error("Firebase Profile Update Error:", error);
   }
@@ -65,21 +69,31 @@ cron.schedule("0 0 * * *", async () => {
     const sixMonthsInMs = 6 * 30 * 24 * 60 * 60 * 1000;
     const cutoffTime = Date.now() - sixMonthsInMs;
 
-    const expiredUsersQuery = usersRef
-      .orderByChild("updatedAt")
-      .endAt(cutoffTime);
-    const snapshot = await expiredUsersQuery.once("value");
+    const snapshot = await usersRef.once("value");
+    if (!snapshot.exists()) {
+      console.log("[CRON] No server data found.");
+      return;
+    }
 
-    if (snapshot.exists()) {
-      const usersToDelete = {};
+    const updates = {};
 
-      snapshot.forEach((childSnapshot) => {
-        usersToDelete[childSnapshot.key] = null;
+    snapshot.forEach((serverSnapshot) => {
+      const serverId = serverSnapshot.key;
+
+      serverSnapshot.forEach((userSnapshot) => {
+        const userId = userSnapshot.key;
+        const userData = userSnapshot.val();
+
+        if (userData.updatedAt && userData.updatedAt <= cutoffTime) {
+          updates[`${serverId}/${userId}`] = null;
+        }
       });
+    });
 
-      await usersRef.update(usersToDelete);
+    if (Object.keys(updates).length > 0) {
+      await usersRef.update(updates);
       console.log(
-        `[CRON] Cleaned up ${Object.keys(usersToDelete).length} inactive user profiles.`,
+        `[CRON] Cleaned up ${Object.keys(updates).length} inactive user profiles across servers.`,
       );
     } else {
       console.log("[CRON] No expired user profiles found.");

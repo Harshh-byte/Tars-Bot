@@ -92,21 +92,22 @@ async function searchGiphy(query) {
 }
 
 export function resolveEmoji(emojiInput, guild) {
-  if (!guild || !emojiInput) return emojiInput;
+  if (!emojiInput) return emojiInput;
   const match = emojiInput.match(/<?a?:?\w+:(\d+)>?/);
   const id = match ? match[1] : emojiInput.trim();
+
   const customEmoji =
-    guild.emojis.cache.get(id) ||
-    guild.emojis.cache.find(
+    client.emojis.cache.get(id) ||
+    client.emojis.cache.find(
       (e) => e.name.toLowerCase() === id.toLowerCase() || e.id === id,
     );
   return customEmoji || emojiInput.trim();
 }
 
 function replaceEmojiNamesWithTags(text, guild) {
-  if (!guild || !text) return text;
+  if (!text) return text;
   return text.replace(/(?<!<a?):(\w+):(?!\d+>)/g, (match, emojiName) => {
-    const customEmoji = guild.emojis.cache.find(
+    const customEmoji = client.emojis.cache.find(
       (e) => e.name.toLowerCase() === emojiName.toLowerCase(),
     );
     return customEmoji ? customEmoji.toString() : match;
@@ -222,7 +223,8 @@ export async function buildAiReply({
   targetMember,
   guild,
 }) {
-  const convo = await getConversation(authorId);
+  const serverId = guild?.id || "DM";
+  const convo = await getConversation(serverId, authorId);
   convo.messages.push({ role: "user", content: inputText.trim() });
   if (convo.messages.length > 10) convo.messages.shift();
 
@@ -235,22 +237,21 @@ export async function buildAiReply({
   const Time = getTarsTime();
 
   let emojisContext = "";
-  if (guild) {
-    try {
-      const fetchedEmojis = await guild.emojis
-        .fetch()
-        .catch(() => guild.emojis.cache);
-      const availableEmojis = Array.from(fetchedEmojis.values());
-      if (availableEmojis.length > 0) {
-        emojisContext =
-          `\n### CUSTOM SERVER EMOJIS:\n` +
-          availableEmojis
-            .map((e) => `- Name: "${e.name}", Code: ":${e.name}:"`)
-            .join("\n");
-      }
-    } catch (e) {
-      logger.warn("Emoji fetch exception handled", e);
+  try {
+    const globalCustomEmojis = Array.from(client.emojis.cache.values());
+    if (globalCustomEmojis.length > 0) {
+      const sampledEmojis = globalCustomEmojis
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 40);
+      emojisContext =
+        `\n### GLOBAL CUSTOM EMOJIS (ACROSS ALL SERVERS):\n` +
+        sampledEmojis
+          .map((e) => `- Name: "${e.name}", Code: ":${e.name}:"`)
+          .join("\n") +
+        `\n\nInstructions: You have a superpower—you can use custom emojis from ANY server I am in! Include them in your text reply via Code format (e.g., :emoji_name:) or in your "reactions" array. Match your savage, edgy persona perfectly with these choices.`;
     }
+  } catch (e) {
+    logger.warn("Could not aggregate global client emojis:", e);
   }
 
   const systemPrompt = `${tarsSystemPrompt}\n### USER_CONTEXT:\n- Mode: ${mode}\n- Author: ${authorName}\n- Target: ${targetName}\n### LIVE_DATA:\n- Time: ${Time.time} | Date: ${Time.date}\n${emojisContext}`;
@@ -282,7 +283,7 @@ export async function buildAiReply({
 
   if (replyObj.text && replyObj.text.trim() !== "") {
     convo.messages.push({ role: "assistant", content: replyObj.text });
-    await saveConversation(authorId, convo);
+    await saveConversation(serverId, authorId, convo);
   }
 
   let gifUrl = null;
