@@ -1,8 +1,10 @@
-export default function Footer({ onOpenPrivacy, onOpenTerms }) {
+import { Link } from "react-router-dom";
+
+export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-ds-border py-8 md:py-10 relative z-10 bg-white/0.5">
+    <footer className="border-t border-ds-border py-8 md:py-10 relative z-10 bg-white/50">
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8">
         <a href="#home" className="flex items-center gap-3">
           <img
@@ -14,27 +16,32 @@ export default function Footer({ onOpenPrivacy, onOpenTerms }) {
             Tars.
           </span>
         </a>
+
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
           <p className="text-ds-muted text-xs">
             &copy; {currentYear} Tars Bot.
           </p>
+
           <div className="flex gap-4">
-            <button
-              onClick={onOpenPrivacy}
-              className="text-ds-muted hover:text-ds-text text-xs cursor-pointer transition-colors"
+            <Link
+              to="/privacy"
+              className="text-ds-muted hover:text-ds-text text-xs transition-colors"
             >
               Privacy Policy
-            </button>
-            <button
-              onClick={onOpenTerms}
-              className="text-ds-muted hover:text-ds-text text-xs cursor-pointer transition-colors"
+            </Link>
+
+            <Link
+              to="/terms"
+              className="text-ds-muted hover:text-ds-text text-xs transition-colors"
             >
               Terms of Service
-            </button>
+            </Link>
           </div>
         </div>
+
         <span className="text-ds-muted text-xs">
-          Built with <span style={{ color: "var(--accent)" }}>♥</span> from Space.
+          Built with <span style={{ color: "var(--accent)" }}>♥</span> from
+          Space.
         </span>
       </div>
     </footer>

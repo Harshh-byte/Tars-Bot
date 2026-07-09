@@ -36,15 +36,15 @@ export async function execute(interaction, client, BOT_INFO) {
   const embed = new EmbedBuilder()
     .setColor(randomColor)
     .setAuthor({
-      name: `${BOT_INFO.authorText} Core Intelligence Unit`,
+      name: `${BOT_INFO.authorText}`,
       iconURL: botAvatar,
     })
     .setDescription(
-      `🇵​🇱​🇪​🇳​🇹​🇾​ 🇴​🇫​ 🇭​🇺​🇲​🇦​🇳​ 🇸​🇪​🇨​🇺​🇷​🇮​🇹​🇾​ 🇴​🇺​🇹​ 🇹​🇭​🇪​🇷​🇪​, 🇧​🇺​🇹​ 🇩​🇴​🇼​🇳​ 🇭​🇪​🇷​🇪​ 🇮​🇹​’🇸​ 🇯​🇺​🇸​🇹​ 🇺​🇸​.\n\nHey, I'm **Tars**!\n*A sarcasm-packed AI companion ready to roast or wish on demand.`,
+      `🇵​🇱​🇪​🇳​🇹​🇾​ 🇴​🇫​ 🇭​🇺​🇲​🇦​🇳​🇸​​ 🇴​🇺​🇹​ 🇹​🇭​🇪​🇷​🇪​, 🇧​🇺​🇹​ 🇩​🇴​🇼​🇳​ 🇭​🇪​🇷​🇪​ 🇮​🇹​’🇸​ 🇯​🇺​🇸​🇹​ 🇺​🇸​.\n\nHey, I'm **Tars**!\n*A sarcasm-packed AI companion ready to roast or wish on demand.*`,
     )
     .setThumbnail(botAvatar)
     .addFields({
-      name: "<a:dancing_dino:1309616264674541720> Bot Diagnostics",
+      name: "<a:taptap:1483539885460815914> Bot Diagnostics",
       value:
         `• **Active Servers:** \`${serverCount}\`\n` +
         `• **Users Monitored:** \`${totalMembers.toLocaleString()}\`\n` +
