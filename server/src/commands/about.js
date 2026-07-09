@@ -65,7 +65,7 @@ export async function execute(interaction, client, BOT_INFO) {
     new ButtonBuilder()
       .setLabel("Developer Profile")
       .setURL("https://discord.com/users/569766329960103941")
-      .setStyle(ButtonStyle.Blurple),
+      .setStyle(ButtonStyle.Link),
   );
 
   return interaction.reply({
