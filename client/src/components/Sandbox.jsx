@@ -135,7 +135,7 @@ export default function Sandbox() {
             <div className="flex flex-col gap-1">
               <h3 className="text-ds-text font-display font-extrabold text-sm md:text-base leading-tight flex items-center gap-1.5">
                 <span className="text-ds-muted text-base font-bold font-mono">#</span>
-                <span>🛰️︲tars-hub</span>
+                <span>⌚︲tars-hub</span>
               </h3>
               <p className="text-ds-muted text-[10px] md:text-xs">
                 Drop your trash inputs and watch a superior machine politely remind you how fucking useless you are.
