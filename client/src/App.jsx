@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
+import Lenis from "lenis";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Capabilities from "./components/Capabilities";
 import Commands from "./components/Commands";
 import Sandbox from "./components/Sandbox";
+import Parameters from "./components/Parameters";
 import FAQs from "./components/FAQs";
 import Footer from "./components/Footer";
+import SEO from "./components/shared/SEO";
 import CustomCursor from "./components/CustomCursor";
 
 export default function App() {
@@ -34,17 +37,41 @@ export default function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
+    // 1. Initialize Lenis Smooth Scroll
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 1.1,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    // 2. Track Scroll Progress
     const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalScroll > 0) {
-        setScrollProgress((window.scrollY / totalScroll) * 100);
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollHeight > 0) {
+        const scrolled = (window.scrollY / scrollHeight) * 100;
+        setScrollProgress(scrolled);
       }
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    window.addEventListener("scroll", handleScroll);
+
+    // Clean up
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      lenis.destroy();
+    };
   }, []);
 
   useEffect(() => {
+    // 3. Simple Intersection Observer for entry animations
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -63,9 +90,9 @@ export default function App() {
     return () => observer.disconnect();
   }, []);
 
-
   return (
     <div className="min-h-screen transition-colors duration-300 overflow-x-hidden">
+      <SEO />
       <div
         className="fixed top-0 left-0 h-1 bg-linear-to-r from-ds-blurple to-ds-fuchsia z-100 transition-all duration-75"
         style={{ width: `${scrollProgress}%` }}
@@ -75,10 +102,11 @@ export default function App() {
       <Capabilities />
       <Commands />
       <Sandbox />
+      <Parameters />
       <FAQs />
-<Footer />
+      <Footer />
       <CustomCursor />
-
     </div>
   );
 }
+
