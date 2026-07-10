@@ -32,8 +32,9 @@ export default function Capabilities() {
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="max-w-3xl mb-8 md:mb-10">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase text-ds-text leading-tight mb-4">
-            Built for Menace & Wholesomeness
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase text-ds-text leading-[1.15] mb-4">
+            Built for Menace &amp;{" "}
+            <span className="block sm:inline">Wholesomeness</span>
           </h2>
           <p className="text-ds-muted text-base md:text-lg leading-relaxed max-w-xl font-medium">
             Loaded with advanced cognitive parameters to adjust dynamically from supportive homie to verbal wrecking ball.
