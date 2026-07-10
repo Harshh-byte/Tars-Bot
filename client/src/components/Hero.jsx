@@ -164,7 +164,7 @@ export default function Hero() {
 
             <CircularText
               text="• Sarcastic Discord Bot • Brutal AI Companion • Event Wishes • Context Memory"
-              radius={140}
+              radius={120}
               fontSize="9px"
               className="scale-75 xs:scale-90 sm:scale-100 text-ds-muted opacity-80"
               spinDuration={24}
