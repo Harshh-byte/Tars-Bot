@@ -74,9 +74,9 @@ export default function Parameters() {
                 </span>
               </div>
 
-              <div className="w-full h-4 bg-ds-bg border-2 border-ds-border rounded-none overflow-hidden relative">
+              <div className="w-full h-4 bg-ds-bg border-2 border-ds-border rounded-full overflow-hidden relative">
                 <motion.div
-                  className="h-full rounded-none"
+                  className="h-full rounded-full"
                   style={{ backgroundColor: param.color }}
                   initial={{ width: 0 }}
                   animate={isInView ? { width: `${param.val}%` } : { width: 0 }}
