@@ -104,7 +104,7 @@ export default function Hero() {
         <div className="absolute bottom-8 left-8 w-12 h-12 border-b-3 border-l-3 border-ds-text"></div>
         <div className="absolute bottom-8 right-8 w-12 h-12 border-b-3 border-r-3 border-ds-text"></div>
       </div>
-      <div className="max-w-7xl mx-auto px-6 w-full relative z-10 grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+      <div className="max-w-7xl mx-auto px-6 w-full relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         <div className="lg:col-span-7 flex flex-col items-center text-center lg:items-start lg:text-left">
 
           <h1 className="hero-title-text font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight uppercase mb-6 text-ds-text">
@@ -145,19 +145,19 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="lg:col-span-5 flex items-center justify-center relative">
-          <div ref={heroImageRef} className="floating-avatar-container relative flex items-center justify-center p-12">
+        <div className="lg:col-span-5 flex items-center justify-center relative w-full overflow-hidden">
+          <div ref={heroImageRef} className="floating-avatar-container relative flex items-center justify-center p-6 sm:p-12 w-full max-w-[320px] sm:max-w-none mx-auto">
             <CircularText
               text="• Sarcastic Discord Bot • Brutal AI Companion • Event Wishes • Context Memory"
               radius={140}
               fontSize="9px"
-              className="absolute pointer-events-none scale-90 sm:scale-100 text-ds-muted opacity-80"
+              className="absolute pointer-events-none scale-75 xs:scale-90 sm:scale-100 text-ds-muted opacity-80"
               spinDuration={24}
             />
 
             <div className="absolute w-48 h-48 rounded-full bg-linear-to-tr from-ds-blurple/25 to-ds-fuchsia/20 blur-xl pointer-events-none" />
 
-            <div className="relative z-10 w-44 h-44 border border-ds-border bg-ds-card p-1 shadow-[6px_6px_0px_var(--border-shadow)]">
+            <div className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 border border-ds-border bg-ds-card p-1 shadow-[6px_6px_0px_var(--border-shadow)]">
               <img
                 src="/Icon.png"
                 alt="Tars Avatar"
