@@ -24,8 +24,8 @@
   --border-color: rgba(15, 23, 42, 0.08);
   --card-bg: rgba(255, 255, 255, 0.85);
   --card-hover-border: rgba(88, 101, 242, 0.25);
-  --dot-color: rgba(15, 23, 42, 0.05);
-  --grid-color: rgba(15, 23, 42, 0.25);
+  --dot-color: rgba(99, 102, 241, 0.04);
+  --grid-color: rgba(99, 102, 241, 0.15);
   --glass-bg: rgba(255, 255, 255, 0.4);
   --accent-color: #5865f2;
   --accent: var(--accent-color);
@@ -46,7 +46,7 @@
   --border-color: rgba(255, 255, 255, 0.08);
   --card-bg: rgba(16, 20, 30, 0.6);
   --card-hover-border: rgba(88, 101, 242, 0.4);
-  --dot-color: rgba(255, 255, 255, 0.15);
+  --dot-color: rgba(99, 102, 241, 0.15);
   --grid-color: rgba(255, 255, 255, 0.18);
   --glass-bg: rgba(9, 10, 15, 0.5);
   --accent-color: #5865f2;
