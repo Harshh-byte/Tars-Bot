@@ -166,11 +166,11 @@ export default function Hero() {
               className="scale-75 xs:scale-90 sm:scale-100 text-ds-muted opacity-80"
               spinDuration={24}
             >
-              <div className="relative w-36 h-36 sm:w-44 sm:h-44 border border-ds-border bg-ds-card p-1 shadow-[6px_6px_0px_var(--border-shadow)] pointer-events-auto">
+              <div className="relative w-52 h-52 sm:w-56 sm:h-56 rounded-full border-3 border-ds-border bg-ds-card p-1 overflow-hidden shadow-[6px_6px_0px_var(--border-shadow)] pointer-events-auto">
                 <img
                   src="/Icon.png"
                   alt="Tars Avatar"
-                  className="w-full h-full object-cover bg-black"
+                  className="w-full h-full object-cover rounded-full bg-black"
                 />
               </div>
             </CircularText>
