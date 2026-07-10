@@ -45,6 +45,15 @@ function useTypewriter(words, speed = 60, delay = 2500) {
 }
 
 export default function Hero() {
+  const [isDecrypted, setIsDecrypted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsDecrypted(true);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const phrases = [
     "The ultimate cognitive powerhouse for your Discord server.",
     "Engineered for brutal honesty and precise sarcasm.",
@@ -88,7 +97,7 @@ export default function Hero() {
       id="home"
       className="relative min-h-screen flex items-center pt-28 md:pt-36 pb-12 md:pb-16 overflow-hidden bg-ds-bg"
     >
-      <div className="absolute inset-0 z-0 opacity-40 dark:opacity-60 pointer-events-none">
+      <div className="absolute inset-0 z-0 opacity-40 dark:opacity-85 pointer-events-none">
         <Squares
           direction="diagonal"
           speed={0.4}
@@ -104,12 +113,13 @@ export default function Hero() {
         <div className="absolute bottom-8 left-8 w-12 h-12 border-b-3 border-l-3 border-ds-text"></div>
         <div className="absolute bottom-8 right-8 w-12 h-12 border-b-3 border-r-3 border-ds-text"></div>
       </div>
+      
       <div className="max-w-7xl mx-auto px-6 w-full relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         <div className="lg:col-span-7 flex flex-col items-center text-center lg:items-start lg:text-left">
 
           <h1 className="hero-title-text font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight uppercase mb-6 text-ds-text">
             Meet <br />
-            <span className="text-gradient">
+            <span className={`text-gradient ${isDecrypted ? "shiny-text animate-shine" : ""}`}>
               <DecryptedText text="TARS" speed={60} maxIterations={12} />
             </span>
           </h1>
