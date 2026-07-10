@@ -102,6 +102,10 @@ export default function Footer() {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-ds-muted">
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
             <span>&copy; {currentYear} Tars. All logic is brutal.</span>
+            <span className="hidden sm:inline text-ds-border/40">|</span>
+            <Link to="/privacy" className="hover:text-ds-text transition-colors">Privacy</Link>
+            <span className="hidden sm:inline text-ds-border/40">|</span>
+            <Link to="/terms" className="hover:text-ds-text transition-colors">Terms</Link>
           </div>
           <div className="flex items-center gap-2">
             <span>Built with</span>

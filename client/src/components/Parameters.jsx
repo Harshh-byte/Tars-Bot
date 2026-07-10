@@ -63,11 +63,11 @@ export default function Parameters() {
               spotlightColor="var(--accent-glow)"
             >
               <div className="flex items-center justify-between w-full">
-                <span className="font-display text-2xl font-black text-ds-text uppercase">
+                <span className="font-display text-xl sm:text-2xl font-black text-ds-text">
                   {param.name}
                 </span>
                 <span
-                  className="font-mono text-3xl font-bold"
+                  className="font-mono text-2xl sm:text-3xl font-bold"
                   style={{ color: param.color }}
                 >
                   {param.val}%
