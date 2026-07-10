@@ -97,7 +97,7 @@ export default function Hero() {
       id="home"
       className="relative min-h-screen flex items-center pt-28 md:pt-36 pb-12 md:pb-16 overflow-hidden bg-ds-bg"
     >
-      <div className="absolute inset-0 z-0 opacity-40 dark:opacity-85 pointer-events-none">
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{ opacity: "var(--grid-opacity)" }}>
         <Squares
           direction="diagonal"
           speed={0.4}
