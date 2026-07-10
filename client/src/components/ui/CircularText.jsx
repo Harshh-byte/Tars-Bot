@@ -6,6 +6,7 @@ export default function CircularText({
   fontSize = "10px",
   className = "",
   spinDuration = 20,
+  children,
 }) {
   const characters = text.split("");
   const angleStep = 360 / characters.length;
@@ -16,7 +17,7 @@ export default function CircularText({
       style={{ width: radius * 2, height: radius * 2 }}
     >
       <motion.div
-        className="w-full h-full relative"
+        className="w-full h-full absolute top-0 left-0"
         animate={{ rotate: 360 }}
         transition={{
           repeat: Infinity,
@@ -42,6 +43,7 @@ export default function CircularText({
           );
         })}
       </motion.div>
+      {children && <div className="relative flex items-center justify-center z-10">{children}</div>}
     </div>
   );
 }
