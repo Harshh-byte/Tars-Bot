@@ -125,7 +125,10 @@ export default function Hero() {
           </h1>
 
           <div className="hero-description-container flex items-center justify-center lg:justify-start mb-8 min-h-[4em] text-lg sm:text-xl font-mono text-ds-muted leading-relaxed max-w-xl">
-            <ShinyText text={typewriterText} className="font-mono text-ds-text" />
+            <span className="font-mono text-ds-text">
+              {typewriterText}
+              <span className="animate-[pulse_1s_infinite] font-black text-ds-text ml-0.5">|</span>
+            </span>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center lg:justify-start">
