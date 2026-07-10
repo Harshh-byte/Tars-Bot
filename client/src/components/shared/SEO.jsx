@@ -3,7 +3,7 @@ import { useEffect } from "react";
 export default function SEO({ title, description }) {
   useEffect(() => {
     const prevTitle = document.title;
-    document.title = title ? `${title} | Tars Bot` : "Tars Bot | The Savage Discord Companion";
+    document.title = title ? `${title} • Tars Bot` : "Tars Bot • The Savage Discord Companion";
 
     let metaDesc = document.querySelector('meta[name="description"]');
     let created = false;
