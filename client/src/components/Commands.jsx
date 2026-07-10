@@ -51,7 +51,7 @@ export default function Commands() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-black uppercase text-ds-text">
-            Interactive command <span className="text-gradient">directory</span>
+            Command <span className="text-gradient">Console</span>
           </h2>
         </div>
 

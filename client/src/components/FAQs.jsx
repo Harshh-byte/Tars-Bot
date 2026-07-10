@@ -10,19 +10,19 @@ export default function FAQs() {
     },
     {
       question: "How do I invite Tars to my server?",
-      answer: "Simply click the invite button on Tars' Discord profile or server settings under the App Directory. Make sure to grant the required 'Message Content' and 'Send Messages' permissions."
+      answer: "Click the 'Add to Discord' button at the top of this station. Grant the required permissions, and let Tars roast your channels."
     },
     {
       question: "Does Tars detect different languages?",
-      answer: "Absolutely. Tars automatically detects the language you speak (including casual bilingual dialects) and responds organically in that same language."
+      answer: "Absolutely. Tars automatically decodes the language you speak (including casual bilingual dialects) and responds organically in that same language."
     },
     {
       question: "How long is Tars' context memory?",
-      answer: "Up to 10 messages, allowing threads to continue logically before it chooses to clear its buffer."
+      answer: "Tars remembers up to 10 messages of conversation history per user, allowing natural contextual dialogue before clearing the buffer."
     },
     {
       question: "Can Tars roast admin roles?",
-      answer: "Tars operates on cognitive logic, not server hierarchy. Admins get roasted with the same mathematical precision as everyone else."
+      answer: "Tars operates on cognitive logic, not server hierarchy. Admins get roasted with the same math-grade precision as anyone else."
     },
     {
       question: "Can Tars express emotions visually?",
@@ -39,7 +39,7 @@ export default function FAQs() {
       <div className="max-w-4xl mx-auto px-6">
         <div className="text-center mb-8 md:mb-12">
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-black uppercase text-ds-text">
-            Frequently Asked <span className="text-gradient">Questions</span>
+            FAQ <span className="text-gradient">Database</span>
           </h2>
         </div>
 
