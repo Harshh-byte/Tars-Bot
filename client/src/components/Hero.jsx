@@ -119,7 +119,7 @@ export default function Hero() {
 
           <h1 className="hero-title-text font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight uppercase mb-6 text-ds-text">
             Meet <br />
-            <span className={`text-gradient ${isDecrypted ? "shiny-text animate-shine" : ""}`}>
+            <span className={`text-gradient text-ds-blurple ${isDecrypted ? "shiny-text animate-shine" : ""}`}>
               <DecryptedText text="TARS" speed={60} maxIterations={12} />
             </span>
           </h1>
