@@ -47,11 +47,11 @@ export default function Capabilities() {
             className="bento-card-animate md:col-span-2 custom-card flex flex-col md:flex-row gap-6 items-start"
             spotlightColor="var(--accent-glow)"
           >
-            <div className="p-3 bg-ds-bg border-2 border-ds-border select-none text-ds-blurple mb-3 md:mb-0">
+            <div className="p-3 bg-ds-bg border-2 border-ds-border select-none text-ds-blurple mb-3 md:mb-2">
               <Brain className="w-8 h-8" />
             </div>
             <div className="flex-1">
-              <h3 className="font-display text-xl font-black text-ds-text uppercase mb-3.5 md:mb-2">
+              <h3 className="font-display text-xl font-black text-ds-text uppercase mb-3.5 md:mb-1">
                 Context Retention
               </h3>
               <p className="text-ds-muted text-sm leading-relaxed font-medium">
@@ -64,11 +64,11 @@ export default function Capabilities() {
             className="bento-card-animate custom-card flex flex-col gap-6 md:gap-4 items-start"
             spotlightColor="rgba(255, 51, 51, 0.15)"
           >
-            <div className="p-3 bg-ds-bg border-2 border-ds-border select-none text-ds-red mb-1 md:mb-0">
+            <div className="p-3 bg-ds-bg border-2 border-ds-border select-none text-ds-red mb-1 md:mb-2">
               <Flame className="w-8 h-8" />
             </div>
             <div>
-              <h3 className="font-display text-xl font-black text-ds-text uppercase mb-3.5 md:mb-2">
+              <h3 className="font-display text-xl font-black text-ds-text uppercase mb-3.5 md:mb-1">
                 Savage Roasts
               </h3>
               <p className="text-ds-muted text-sm leading-relaxed font-medium">
@@ -81,11 +81,11 @@ export default function Capabilities() {
             className="bento-card-animate custom-card flex flex-col gap-6 md:gap-4 items-start"
             spotlightColor="rgba(255, 176, 0, 0.15)"
           >
-            <div className="p-3 bg-ds-bg border-2 border-ds-border select-none text-ds-yellow mb-1 md:mb-0">
+            <div className="p-3 bg-ds-bg border-2 border-ds-border select-none text-ds-yellow mb-1 md:mb-2">
               <Sliders className="w-8 h-8" />
             </div>
             <div>
-              <h3 className="font-display text-xl font-black text-ds-text uppercase mb-3.5 md:mb-2">
+              <h3 className="font-display text-xl font-black text-ds-text uppercase mb-3.5 md:mb-1">
                 Tone Adjuster
               </h3>
               <p className="text-ds-muted text-sm leading-relaxed font-medium">
@@ -98,11 +98,11 @@ export default function Capabilities() {
             className="bento-card-animate md:col-span-2 custom-card flex flex-col md:flex-row gap-6 items-start"
             spotlightColor="rgba(0, 119, 170, 0.15)"
           >
-            <div className="p-3 bg-ds-bg border-2 border-ds-border select-none text-ds-fuchsia mb-3 md:mb-0">
+            <div className="p-3 bg-ds-bg border-2 border-ds-border select-none text-ds-fuchsia mb-3 md:mb-2">
               <Gift className="w-8 h-8" />
             </div>
             <div className="flex-1">
-              <h3 className="font-display text-xl font-black text-ds-text uppercase mb-3.5 md:mb-2">
+              <h3 className="font-display text-xl font-black text-ds-text uppercase mb-3.5 md:mb-1">
                 Premium Wishes
               </h3>
               <p className="text-ds-muted text-sm leading-relaxed font-medium">
