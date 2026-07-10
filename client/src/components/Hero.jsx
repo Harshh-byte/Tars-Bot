@@ -147,23 +147,23 @@ export default function Hero() {
 
         <div className="lg:col-span-5 flex items-center justify-center relative w-full overflow-hidden">
           <div ref={heroImageRef} className="floating-avatar-container relative flex items-center justify-center p-6 sm:p-12 w-full max-w-[320px] sm:max-w-none mx-auto">
+            <div className="absolute w-48 h-48 rounded-full bg-linear-to-tr from-ds-blurple/25 to-ds-fuchsia/20 blur-xl pointer-events-none" />
+
             <CircularText
               text="• Sarcastic Discord Bot • Brutal AI Companion • Event Wishes • Context Memory"
               radius={140}
               fontSize="9px"
-              className="absolute pointer-events-none scale-75 xs:scale-90 sm:scale-100 text-ds-muted opacity-80"
+              className="scale-75 xs:scale-90 sm:scale-100 text-ds-muted opacity-80"
               spinDuration={24}
-            />
-
-            <div className="absolute w-48 h-48 rounded-full bg-linear-to-tr from-ds-blurple/25 to-ds-fuchsia/20 blur-xl pointer-events-none" />
-
-            <div className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 border border-ds-border bg-ds-card p-1 shadow-[6px_6px_0px_var(--border-shadow)]">
-              <img
-                src="/Icon.png"
-                alt="Tars Avatar"
-                className="w-full h-full object-cover bg-black"
-              />
-            </div>
+            >
+              <div className="relative w-36 h-36 sm:w-44 sm:h-44 border border-ds-border bg-ds-card p-1 shadow-[6px_6px_0px_var(--border-shadow)] pointer-events-auto">
+                <img
+                  src="/Icon.png"
+                  alt="Tars Avatar"
+                  className="w-full h-full object-cover bg-black"
+                />
+              </div>
+            </CircularText>
           </div>
         </div>
       </div>
