@@ -1,53 +1,62 @@
 import { useState } from "react";
 
+const commands = [
+  {
+    trigger: "/roast [user]",
+    category: "ai",
+    title: "Contextual Roasting",
+    description:
+      "Calculates a customized, sarcastic response based on user variables and past message records.",
+    badge: "Slash",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/wish [user] [event]",
+    category: "ai",
+    title: "Premium Wishes",
+    description:
+      "Formulates high-end congratulations for birthdays, achievements, or customized occasions.",
+    badge: "Slash",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/ping",
+    category: "util",
+    title: "Gateway Diagnostics",
+    description:
+      "Performs diagnostics check on the server connection, returning ping latency and active uptime.",
+    badge: "Utility",
+    badgeColor: "text-ds-green bg-ds-green/10",
+  },
+  {
+    trigger: "/about",
+    category: "util",
+    title: "Cognitive Parameters",
+    description:
+      "Fetches and lists current system attributes (humor quotient, honesty degree) and dev credits.",
+    badge: "Utility",
+    badgeColor: "text-ds-green bg-ds-green/10",
+  },
+];
+
+const categories = [
+  { value: "all", label: "All" },
+  { value: "ai", label: "Slash Commands" },
+  { value: "util", label: "Utility Tools" },
+];
+
 export default function Commands() {
   const [activeCategory, setActiveCategory] = useState("all");
 
-  const commands = [
-    {
-      trigger: "/roast [user]",
-      category: "ai",
-      title: "Contextual Roasting",
-      description:
-        "Calculates a customized, sarcastic response based on user variables and past message records.",
-      badge: "Slash",
-      badgeColor: "text-ds-blurple bg-ds-blurple/10",
-    },
-    {
-      trigger: "/wish [user] [event]",
-      category: "ai",
-      title: "Premium Wishes",
-      description:
-        "Formulates high-end congratulations for birthdays, achievements, or customized occasions.",
-      badge: "Slash",
-      badgeColor: "text-ds-blurple bg-ds-blurple/10",
-    },
-    {
-      trigger: "/ping",
-      category: "util",
-      title: "Gateway Diagnostics",
-      description:
-        "Performs diagnostics check on the server connection, returning ping latency and active uptime.",
-      badge: "Utility",
-      badgeColor: "text-ds-green bg-ds-green/10",
-    },
-    {
-      trigger: "/about",
-      category: "util",
-      title: "Cognitive Parameters",
-      description:
-        "Fetches and lists current system attributes (humor quotient, honesty degree) and dev credits.",
-      badge: "Utility",
-      badgeColor: "text-ds-green bg-ds-green/10",
-    },
-  ];
-
   const filteredCommands = commands.filter(
-    (cmd) => activeCategory === "all" || cmd.category === activeCategory
+    (cmd) => activeCategory === "all" || cmd.category === activeCategory,
   );
 
   return (
-    <section id="commands" className="py-16 md:py-20 lg:py-24 relative z-10 border-t border-ds-border reveal">
+    <section
+      id="commands"
+      className="py-16 md:py-20 lg:py-24 relative z-10 border-t border-ds-border reveal"
+    >
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-black uppercase text-ds-text">
@@ -55,48 +64,42 @@ export default function Commands() {
           </h2>
         </div>
 
-        <div className="flex justify-center gap-3 flex-wrap mb-8">
-          <button
-            onClick={() => setActiveCategory("all")}
-            className={`px-4 py-2.5 sm:px-6 sm:py-3 rounded-full border text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
-              activeCategory === "all"
-                ? "border-ds-blurple/50 bg-ds-blurple/10 text-ds-blurple shadow-[0_0_20px_rgba(88,101,242,0.15)]"
-                : "border-ds-border text-ds-muted hover:text-ds-text hover:bg-white/5"
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setActiveCategory("ai")}
-            className={`px-4 py-2.5 sm:px-6 sm:py-3 rounded-full border text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
-              activeCategory === "ai"
-                ? "border-ds-blurple/50 bg-ds-blurple/10 text-ds-blurple shadow-[0_0_20px_rgba(88,101,242,0.15)]"
-                : "border-ds-border text-ds-muted hover:text-ds-text hover:bg-white/5"
-            }`}
-          >
-            Slash Commands
-          </button>
-          <button
-            onClick={() => setActiveCategory("util")}
-            className={`px-4 py-2.5 sm:px-6 sm:py-3 rounded-full border text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
-              activeCategory === "util"
-                ? "border-ds-blurple/50 bg-ds-blurple/10 text-ds-blurple shadow-[0_0_20px_rgba(88,101,242,0.15)]"
-                : "border-ds-border text-ds-muted hover:text-ds-text hover:bg-white/5"
-            }`}
-          >
-            Utility Tools
-          </button>
+        <div
+          role="group"
+          aria-label="Filter commands by category"
+          className="flex justify-center gap-3 flex-wrap mb-8"
+        >
+          {categories.map((cat) => {
+            const isActive = activeCategory === cat.value;
+            return (
+              <button
+                key={cat.value}
+                type="button"
+                data-cursor="link"
+                aria-pressed={isActive}
+                onClick={() => setActiveCategory(cat.value)}
+                className={`px-4 py-2.5 sm:px-6 sm:py-3 rounded-full border text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ds-blurple ${
+                  isActive
+                    ? "border-ds-blurple/50 bg-ds-blurple/10 text-ds-blurple shadow-[0_0_20px_rgba(88,101,242,0.15)]"
+                    : "border-ds-border text-ds-muted hover:text-ds-text hover:bg-ds-border/60"
+                }`}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCommands.map((cmd, idx) => (
+          {filteredCommands.map((cmd) => (
             <div
-              key={idx}
+              key={cmd.trigger}
+              data-cursor="code"
               className="custom-card flex flex-col justify-between min-h-[220px]"
             >
               <div>
                 <div className="flex justify-between items-center mb-6">
-                  <code className="text-ds-text font-mono bg-white/5 px-2.5 py-1 rounded text-xs font-bold border border-ds-border">
+                  <code className="text-ds-text font-mono bg-ds-border/50 px-2.5 py-1 rounded text-xs font-bold border border-ds-border">
                     {cmd.trigger}
                   </code>
                   <span

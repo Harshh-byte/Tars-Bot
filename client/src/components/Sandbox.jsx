@@ -119,7 +119,7 @@ export default function Sandbox() {
   ];
 
   return (
-    <section id="sandbox" className="py-12 md:py-16 lg:py-20 relative z-10 border-t border-ds-border reveal">
+    <section id="sandbox" data-cursor="terminal" className="py-12 md:py-16 lg:py-20 relative z-10 border-t border-ds-border reveal">
       <div className="max-w-4xl mx-auto px-6">
         <div className="text-center mb-8 md:mb-12">
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-black uppercase text-ds-text">
@@ -234,7 +234,7 @@ export default function Sandbox() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               disabled={isTyping}
-              placeholder="Message #🛰️︲tars-hub..."
+              placeholder="Message #⌚︲tars-hub..."
               className="flex-1 px-4 py-3 bg-ds-card border border-ds-border/70 rounded-xl text-sm font-medium text-ds-text placeholder:text-ds-muted focus:outline-none focus:border-ds-blurple/60 transition-all font-body disabled:opacity-50"
             />
             <button
