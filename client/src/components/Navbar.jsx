@@ -40,10 +40,10 @@ export default function Navbar({ theme, onToggleTheme }) {
             <img
               src="/Icon.png"
               alt="Tars Logo"
-              className="w-10 h-10 rounded-xl bg-black border border-black p-0.5 shadow-sm group-hover:scale-105 group-hover:rotate-3 transition-all duration-300"
+              className="w-10 h-10 rounded-none bg-black border border-ds-text p-0.5"
             />
-            <span className="font-display font-extrabold text-xl tracking-tight text-ds-text">
-              Tars.
+            <span className="font-display font-extrabold text-xl tracking-wider text-ds-text">
+              Tars<span className="text-ds-blurple">.</span>
             </span>
           </a>
 
@@ -84,6 +84,7 @@ export default function Navbar({ theme, onToggleTheme }) {
 
           <div className="hidden md:flex items-center gap-4">
             <button
+              data-cursor="theme"
               onClick={onToggleTheme}
               className={`theme-toggle-btn w-10 h-10 rounded-full border border-ds-border bg-ds-card/85 backdrop-blur-md flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-ds-text hover:bg-ds-border shadow-sm relative overflow-hidden active:scale-95 ${
                 theme === "dark" ? "dark-active" : ""
@@ -123,8 +124,15 @@ export default function Navbar({ theme, onToggleTheme }) {
             <a
               href="https://discord.com/users/569766329960103941"
               className="btn-primary flex items-center justify-center gap-2.5"
+              data-cursor="code"
             >
-              <svg className="w-4 h-4 fill-none stroke-current shrink-0" strokeWidth="2.5" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                className="w-4 h-4 fill-none stroke-current shrink-0"
+                strokeWidth="2.5"
+                viewBox="0 0 24 24"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="16 18 22 12 16 6"></polyline>
                 <polyline points="8 6 2 12 8 18"></polyline>
               </svg>
@@ -134,8 +142,9 @@ export default function Navbar({ theme, onToggleTheme }) {
 
           <div className="flex items-center gap-3 md:hidden">
             <button
+              data-cursor="theme"
               onClick={onToggleTheme}
-              className={`theme-toggle-btn w-9 h-9 rounded-full border border-ds-border bg-ds-card/85 flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-ds-text active:scale-95 ${
+              className={`theme-toggle-btn w-9 h-9 rounded-full border bg-ds-card/85 flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-ds-text active:scale-95 ${
                 theme === "dark" ? "dark-active" : ""
               }`}
               aria-label="Toggle theme"
@@ -242,8 +251,15 @@ export default function Navbar({ theme, onToggleTheme }) {
         <a
           href="https://discord.com/users/569766329960103941"
           className="btn-primary w-4/5 mt-6 flex items-center justify-center gap-2.5"
+          data-cursor="code"
         >
-          <svg className="w-4 h-4 fill-none stroke-current shrink-0" strokeWidth="2.5" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className="w-4 h-4 fill-none stroke-current shrink-0"
+            strokeWidth="2.5"
+            viewBox="0 0 24 24"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <polyline points="16 18 22 12 16 6"></polyline>
             <polyline points="8 6 2 12 8 18"></polyline>
           </svg>

@@ -10,11 +10,18 @@ export default function Privacy() {
 
   return (
     <div className="min-h-screen bg-ds-bg text-ds-text font-mono flex flex-col">
-      <SEO title="Privacy Policy" description="How we handle your data and privacy parameters at Tars Bot." />
+      <SEO
+        title="Privacy Policy"
+        description="How we handle your data and privacy parameters at Tars Bot."
+      />
       <header className="border-b-3 border-ds-border py-4 px-6 bg-ds-card/85 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2.5">
+            <Link
+              to="/"
+              data-cursor="link"
+              className="flex items-center gap-2.5 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ds-blurple"
+            >
               <img
                 src="/Icon.png"
                 alt="Tars Logo"
@@ -29,10 +36,11 @@ export default function Privacy() {
               Privacy Policy
             </span>
           </div>
-          
+
           <Link
             to="/"
-            className="text-xs font-bold text-ds-muted hover:text-ds-text transition-colors tracking-wider"
+            data-cursor="link"
+            className="text-xs font-bold text-ds-muted hover:text-ds-text transition-colors tracking-wider rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ds-blurple"
           >
             Back to Home
           </Link>
@@ -47,71 +55,82 @@ export default function Privacy() {
         </header>
 
         <div className="space-y-10 leading-relaxed text-base">
-          <section className="custom-card border-2 border-ds-border p-6 bg-ds-card/45 shadow-[4px_4px_0px_var(--border-shadow)]">
+          <section className="custom-card border-2 border-ds-border p-6 bg-ds-card/45 shadow-[4px_4px_0px_var(--border-color)]">
             <h2 className="text-xl font-display font-bold text-ds-text uppercase mb-4 flex items-center gap-2">
               <span className="text-ds-blurple">01.</span> Data Collection
             </h2>
             <p className="text-ds-muted mb-4">
-              Tars only collects the minimal scope of metrics required to execute
-              bot prompts and maintain standard quality operations:
+              Tars only collects the minimal scope of metrics required to
+              execute bot prompts and maintain standard quality operations:
             </p>
             <ul className="list-none pl-4 space-y-2 text-sm">
               <li className="flex items-center gap-2">
-                <span className="text-ds-fuchsia font-bold">&gt;&gt;</span>{" "}
+                <span className="text-ds-fuchsia font-bold" aria-hidden="true">
+                  &gt;&gt;
+                </span>{" "}
                 Discord User IDs (for tracking author configurations)
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-ds-fuchsia font-bold">&gt;&gt;</span> Server
-                IDs (for saving channel settings)
+                <span className="text-ds-fuchsia font-bold" aria-hidden="true">
+                  &gt;&gt;
+                </span>{" "}
+                Server IDs (for saving channel settings)
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-ds-fuchsia font-bold">&gt;&gt;</span>{" "}
+                <span className="text-ds-fuchsia font-bold" aria-hidden="true">
+                  &gt;&gt;
+                </span>{" "}
                 Configured Settings (e.g. customized role names)
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-ds-fuchsia font-bold">&gt;&gt;</span>{" "}
+                <span className="text-ds-fuchsia font-bold" aria-hidden="true">
+                  &gt;&gt;
+                </span>{" "}
                 Latency Logs (for internal performance profiling)
               </li>
             </ul>
           </section>
 
-          <section className="custom-card border-2 border-ds-border p-6 bg-ds-card/45 shadow-[4px_4px_0px_var(--border-shadow)]">
+          <section className="custom-card border-2 border-ds-border p-6 bg-ds-card/45 shadow-[4px_4px_0px_var(--border-color)]">
             <h2 className="text-xl font-display font-bold text-ds-text uppercase mb-4 flex items-center gap-2">
               <span className="text-ds-blurple">02.</span> Retention & Purging
             </h2>
             <p className="text-ds-muted">
-              All transient chat contexts (used for calculating roasts and wishes)
-              are held exclusively in short-term RAM buffers and automatically
-              purged. Persistent database storage is strictly reserved for
-              user/guild configurations and is deleted after six months of
-              consecutive server inactivity.
+              All transient chat contexts (used for calculating roasts and
+              wishes) are held exclusively in short-term RAM buffers and
+              automatically purged. Persistent database storage is strictly
+              reserved for user/guild configurations and is deleted after six
+              months of consecutive server inactivity.
             </p>
           </section>
 
-          <section className="custom-card border-2 border-ds-border p-6 bg-ds-card/45 shadow-[4px_4px_0px_var(--border-shadow)]">
+          <section className="custom-card border-2 border-ds-border p-6 bg-ds-card/45 shadow-[4px_4px_0px_var(--border-color)]">
             <h2 className="text-xl font-display font-bold text-ds-text uppercase mb-4 flex items-center gap-2">
-              <span className="text-ds-blurple">03.</span> Third-Party Boundaries
+              <span className="text-ds-blurple">03.</span> Third-Party
+              Boundaries
             </h2>
             <p className="text-ds-muted">
               Tars executes commands through the official Discord API.
-              Consequently, all communications are subject to Discord's Developer
-              Terms and Privacy Protocols. We never sell, exchange, or rent server
-              statistics to outer third parties.
+              Consequently, all communications are subject to Discord's
+              Developer Terms and Privacy Protocols. We never sell, exchange, or
+              rent server statistics to outer third parties.
             </p>
           </section>
 
-          <section className="custom-card border-2 border-ds-border p-6 bg-ds-card/45 shadow-[4px_4px_0px_var(--border-shadow)]">
+          <section className="custom-card border-2 border-ds-border p-6 bg-ds-card/45 shadow-[4px_4px_0px_var(--border-color)]">
             <h2 className="text-xl font-display font-bold text-ds-text uppercase mb-4 flex items-center gap-2">
               <span className="text-ds-blurple">04.</span> Inquiries
             </h2>
             <p className="text-ds-muted">
               For access requests, compliance tickets, or standard data purge
-              official support channel.
+              requests, please reach out through our official support channel.
             </p>
           </section>
 
           <section className="pt-8 border-t border-ds-border/40 mt-8">
-            <p className="text-sm font-medium text-ds-muted">Last Updated: July 2026</p>
+            <p className="text-sm font-medium text-ds-muted">
+              Last Updated: July 2026
+            </p>
           </section>
         </div>
       </main>
