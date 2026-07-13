@@ -1,18 +1,42 @@
-import { Events } from "discord.js";
+import { Events, MessageFlags, EmbedBuilder } from "discord.js";
 import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 
 export const name = Events.InteractionCreate;
 
+function getFormattedDateTime() {
+  const now = new Date();
+  const options = { timeZone: "Asia/Kolkata" };
+  const localDate = new Date(now.toLocaleString("en-US", options));
+  const day = localDate.getDate();
+  const month = localDate.getMonth() + 1;
+  const year = String(localDate.getFullYear()).slice(-2);
+  const dateStr = `${day}/${month}/${year}`;
+
+  const timeStr = new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(now);
+  return `${dateStr} • ${timeStr}`;
+}
+
 export async function execute(interaction, client, context) {
   if (!interaction.isChatInputCommand()) return;
 
-  const musicCommands = ["play", "skip", "volume", "stop"];
+  if (client.maintenanceMode && interaction.user.id !== process.env.OWNER_ID) {
+    const maintenanceEmbed = new EmbedBuilder()
+      .setColor(0xffa502)
+      .setTitle("<:Warning:1526228248458035381>  **System Maintenance**")
+      .setDescription(
+        "Tars is currently undergoing scheduled maintenance and will be back online shortly.",
+      )
+      .setFooter({ text: getFormattedDateTime() });
 
-  if (musicCommands.includes(interaction.commandName)) {
     return interaction.reply({
-      content: `🎵 The \`/${interaction.commandName}\` feature is currently under maintenance.`,
-      ephemeral: true,
+      embeds: [maintenanceEmbed],
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -29,7 +53,7 @@ export async function execute(interaction, client, context) {
 
     const payload = {
       content: "An unexpected error occurred while executing this command.",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     };
 
     if (interaction.deferred || interaction.replied) {

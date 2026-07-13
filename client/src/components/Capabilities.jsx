@@ -13,7 +13,7 @@ const capabilities = [
     description:
       "Unlike simple reply bots, Tars maintains context up to 10 messages deep, naturally tracking the flow of conversations and remembering past roasts.",
     iconColor: "text-ds-blurple",
-    spotlightColor: "var(--accent-glow)",
+    spotlightColor: "rgba(88, 101, 242, 0.15)",
     span: true,
   },
   {

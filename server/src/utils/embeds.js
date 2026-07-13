@@ -20,22 +20,24 @@ export function infoEmbed({
   return embed;
 }
 export function successEmbed({ title = "Success", description, fields = [] }) {
-  const embed = new EmbedBuilder().setColor(0x57f287).setTitle(`✅ ${title}`);
+  const embed = new EmbedBuilder()
+    .setColor(0x2ecc71)
+    .setTitle(`<:Success:1526228339910643793> **${title}**`);
   if (description) embed.setDescription(description);
   if (fields.length) embed.addFields(fields);
   return embed;
 }
 export function errorEmbed({ title = "Something went wrong", description }) {
   return new EmbedBuilder()
-    .setColor(0xed4245)
-    .setTitle(`❌ ${title}`)
+    .setColor(0xff4757)
+    .setTitle(`<:Failed:1526228290413658184> **${title}**`)
     .setDescription(
       description ?? "An unexpected error occurred. Please try again later.",
     );
 }
 export function warningEmbed({ title = "Warning", description }) {
   return new EmbedBuilder()
-    .setColor(0xfee75c)
-    .setTitle(`⚠️ ${title}`)
+    .setColor(0xffa502)
+    .setTitle(`<:Warning:1526228248458035381> **${title}**`)
     .setDescription(description);
 }

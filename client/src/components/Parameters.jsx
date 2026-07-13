@@ -7,18 +7,21 @@ const params = [
     name: "Honesty",
     val: 90,
     color: "var(--color-ds-blurple)",
+    spotlight: "rgba(88, 101, 242, 0.15)",
     desc: "Brutally honest. Zero fluff or fake affirmations.",
   },
   {
     name: "Humor",
     val: 75,
     color: "var(--color-ds-fuchsia)",
+    spotlight: "rgba(235, 69, 158, 0.15)",
     desc: "Sarcastic, dry, and sharp responses.",
   },
   {
     name: "Discretion",
     val: 10,
     color: "var(--color-ds-red)",
+    spotlight: "rgba(237, 66, 69, 0.15)",
     desc: "Will hold absolutely nothing back if provoked.",
   },
 ];
@@ -85,7 +88,7 @@ export default function Parameters() {
             <SpotlightCard
               key={param.name}
               className="param-card-animate custom-card flex flex-col gap-5"
-              spotlightColor="var(--accent-glow)"
+              spotlightColor={param.spotlight}
             >
               <div className="flex items-center justify-between w-full">
                 <span className="font-display text-xl sm:text-2xl font-black text-ds-text">

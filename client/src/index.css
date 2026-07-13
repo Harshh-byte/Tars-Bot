@@ -251,8 +251,8 @@ body {
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 999999;
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -260,13 +260,13 @@ body {
 }
 
 .cursor-single-dot {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   border-radius: 999px;
   background: #5865f2;
   box-shadow:
-    0 0 12px rgba(88, 101, 242, 0.55),
-    0 0 26px rgba(88, 101, 242, 0.28);
+    0 0 16px rgba(88, 101, 242, 0.55),
+    0 0 32px rgba(88, 101, 242, 0.28);
   transition: 0.18s;
 }
 

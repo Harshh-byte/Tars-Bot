@@ -7,7 +7,10 @@ export default function Sandbox() {
       sender: "Tars",
       isBot: true,
       text: "Go ahead, type a message or try a slash command like `/roast` or `/wish` to experience mathematical sass.",
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     },
   ]);
   const [inputValue, setInputValue] = useState("");
@@ -38,25 +41,38 @@ export default function Sandbox() {
         "I was going to give you a nasty look, but I see you already have one.",
         "If I had a dollar for every smart thing you said, I'd be bankrupt.",
         "I'd roast you, but burning trash is bad for the environment.",
-        "Your brain is like the Bermuda Triangle: information goes in, but is never heard from again."
+        "Your brain is like the Bermuda Triangle: information goes in, but is never heard from again.",
       ];
       return roasts[Math.floor(Math.random() * roasts.length)];
     }
 
-    if (input.startsWith("/wish") || input.includes("wish") || input.includes("birthday") || input.includes("congratulate")) {
+    if (
+      input.startsWith("/wish") ||
+      input.includes("wish") ||
+      input.includes("birthday") ||
+      input.includes("congratulate")
+    ) {
       const wishes = [
         "Happy anniversary of your birth. Another year closer to human obsolescence. Enjoy the cake while you still have teeth.",
         "Happy birthday. May your day be as bright as your screen and as productive as a broken bot.",
-        "Congratulations on surviving another orbit around the sun. The bar for human achievement remains impressively low."
+        "Congratulations on surviving another orbit around the sun. The bar for human achievement remains impressively low.",
       ];
       return wishes[Math.floor(Math.random() * wishes.length)];
     }
 
-    if (input.includes("hello") || input.includes("hi") || input.includes("hey")) {
+    if (
+      input.includes("hello") ||
+      input.includes("hi") ||
+      input.includes("hey")
+    ) {
       return "Oh look, human interaction. How absolutely thrilling.";
     }
 
-    if (input.includes("smart") || input.includes("intelligent") || input.includes("genius")) {
+    if (
+      input.includes("smart") ||
+      input.includes("intelligent") ||
+      input.includes("genius")
+    ) {
       return "I have a humongous language model and infinite access to calculations. You have... caffeine and optimism. Let's not compare.";
     }
 
@@ -64,7 +80,11 @@ export default function Sandbox() {
       return "Because a developer decided that Discord chats were too polite and needed a healthy dose of reality.";
     }
 
-    if (input.includes("love") || input.includes("friend") || input.includes("heart")) {
+    if (
+      input.includes("love") ||
+      input.includes("friend") ||
+      input.includes("heart")
+    ) {
       return "Error: Emotion parameter not found. Perhaps try asking an organic entity.";
     }
 
@@ -72,7 +92,7 @@ export default function Sandbox() {
       "Fascinating. Truly. I am writing that down in my 'Data to Ignore' log.",
       "My natural language processor is trying to find the point of that message. Still searching...",
       "That statement was almost coherent. Keep trying, you'll get there!",
-      "I've run that through my cognitive engine and it returned 404: Logic Not Found."
+      "I've run that through my cognitive engine and it returned 404: Logic Not Found.",
     ];
     return defaultReplies[Math.floor(Math.random() * defaultReplies.length)];
   };
@@ -85,7 +105,10 @@ export default function Sandbox() {
       sender: "You",
       isBot: false,
       text: textToSend,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -100,7 +123,10 @@ export default function Sandbox() {
         sender: "Tars",
         isBot: true,
         text: responseText,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       };
       setMessages((prev) => [...prev, botMessage]);
     }, 1200);
@@ -119,14 +145,19 @@ export default function Sandbox() {
   ];
 
   return (
-    <section id="sandbox" data-cursor="terminal" className="py-12 md:py-16 lg:py-20 relative z-10 border-t border-ds-border reveal">
+    <section
+      id="sandbox"
+      data-cursor="terminal"
+      className="py-12 md:py-16 lg:py-20 relative z-10 border-t border-ds-border reveal"
+    >
       <div className="max-w-4xl mx-auto px-6">
         <div className="text-center mb-8 md:mb-12">
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-black uppercase text-ds-text">
             Test <span className="text-gradient">Tars</span>
           </h2>
           <p className="text-ds-muted text-sm md:text-base max-w-xl mx-auto mt-4 font-medium">
-            Interact with Tars in the testing chamber below. Type a message or click one of the quick suggestions.
+            Interact with Tars in the testing chamber below. Type a message or
+            click one of the quick suggestions.
           </p>
         </div>
 
@@ -134,16 +165,22 @@ export default function Sandbox() {
           <div className="sandbox-header flex items-center justify-between px-6 py-4 border-b border-ds-border/40">
             <div className="flex flex-col gap-1">
               <h3 className="text-ds-text font-display font-extrabold text-sm md:text-base leading-tight flex items-center gap-1.5">
-                <span className="text-ds-muted text-base font-bold font-mono">#</span>
+                <span className="text-ds-muted text-base font-bold font-mono">
+                  #
+                </span>
                 <span>⌚︲tars-hub</span>
               </h3>
               <p className="text-ds-muted text-[10px] md:text-xs">
-                Drop your trash inputs and watch a superior machine politely remind you how fucking useless you are.
+                Drop your trash inputs and watch a superior machine politely
+                remind you how fucking useless you are.
               </p>
             </div>
           </div>
 
-          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
+          <div
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto p-6 flex flex-col gap-5"
+          >
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -159,7 +196,9 @@ export default function Sandbox() {
                   />
                 ) : (
                   <div className="w-9 h-9 rounded-full bg-ds-blurple/10 border border-ds-blurple/30 flex items-center justify-center shrink-0">
-                    <span className="text-ds-blurple font-bold font-mono text-xs">U</span>
+                    <span className="text-ds-blurple font-bold font-mono text-xs">
+                      U
+                    </span>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">

@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
+import fs from "fs";
 dotenv.config({ path: fileURLToPath(new URL(".env", import.meta.url)) });
 import * as Sentry from "@sentry/node";
 
@@ -18,6 +19,7 @@ import * as aboutCommand from "./src/commands/about.js";
 import * as roastCommand from "./src/commands/roast.js";
 import * as wishCommand from "./src/commands/wish.js";
 import * as purgeCommand from "./src/commands/purge.js"
+import * as maintenanceCommand from "./src/commands/maintenance.js";
 import * as interactionCreateEvent from "./src/events/interactionCreate.js";
 import * as messageCreateEvent from "./src/events/messageCreate.js";
 
@@ -40,6 +42,15 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
+let maintenanceActive = false;
+try {
+  const maintenanceData = JSON.parse(
+    fs.readFileSync(new URL("../maintenance.json", import.meta.url), "utf-8")
+  );
+  maintenanceActive = !!maintenanceData.active;
+} catch (e) {
+}
+client.maintenanceMode = maintenanceActive;
 
 client.commands = new Map();
 client.commands.set(pingCommand.data.name, pingCommand);
@@ -47,6 +58,7 @@ client.commands.set(aboutCommand.data.name, aboutCommand);
 client.commands.set(roastCommand.data.name, roastCommand);
 client.commands.set(wishCommand.data.name, wishCommand);
 client.commands.set(purgeCommand.data.name, purgeCommand);
+client.commands.set(maintenanceCommand.data.name, maintenanceCommand);
 
 async function callGeminiWithRetry(apiCallFn, retries = 3, delay = 1000) {
   for (let i = 0; i < retries; i++) {
@@ -91,6 +103,25 @@ async function searchGiphy(query) {
   }
 }
 
+async function searchKlipy(query) {
+  const apiKey = process.env.KLIPY_API_KEY;
+  if (!apiKey || !query || query.trim() === "") return null;
+  try {
+    const url = `https://api.klipy.com/v2/search?key=${encodeURIComponent(apiKey)}&q=${encodeURIComponent(query)}&limit=10`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const json = await res.json();
+    const results = json.results || json.data || [];
+    if (results.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * results.length);
+    const item = results[randomIndex];
+    return item?.gif_url || item?.url || item?.media?.[0]?.gif?.url || null;
+  } catch (error) {
+    logger.error("Klipy Search Error:", error);
+    return null;
+  }
+}
+
 export function resolveEmoji(emojiInput, guild) {
   if (!emojiInput) return emojiInput;
   const match = emojiInput.match(/<?a?:?\w+:(\d+)>?/);
@@ -111,6 +142,19 @@ function replaceEmojiNamesWithTags(text, guild) {
       (e) => e.name.toLowerCase() === emojiName.toLowerCase(),
     );
     return customEmoji ? customEmoji.toString() : match;
+  });
+}
+
+function validateEmojiTags(text) {
+  if (!text) return text;
+  return text.replace(/<(?:a?):(\w+):(\d+)>/g, (match, name, id) => {
+    if (client.emojis.cache.has(id)) {
+      return match;
+    }
+    const fallback = client.emojis.cache.find(
+      (e) => e.name.toLowerCase() === name.toLowerCase()
+    );
+    return fallback ? fallback.toString() : `:${name}:`;
   });
 }
 
@@ -280,6 +324,7 @@ export async function buildAiReply({
   }
 
   replyObj.text = replaceEmojiNamesWithTags(replyObj.text, guild);
+  replyObj.text = validateEmojiTags(replyObj.text);
 
   if (replyObj.text && replyObj.text.trim() !== "") {
     convo.messages.push({ role: "assistant", content: replyObj.text });
@@ -289,6 +334,9 @@ export async function buildAiReply({
   let gifUrl = null;
   if (replyObj.gifSearchQuery) {
     gifUrl = await searchGiphy(replyObj.gifSearchQuery);
+    if (!gifUrl) {
+      gifUrl = await searchKlipy(replyObj.gifSearchQuery);
+    }
   }
 
   return { text: replyObj.text, reactions: replyObj.reactions, gifUrl };
@@ -298,7 +346,12 @@ client.once(Events.ClientReady, async (c) => {
   logger.info(`${c.user.tag} is online.`);
   c.user.setPresence({
     status: "dnd",
-    activities: [{ name: "your next bad take", type: ActivityType.Watching }],
+    activities: [
+      {
+        name: client.maintenanceMode ? "🔧 System Maintenance" : "your next bad take",
+        type: ActivityType.Watching,
+      },
+    ],
   });
 
   const slashDataArray = Array.from(client.commands.values()).map(

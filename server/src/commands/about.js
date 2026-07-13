@@ -1,11 +1,11 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
 import { infoEmbed } from "../utils/embeds.js";
 export const data = {
   name: "about",
   description: "View information about the bot.",
   dm_permission: false,
 };
-export async function execute(interaction, client, BOT_INFO) {
+export async function execute(interaction, client, { BOT_INFO }) {
   const botAvatar = client.user.displayAvatarURL({
     extension: "png",
     size: 512,
@@ -29,14 +29,14 @@ export async function execute(interaction, client, BOT_INFO) {
       iconURL: botAvatar,
     },
     description:
-      "🇵​🇱​🇪​🇳​🇹​🇾​ 🇴​🇫​ 🇭​🇺​🇲​🇦​🇳​🇸​ 🇴​🇺​🇹​ 🇹​🇭​🇪​🇷​🇪​, 🇧​🇺​🇹​ 🇩​🇴​🇼​🇳​ 🇭​🇪​🇷​🇪​ 🇮​🇹​’🇸​ 🇯​🇺​🇸​🇹​ 🇺​🇸​.\n\n" +
+      "ᴘʟᴇɴᴛʏ ᴏꜰ ʜᴜᴍᴀɴꜱ ᴏᴜᴛ ᴛʜᴇʀᴇ, ʙᴜᴛ ᴅᴏᴡɴ ʜᴇʀᴇ ɪᴛ'ꜱ ᴊᴜꜱᴛ ᴜꜱ.\n\n" +
       "Hey, I'm **Tars**!\n" +
       "*A sarcasm-packed AI companion ready to roast or wish on demand.*",
     thumbnail: botAvatar,
     footer: `v${BOT_INFO.version} • Built with discord.js`,
     fields: [
       {
-        name: "<a:taptap:1483539885460815914> Bot Diagnostics",
+        name: "<a:TapTap:1526235921643737219> Bot Diagnostics",
         value:
           `• **Active Servers:** \`${serverCount}\`\n` +
           `• **Users Monitored:** \`${totalMembers.toLocaleString()}\`\n` +
@@ -52,12 +52,13 @@ export async function execute(interaction, client, BOT_INFO) {
       .setURL(inviteUrl),
     new ButtonBuilder()
       .setLabel("Developer")
+      .setEmoji("1526228198621184000")
       .setStyle(ButtonStyle.Link)
-      .setURL("https://discord.com/users/${process.env.OWNER_ID}"),
+      .setURL(`https://discord.com/users/${process.env.OWNER_ID}`),
   );
   return interaction.reply({
     embeds: [embed],
     components: [row],
-    ephemeral: true,
+    flags: MessageFlags.Ephemeral,
   });
 }

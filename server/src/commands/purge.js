@@ -3,6 +3,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
+  MessageFlags,
 } from "discord.js";
 import { deleteUserData, deleteServerData } from "../services/database.js";
 import { successEmbed, warningEmbed, errorEmbed } from "../utils/embeds.js";
@@ -40,7 +41,7 @@ export async function execute(interaction) {
           description: "Only the bot owner can use this command.",
         }),
       ],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
   const subcommand = interaction.options.getSubcommand();
@@ -56,7 +57,7 @@ export async function execute(interaction) {
             title: "Unknown Subcommand",
           }),
         ],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
   }
 }
@@ -90,7 +91,7 @@ async function purgeUser(interaction) {
           ],
         }),
       ],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   } catch (error) {
     return interaction.reply({
@@ -101,7 +102,7 @@ async function purgeUser(interaction) {
             "I couldn't delete this user's stored memory. Please try again later.",
         }),
       ],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 }
@@ -110,7 +111,7 @@ async function purgeServer(interaction) {
     new ButtonBuilder()
       .setCustomId("purge_confirm")
       .setLabel("Delete Everything")
-      .setEmoji("🗑️")
+      .setEmoji("1526228290413658184")
       .setStyle(ButtonStyle.Danger),
     new ButtonBuilder()
       .setCustomId("purge_cancel")
@@ -122,13 +123,11 @@ async function purgeServer(interaction) {
       warningEmbed({
         title: "Delete Server Memory?",
         description:
-          "This will permanently delete **every stored memory** for this server.\n\n" +
-          "**This action cannot be undone.**\n\n" +
-          "Press **Delete Everything** to continue.",
+          "This will permanently delete every stored memory for this server. This action cannot be undone.",
       }),
     ],
     components: [row],
-    ephemeral: true,
+    flags: MessageFlags.Ephemeral,
   });
   const reply = await interaction.fetchReply();
   try {
@@ -179,7 +178,7 @@ async function purgeServer(interaction) {
         warningEmbed({
           title: "Confirmation Expired",
           description:
-            "No response was received within **30 seconds**.\nThe purge operation has been cancelled.",
+            "No response was received within 30 seconds. The purge operation has been cancelled.",
         }),
       ],
       components: [],
