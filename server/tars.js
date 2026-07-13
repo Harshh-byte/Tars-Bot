@@ -347,11 +347,11 @@ client.once(Events.ClientReady, async (c) => {
   c.user.setPresence({
     status: "dnd",
     activities: [
-      {
-        name: client.maintenanceMode ? "🔧 System Maintenance" : "your next bad take",
-        type: ActivityType.Watching,
-      },
-    ],
+  {
+    name: "your next bad take",
+    type: ActivityType.Watching,
+  },
+],
   });
 
   const slashDataArray = Array.from(client.commands.values()).map(
