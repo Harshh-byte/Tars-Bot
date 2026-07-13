@@ -26,6 +26,17 @@ export default function CustomCursor() {
   });
 
   useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     if (window.matchMedia("(hover: none)").matches) return;
     const trackMouse = (e) => {
       mouse.current.x = e.clientX;
@@ -178,26 +189,26 @@ export default function CustomCursor() {
       )}
 
       {cursorMode === "link" && (
-        <ArrowUpRight size={20} strokeWidth={2.5} className="cursor-icon" />
+        <ArrowUpRight size={26} strokeWidth={2.5} className="cursor-icon" />
       )}
 
       {cursorMode === "faq" && (
-        <BadgeHelp size={20} strokeWidth={2.5} className="cursor-icon" />
+        <BadgeHelp size={26} strokeWidth={2.5} className="cursor-icon" />
       )}
 
       {cursorMode === "terminal" && (
-        <Terminal size={20} strokeWidth={2.4} className="cursor-icon" />
+        <Terminal size={26} strokeWidth={2.4} className="cursor-icon" />
       )}
 
       {cursorMode === "code" && (
-        <CodeXml size={20} strokeWidth={2.4} className="cursor-icon" />
+        <CodeXml size={26} strokeWidth={2.4} className="cursor-icon" />
       )}
 
       {cursorMode === "theme" &&
         (isDark ? (
-          <Moon size={20} strokeWidth={2.3} className="cursor-icon" />
+          <Moon size={26} strokeWidth={2.3} className="cursor-icon" />
         ) : (
-          <Sun size={20} strokeWidth={2.3} className="cursor-icon" />
+          <Sun size={26} strokeWidth={2.3} className="cursor-icon" />
         ))}
     </div>
   );

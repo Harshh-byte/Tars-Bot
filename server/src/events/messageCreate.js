@@ -8,6 +8,8 @@ export const name = Events.MessageCreate;
 export async function execute(message, client, { buildAiReply }) {
   if (message.author.bot) return;
 
+  if (client.maintenanceMode && message.author.id !== process.env.OWNER_ID) return;
+
   const isMentioned = message.mentions.has(client.user);
   let isReplyToBot = false;
 

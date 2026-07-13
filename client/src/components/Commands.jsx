@@ -4,9 +4,9 @@ const commands = [
   {
     trigger: "/roast [user]",
     category: "ai",
-    title: "Contextual Roasting",
+    title: "Sarcastic Roasting",
     description:
-      "Calculates a customized, sarcastic response based on user variables and past message records.",
+      "Calculates a customized verbal execution based on user variables and past server logs.",
     badge: "Slash",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -15,7 +15,7 @@ const commands = [
     category: "ai",
     title: "Premium Wishes",
     description:
-      "Formulates high-end congratulations for birthdays, achievements, or customized occasions.",
+      "Generates highly charismatic congratulations for birthdays, promotions, or customized celebrations.",
     badge: "Slash",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -24,7 +24,7 @@ const commands = [
     category: "util",
     title: "Gateway Diagnostics",
     description:
-      "Performs diagnostics check on the server connection, returning ping latency and active uptime.",
+      "Runs gateway checks on the connection, returning system latency stats.",
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },
@@ -33,7 +33,7 @@ const commands = [
     category: "util",
     title: "Cognitive Parameters",
     description:
-      "Fetches and lists current system attributes (humor quotient, honesty degree) and dev credits.",
+      "Retrieves active system quotients like honesty levels, humor levels, and developer credits.",
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },
