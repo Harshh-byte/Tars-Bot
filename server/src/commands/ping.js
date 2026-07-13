@@ -4,7 +4,7 @@ export const data = {
   dm_permission: false,
 };
 
-export async function execute(interaction, client, getUptimeString) {
+export async function execute(interaction, getUptimeString) {
   const gatewayLatency = Date.now() - interaction.createdTimestamp;
   return interaction.reply({
     content: `🏓 **Pong!**\nGateway latency is \`${gatewayLatency}ms\` and my uptime is \`${getUptimeString()}\`.`,

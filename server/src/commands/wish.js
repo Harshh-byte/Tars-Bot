@@ -1,5 +1,5 @@
 import { resolveEmoji } from "../../tars.js";
-import logger from "../logger.js";
+import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 
 export const data = {
