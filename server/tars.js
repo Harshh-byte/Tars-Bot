@@ -11,14 +11,13 @@ import { Client, GatewayIntentBits, ActivityType, Events } from "discord.js";
 import { GoogleGenAI } from "@google/genai";
 import express from "express";
 import { tarsSystemPrompt } from "./src/config.js";
-import { getConversation, saveConversation } from "./src/database.js";
-import logger from "./src/logger.js";
-
+import { getConversation, saveConversation } from "./src/services/database.js";
+import logger from "./src/utils/logger.js";
 import * as pingCommand from "./src/commands/ping.js";
 import * as aboutCommand from "./src/commands/about.js";
 import * as roastCommand from "./src/commands/roast.js";
 import * as wishCommand from "./src/commands/wish.js";
-
+import * as purgeCommand from "./src/commands/purge.js"
 import * as interactionCreateEvent from "./src/events/interactionCreate.js";
 import * as messageCreateEvent from "./src/events/messageCreate.js";
 
@@ -47,6 +46,7 @@ client.commands.set(pingCommand.data.name, pingCommand);
 client.commands.set(aboutCommand.data.name, aboutCommand);
 client.commands.set(roastCommand.data.name, roastCommand);
 client.commands.set(wishCommand.data.name, wishCommand);
+client.commands.set(purgeCommand.data.name, purgeCommand);
 
 async function callGeminiWithRetry(apiCallFn, retries = 3, delay = 1000) {
   for (let i = 0; i < retries; i++) {
@@ -304,19 +304,9 @@ client.once(Events.ClientReady, async (c) => {
   const slashDataArray = Array.from(client.commands.values()).map(
     (cmd) => cmd.data,
   );
-  const maintenanceCommands = [
-    { name: "play", description: "Play music.", dm_permission: false },
-    { name: "skip", description: "Skip music.", dm_permission: false },
-    {
-      name: "volume",
-      description: "Adjust music volume.",
-      dm_permission: false,
-    },
-    { name: "stop", description: "Stop music player.", dm_permission: false },
-  ];
 
   await c.application.commands
-    .set([...slashDataArray, ...maintenanceCommands])
+    .set(slashDataArray)
     .catch((err) => logger.error("Sync Failure", err));
 });
 

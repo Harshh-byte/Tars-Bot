@@ -1,5 +1,5 @@
 import { Events } from "discord.js";
-import logger from "../logger.js";
+import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { resolveEmoji } from "../../tars.js";
 
