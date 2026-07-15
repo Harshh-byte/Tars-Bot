@@ -1,5 +1,5 @@
 import { EmbedBuilder, MessageFlags, ActivityType } from "discord.js";
-import { errorEmbed } from "../utils/embeds.js";
+import { errorEmbed } from "../../utils/embeds.js";
 import fs from "fs";
 
 export const data = {
@@ -58,7 +58,7 @@ export async function execute(interaction, client) {
 
       client.maintenanceMode = true;
       fs.writeFileSync(
-        new URL("../../../maintenance.json", import.meta.url),
+        new URL("../../../../maintenance.json", import.meta.url),
         JSON.stringify(
           {
             active: true,
@@ -88,7 +88,7 @@ export async function execute(interaction, client) {
       let channelId = null;
       try {
         const savedData = JSON.parse(
-          fs.readFileSync(new URL("../../../maintenance.json", import.meta.url), "utf-8")
+          fs.readFileSync(new URL("../../../../maintenance.json", import.meta.url), "utf-8")
         );
         messageId = savedData.messageId;
         channelId = savedData.channelId;
@@ -96,7 +96,7 @@ export async function execute(interaction, client) {
       }
   
       fs.writeFileSync(
-        new URL("../../../maintenance.json", import.meta.url),
+        new URL("../../../../maintenance.json", import.meta.url),
         JSON.stringify({ active: false }, null, 2)
       );
 

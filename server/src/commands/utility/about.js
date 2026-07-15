@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from "discord.js";
-import { infoEmbed } from "../utils/embeds.js";
+import { infoEmbed } from "../../utils/embeds.js";
 export const data = {
   name: "about",
   description: "View information about the bot.",

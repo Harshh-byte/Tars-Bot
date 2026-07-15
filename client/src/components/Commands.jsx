@@ -7,7 +7,7 @@ const commands = [
     title: "Sarcastic Roasting",
     description:
       "Calculates a customized verbal execution based on user variables and past server logs.",
-    badge: "Slash",
+    badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
@@ -16,7 +16,7 @@ const commands = [
     title: "Premium Wishes",
     description:
       "Generates highly charismatic congratulations for birthdays, promotions, or customized celebrations.",
-    badge: "Slash",
+    badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
@@ -41,8 +41,8 @@ const commands = [
 
 const categories = [
   { value: "all", label: "All" },
-  { value: "ai", label: "Slash Commands" },
-  { value: "util", label: "Utility Tools" },
+  { value: "ai", label: "Activity" },
+  { value: "util", label: "Tools" },
 ];
 
 export default function Commands() {
@@ -75,7 +75,6 @@ export default function Commands() {
               <button
                 key={cat.value}
                 type="button"
-                data-cursor="link"
                 aria-pressed={isActive}
                 onClick={() => setActiveCategory(cat.value)}
                 className={`px-4 py-2.5 sm:px-6 sm:py-3 rounded-full border text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ds-blurple ${
@@ -94,7 +93,6 @@ export default function Commands() {
           {filteredCommands.map((cmd) => (
             <div
               key={cmd.trigger}
-              data-cursor="code"
               className="custom-card flex flex-col justify-between min-h-[220px]"
             >
               <div>

@@ -1,5 +1,4 @@
-import { resolveEmoji } from "../../tars.js";
-import logger from "../utils/logger.js";
+import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 
 export const data = {
@@ -59,7 +58,7 @@ export async function execute(interaction, client, { buildAiReply }) {
 
     if (replyData.reactions && replyData.reactions.length > 0) {
       for (const emoji of replyData.reactions) {
-        const resolved = resolveEmoji(emoji, interaction.guild);
+        const resolved = client.resolveEmoji(emoji);
         if (resolved) {
           const channel = interaction.channel;
           if (channel) {

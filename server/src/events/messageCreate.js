@@ -1,7 +1,6 @@
 import { Events } from "discord.js";
 import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { resolveEmoji } from "../../tars.js";
 
 export const name = Events.MessageCreate;
 
@@ -41,7 +40,7 @@ export async function execute(message, client, { buildAiReply }) {
 
     if (replyData.reactions && replyData.reactions.length > 0) {
       for (const emoji of replyData.reactions) {
-        const resolved = resolveEmoji(emoji, message.guild);
+        const resolved = client.resolveEmoji(emoji);
         if (resolved) {
           await message.react(resolved).catch(() => null);
         }

@@ -14,12 +14,6 @@ import express from "express";
 import { tarsSystemPrompt } from "./src/config.js";
 import { getConversation, saveConversation } from "./src/services/database.js";
 import logger from "./src/utils/logger.js";
-import * as pingCommand from "./src/commands/ping.js";
-import * as aboutCommand from "./src/commands/about.js";
-import * as roastCommand from "./src/commands/roast.js";
-import * as wishCommand from "./src/commands/wish.js";
-import * as purgeCommand from "./src/commands/purge.js"
-import * as maintenanceCommand from "./src/commands/maintenance.js";
 import * as interactionCreateEvent from "./src/events/interactionCreate.js";
 import * as messageCreateEvent from "./src/events/messageCreate.js";
 
@@ -53,12 +47,28 @@ try {
 client.maintenanceMode = maintenanceActive;
 
 client.commands = new Map();
-client.commands.set(pingCommand.data.name, pingCommand);
-client.commands.set(aboutCommand.data.name, aboutCommand);
-client.commands.set(roastCommand.data.name, roastCommand);
-client.commands.set(wishCommand.data.name, wishCommand);
-client.commands.set(purgeCommand.data.name, purgeCommand);
-client.commands.set(maintenanceCommand.data.name, maintenanceCommand);
+
+async function loadCommands() {
+  const commandsPath = new URL("./src/commands/", import.meta.url);
+  async function walk(dirUrl) {
+    const files = fs.readdirSync(dirUrl, { withFileTypes: true });
+    for (const file of files) {
+      if (file.isDirectory()) {
+        await walk(new URL(`${file.name}/`, dirUrl));
+      } else if (file.name.endsWith(".js")) {
+        const commandUrl = new URL(file.name, dirUrl).href;
+        const command = await import(commandUrl);
+        if (command.data && command.execute) {
+          client.commands.set(command.data.name, command);
+        } else {
+          logger.warn(`Skipped loading invalid command at: ${commandUrl}`);
+        }
+      }
+    }
+  }
+  await walk(commandsPath);
+}
+await loadCommands();
 
 async function callGeminiWithRetry(apiCallFn, retries = 3, delay = 1000) {
   for (let i = 0; i < retries; i++) {
@@ -122,7 +132,7 @@ async function searchKlipy(query) {
   }
 }
 
-export function resolveEmoji(emojiInput, guild) {
+client.resolveEmoji = function (emojiInput) {
   if (!emojiInput) return emojiInput;
   const match = emojiInput.match(/<?a?:?\w+:(\d+)>?/);
   const id = match ? match[1] : emojiInput.trim();
@@ -133,7 +143,7 @@ export function resolveEmoji(emojiInput, guild) {
       (e) => e.name.toLowerCase() === id.toLowerCase() || e.id === id,
     );
   return customEmoji || emojiInput.trim();
-}
+};
 
 function replaceEmojiNamesWithTags(text, guild) {
   if (!text) return text;
