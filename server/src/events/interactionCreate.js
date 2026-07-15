@@ -28,7 +28,7 @@ export async function execute(interaction, client, context) {
   if (client.maintenanceMode && interaction.user.id !== process.env.OWNER_ID) {
     const maintenanceEmbed = new EmbedBuilder()
       .setColor(0xffa502)
-      .setTitle("<:Warning:1526228248458035381>  **System Maintenance**")
+      .setTitle("<:Updates:1526472917964030053> **System Maintenance**")
       .setDescription(
         "Tars is currently undergoing scheduled maintenance and will be back online shortly.",
       )

@@ -70,16 +70,6 @@ export async function execute(interaction, client) {
         )
       );
 
-      client.user.setPresence({
-        status: "dnd",
-        activities: [
-          {
-            name: "<:Updates:1526472917964030053> Tars Maintenance",
-            type: ActivityType.Watching,
-          },
-        ],
-      });
-
       return interaction.reply({
         content: "<a:Maintenance:1526290002974343308> Tars is going under maintenance.",
         flags: MessageFlags.Ephemeral,
@@ -93,7 +83,7 @@ export async function execute(interaction, client) {
   } else if (subcommand === "complete") {
     try {
       client.maintenanceMode = false;
-
+  
       let messageId = null;
       let channelId = null;
       try {
@@ -104,21 +94,11 @@ export async function execute(interaction, client) {
         channelId = savedData.channelId;
       } catch (e) {
       }
-
+  
       fs.writeFileSync(
         new URL("../../../maintenance.json", import.meta.url),
         JSON.stringify({ active: false }, null, 2)
       );
-
-      client.user.setPresence({
-        status: "dnd",
-        activities: [
-          {
-            name: "your next bad take",
-            type: ActivityType.Watching,
-          },
-        ],
-      });
 
       const botAvatar = client.user.displayAvatarURL({
         extension: "png",
