@@ -5,8 +5,8 @@ import {
   ComponentType,
   MessageFlags,
 } from "discord.js";
-import { deleteUserData, deleteServerData } from "../services/database.js";
-import { successEmbed, warningEmbed, errorEmbed } from "../utils/embeds.js";
+import { deleteUserData, deleteServerData } from "../../services/database.js";
+import { successEmbed, warningEmbed, errorEmbed } from "../../utils/embeds.js";
 export const data = {
   name: "purge",
   description: "Delete stored bot memory.",
