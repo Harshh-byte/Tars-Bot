@@ -74,7 +74,7 @@ export async function execute(interaction, client) {
         status: "dnd",
         activities: [
           {
-            name: "<:Wrench:1526299354384564354> Tars Maintenance",
+            name: "<:Updates:1526472917964030053> Tars Maintenance",
             type: ActivityType.Watching,
           },
         ],
