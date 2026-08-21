@@ -1,4 +1,4 @@
-import { Events, MessageFlags, EmbedBuilder } from "discord.js";
+import { Events, EmbedBuilder } from "discord.js";
 import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 

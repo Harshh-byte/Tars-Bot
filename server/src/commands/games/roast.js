@@ -15,7 +15,7 @@ export const data = {
   ],
 };
 
-export async function execute(interaction, client, { buildAiReply, BOT_INFO }) {
+export async function execute(interaction, client, { buildAiReply }) {
   const targetUser = interaction.options.getUser("user") || interaction.user;
   const isSelf = targetUser.id === interaction.user.id;
 

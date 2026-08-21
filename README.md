@@ -22,6 +22,7 @@ Tars is a bold, savage, and highly adaptive Discord AI companion built with Disc
   - `/ping` - Check bot latency and uptime tracking.
   - `/roast [user]` - Unleash a brutal, one-line roast.
   - `/wish [user] [event]` - Deliver a premium, charming wish for any occasion.
+  - `/meme [category]` - Fetch fresh, dank memes from top meme subreddits.
 - **Status Server:** Includes a lightweight Express server for simple uptime monitoring (e.g., via Render or UptimeRobot).
 
 ---

@@ -11,11 +11,20 @@ const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
-    trigger: "/wish [user] [event]",
+    trigger: "/wish [event]",
     category: "ai",
     title: "Premium Wishes",
     description:
       "Generates highly charismatic congratulations for birthdays, promotions, or customized celebrations.",
+    badge: "Fun",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/meme",
+    category: "ai",
+    title: "Dank Reddit Memes",
+    description:
+      "Fetches real, trending memes directly from Reddit.",
     badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -93,7 +102,7 @@ export default function Commands() {
           {filteredCommands.map((cmd) => (
             <div
               key={cmd.trigger}
-              className="custom-card flex flex-col justify-between min-h-[220px]"
+              className="custom-card flex flex-col justify-between min-h-55"
             >
               <div>
                 <div className="flex justify-between items-center mb-6">
