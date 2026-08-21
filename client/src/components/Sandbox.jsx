@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { User } from "lucide-react";
 
 export default function Sandbox() {
   const [messages, setMessages] = useState([
@@ -161,7 +162,7 @@ export default function Sandbox() {
           </p>
         </div>
 
-        <div className="sandbox-window flex flex-col h-[520px] rounded-3xl border border-ds-border bg-ds-card/35 backdrop-blur-md overflow-hidden relative">
+        <div className="sandbox-window flex flex-col h-130 rounded-3xl border border-ds-border bg-ds-card/35 backdrop-blur-md overflow-hidden relative">
           <div className="sandbox-header flex items-center justify-between px-6 py-4 border-b border-ds-border/40">
             <div className="flex flex-col gap-1">
               <h3 className="text-ds-text font-display font-extrabold text-sm md:text-base leading-tight flex items-center gap-1.5">
@@ -192,13 +193,11 @@ export default function Sandbox() {
                   <img
                     src="/Icon.png"
                     alt="Tars Avatar"
-                    className="w-9 h-9 rounded-full bg-black border border-ds-border p-0.5 shrink-0"
+                    className="w-9 h-9 rounded-full bg-black shrink-0"
                   />
                 ) : (
                   <div className="w-9 h-9 rounded-full bg-ds-blurple/10 border border-ds-blurple/30 flex items-center justify-center shrink-0">
-                    <span className="text-ds-blurple font-bold font-mono text-xs">
-                      U
-                    </span>
+                    <User className="w-4.5 h-4.5 text-ds-blurple" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">

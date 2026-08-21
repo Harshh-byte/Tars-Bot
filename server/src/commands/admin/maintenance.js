@@ -1,4 +1,4 @@
-import { EmbedBuilder, MessageFlags, ActivityType } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { errorEmbed } from "../../utils/embeds.js";
 import fs from "fs";
 
