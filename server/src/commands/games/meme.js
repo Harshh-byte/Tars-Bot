@@ -14,6 +14,7 @@ export const data = {
       required: false,
       choices: [
         { name: "Dank Memes", value: "dankmemes" },
+        // { name: "Dark Memes", value: "darkmemers" },
         { name: "General Memes", value: "memes" },
         { name: "Wholesome", value: "wholesomememes" },
         { name: "Me_IRL", value: "me_irl" },
@@ -26,6 +27,7 @@ export const data = {
 
 const SUBREDDITS = [
   "dankmemes",
+  // "darkmemers",
   "memes",
   "wholesomememes",
   "me_irl",
@@ -38,13 +40,15 @@ export async function execute(interaction) {
     await interaction.deferReply();
 
     const selectedType = interaction.options.getString("type");
-    const subreddit = selectedType || SUBREDDITS[Math.floor(Math.random() * SUBREDDITS.length)];
+    const subreddit =
+      selectedType || SUBREDDITS[Math.floor(Math.random() * SUBREDDITS.length)];
 
     const response = await fetch(`https://meme-api.com/gimme/${subreddit}`);
-    
+
     if (!response.ok) {
       return interaction.editReply({
-        content: "Couldn't fetch a meme right now. Meme servers might be rate-limited!",
+        content:
+          "Couldn't fetch a meme right now. Meme servers might be rate-limited!",
       });
     }
 
@@ -61,12 +65,17 @@ export async function execute(interaction) {
     const randomColor = Math.floor(Math.random() * 16777215);
 
     const embed = new EmbedBuilder()
-      .setTitle(data.title.length > 256 ? data.title.substring(0, 253) + "..." : data.title)
+      .setTitle(
+        data.title.length > 256
+          ? data.title.substring(0, 253) + "..."
+          : data.title,
+      )
       .setURL(data.postLink)
       .setImage(data.url)
       .setColor(randomColor)
       .setFooter({
-        text: `r/${data.subreddit}`,
+        text: `${data.ups ? data.ups.toLocaleString() : 0} upvotes • Posted by u/${data.author || "anonymous"}`,
+        iconURL: "https://cdn.discordapp.com/emojis/1540698439594016778.png",
       });
 
     await interaction.editReply({
