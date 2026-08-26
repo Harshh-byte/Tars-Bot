@@ -2,31 +2,130 @@ import { useState } from "react";
 
 const commands = [
   {
-    trigger: "/roast [user]",
+    trigger: "/tod",
     category: "ai",
-    title: "Sarcastic Roasting",
+    title: "Truth or Dare",
     description:
-      "Calculates a customized verbal execution based on user variables and past server logs.",
+      "Play Truth or Dare with rating selection (PG, PG13, R) and Tars responses.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/wyr",
+    category: "ai",
+    title: "Would You Rather",
+    description:
+      "Play Would You Rather with rating options and interactive choices.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/iq",
+    category: "ai",
+    title: "IQ Calculator",
+    description:
+      "Calculate a user's IQ score with classification tiers and sarcastic remarks.",
     badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
-    trigger: "/wish [event]",
+    trigger: "/flip",
+    category: "ai",
+    title: "Coin Flip",
+    description:
+      "Flip a coin.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/roll",
+    category: "ai",
+    title: "Dice Roll",
+    description:
+      "Roll a dice.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/rps",
+    category: "ai",
+    title: "Rock, Paper, Scissors",
+    description:
+      "Play Rock, Paper, Scissors against Tars or challenge a server member with custom match buttons.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/ttt",
+    category: "ai",
+    title: "Tic-Tac-Toe",
+    description:
+      "Play interactive 3x3 Tic-Tac-Toe against Tars or challenge another player in real-time.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/gay",
+    category: "ai",
+    title: "Gay Calculator",
+    description:
+      "Calculate how gay a user is with category levels and Tars sarcasm.",
+    badge: "Fun",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/lesbian",
+    category: "ai",
+    title: "Lesbian Calculator",
+    description:
+      "Calculate how lesbian a user is with category levels and Tars sarcasm.",
+    badge: "Fun",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/pp",
+    category: "ai",
+    title: "PP Size Calculator",
+    description:
+      "Check a user's pp size with sarcastic Tars one-liners.",
+    badge: "Fun",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/roast",
+    category: "ai",
+    title: "Sarcastic Roasting",
+    description:
+      "Calculates a customized verbal execution based on user variables.",
+    badge: "Fun",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/wish",
     category: "ai",
     title: "Premium Wishes",
     description:
-      "Generates highly charismatic congratulations for birthdays, promotions, or customized celebrations.",
+      "Generates highly charismatic congratulations for customized celebrations.",
     badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
     trigger: "/meme",
     category: "ai",
-    title: "Dank Reddit Memes",
+    title: "Dank Memes",
     description:
       "Fetches real, trending memes directly from Reddit.",
     badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/prefix",
+    category: "util",
+    title: "Prefix Manager",
+    description:
+      "View or update the server's command prefix.",
+    badge: "Utility",
+    badgeColor: "text-ds-green bg-ds-green/10",
   },
   {
     trigger: "/ping",
@@ -40,9 +139,18 @@ const commands = [
   {
     trigger: "/about",
     category: "util",
-    title: "Cognitive Parameters",
+    title: "Bot Info & Stats",
     description:
-      "Retrieves active system quotients like honesty levels, humor levels, and developer credits.",
+      "View bot system statistics, developer info, and quotients.",
+    badge: "Utility",
+    badgeColor: "text-ds-green bg-ds-green/10",
+  },
+  {
+    trigger: "/help",
+    category: "util",
+    title: "Help Menu",
+    description:
+      "Displays interactive help menu and command detail inspection.",
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },

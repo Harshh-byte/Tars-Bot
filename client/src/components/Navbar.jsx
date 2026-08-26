@@ -66,14 +66,6 @@ export default function Navbar({ theme, onToggleTheme }) {
             </li>
             <li>
               <a
-                href="#sandbox"
-                className="text-[11px] font-bold uppercase tracking-wider text-ds-muted hover:text-ds-text transition-colors"
-              >
-                Sandbox
-              </a>
-            </li>
-            <li>
-              <a
                 href="#faqs"
                 className="text-[11px] font-bold uppercase tracking-wider text-ds-muted hover:text-ds-text transition-colors"
               >
@@ -227,15 +219,6 @@ export default function Navbar({ theme, onToggleTheme }) {
               className="block font-display text-3xl font-extrabold text-ds-muted hover:text-ds-text transition-all"
             >
               Commands
-            </a>
-          </li>
-          <li>
-            <a
-              href="#sandbox"
-              onClick={handleMobileLinkClick}
-              className="block font-display text-3xl font-extrabold text-ds-muted hover:text-ds-text transition-all"
-            >
-              Sandbox
             </a>
           </li>
           <li>

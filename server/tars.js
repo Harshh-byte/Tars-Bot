@@ -60,6 +60,11 @@ async function loadCommands() {
         const command = await import(commandUrl);
         if (command.data && command.execute) {
           client.commands.set(command.data.name, command);
+          if (Array.isArray(command.aliases)) {
+            for (const alias of command.aliases) {
+              client.commands.set(alias, command);
+            }
+          }
         } else {
           logger.warn(`Skipped loading invalid command at: ${commandUrl}`);
         }
@@ -364,12 +369,17 @@ client.once(Events.ClientReady, async (c) => {
 ],
   });
 
-  const slashDataArray = Array.from(client.commands.values()).map(
-    (cmd) => cmd.data,
-  );
+  const uniqueCommandsMap = new Map();
+  for (const cmd of client.commands.values()) {
+    if (cmd?.data?.name) {
+      uniqueCommandsMap.set(cmd.data.name, cmd.data);
+    }
+  }
+  const slashDataArray = Array.from(uniqueCommandsMap.values());
 
   await c.application.commands
     .set(slashDataArray)
+    .then(() => logger.info(`Successfully synced ${slashDataArray.length} slash commands.`))
     .catch((err) => logger.error("Sync Failure", err));
 });
 

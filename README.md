@@ -1,97 +1,125 @@
-# Tars Bot 🤖 — The Savage Discord Companion
+# Tars Bot 🤖 — The Savage & Interactive Discord Companion
 
 ![Tars Bot Banner](./assets/ReadMe.png)
 
-Tars is a bold, savage, and highly adaptive Discord AI companion built with Discord.js and powered by Google's Gemini models. He is designed to be a "ruthless Discord homie" with dark humor, capable of roasting users, giving premium wishes, sending server emojis, reacting to messages, and attaching relevant Giphy GIFs.
+**Tars** is a modern, savage, and highly interactive Discord companion built with **Discord.js v14**, **Node.js**, **React (Vite frontend)**, and powered by **Google's Gemini AI**. Designed as a ruthless, sharp-witted Discord bot, Tars features dark humor, game calculators, decision tools, interactive button controls, custom prefix support, and a full web console dashboard.
 
 ---
 
 ## 🌟 Key Features
 
-- **AI-Powered Responses:** Uses the new `@google/genai` SDK (`gemini-2.5-flash-lite`) to generate contextual, savage, or wholesome responses.
-- **Context Awareness:** Remembers the last 10 messages of conversation history per user, securely stored in a Firebase Realtime Database.
-- **Dynamic Response Rhythm:** Behaves like an authentic person by fluctuating output combinations. Tars will sometimes only react with an emoji, sometimes only send a GIF, or sometimes just send a text line without cluttering chat every time.
-- **Self-Reaction Prevention:** Tars naturally applies reactions directly underneath the user's triggering message rather than reacting to his own outputs.
-- **Winston Structured Logging:** Production-grade logging system writing to the console and dynamic log files (`logs/error.log` and `logs/combined.log`).
-- **Uncensored GIF Engine:** Searches Giphy with an `R-rating` configuration to attach edgier, context-relevant GIFs directly as native attachments.
-- **Automated Data Lifecycle Cleanup:** Includes a built-in background `node-cron` worker that runs every night at midnight to scan and completely wipe inactive user conversation caches older than 6 months.
-- **Emoji Reactions & Guardrails:** Auto-resolves custom server emojis (static/animated). Includes strict safeguards preventing the AI from hallucinating fake emoji tags.
-- **Robust Error Handling:** Seamless retry mechanisms with exponential backoff for transient API (503/429) errors, plus automated Sentry telemetry tracking.
-- **Slash Commands:**
-  - `/about` - View detailed stats and bot parameters.
-  - `/ping` - Check bot latency and uptime tracking.
-  - `/roast [user]` - Unleash a brutal, one-line roast.
-  - `/wish [user] [event]` - Deliver a premium, charming wish for any occasion.
-  - `/meme [category]` - Fetch fresh, dank memes from top meme subreddits.
-- **Status Server:** Includes a lightweight Express server for simple uptime monitoring (e.g., via Render or UptimeRobot).
+- 🧠 **AI-Powered Responses & Sarcasm:** Powered by Google's `@google/genai` SDK (`gemini-2.5-flash-lite`) to deliver sharp roasts, charismatic wishes, and instant sarcastic remarks.
+- ⚙️ **Dynamic Per-Guild Prefix Manager:** Custom server prefix support (`.prefix <new_prefix>`) with real-time Firebase caching and fallback to default `.`.
+- 📖 **Interactive Custom Help System:** Interactive select menus with custom server emojis, module categories (Home, Fun, Utility), and command-specific detail cards (`.help <command>`).
+- 🎮 **Interactive Games & Calculators:**
+  - **Truth or Dare** (`.tod`, `.truth`, `.dare`, `/tod`): Hybrid API & fallback generator supporting `PG`, `PG-13`, and `R` rating filters with interactive choice buttons.
+  - **Would You Rather** (`.wyr`, `.wouldyourather`, `/wyr`): Dilemma generator with rating filters, option selection buttons, and seamless channel continuation.
+  - **IQ Calculator** (`.iq`, `/iq`): Instant score calculation across 5 intelligence categories with Tars sarcastic evaluations.
+  - **PP Calculator** (`.pp`, `.dih`, `/pp`): Dih size generator (1–15 inches) paired with savage 4-tier sarcastic one-liners.
+  - **Gay / Lesbian Calculators** (`.gay`, `.howgay`, `.lesbian`, `.howlesbian`, `/gay`, `/lesbian`): Instant percentage calculators with score classification tiers.
+  - **Rock, Paper, Scissors & Tic-Tac-Toe** (`.rps`, `.ttt`): Real-time interactive Discord games played directly in chat against Tars or server members.
+  - **Coin Flip & Dice Roll** (`.flip`, `.coin`, `.cf`, `.roll`, `.dice`): Fast decision-making utilities returning heads/tails or Unicode dice faces (⚀ ⚁ ⚂ ⚃ ⚄ ⚅).
+  - **Sarcastic Roasts & Wishes** (`.roast`, `.wish`): Custom AI verbal executions and charismatic occasion wishes.
+  - **Reddit Dank Memes** (`.meme`): Fetches hot memes from top subreddits.
+- 🌐 **Web Dashboard Frontend:** A modern React + Vite + TailwindCSS landing page displaying real-time command documentation and system stats.
+- 📊 **Firebase Realtime Database & Winston Logging:** Persistent prefix caching, conversation context tracking, production-grade Winston logging, and Sentry error telemetry.
+
+---
+
+## 📜 Command Reference
+
+| Command                 | Text Aliases              | Slash Command | Description                                                                 |
+| :---------------------- | :------------------------ | :------------ | :-------------------------------------------------------------------------- |
+| **Help Menu**           | `.help`, `.h`             | `/help`       | Interactive command list or detailed command inspector (`.help <command>`). |
+| **Prefix Manager**      | `.prefix`, `.pref`        | `/prefix`     | View or change the server command prefix.                                   |
+| **Gateway Diagnostics** | `.ping`, `.p`             | `/ping`       | Check bot latency and WebSocket connection.                                 |
+| **Cognitive Stats**     | `.about`, `.info`         | `/about`      | View bot statistics, quotients, and system info.                            |
+| **Truth or Dare**       | `.tod`, `.truth`, `.dare` | `/tod`        | Play Truth or Dare with rating selection (`PG`, `PG13`, `R`).               |
+| **Would You Rather**    | `.wyr`, `.wouldyourather` | `/wyr`        | Play Would You Rather with rating options.                                  |
+| **IQ Calculator**       | `.iq`                     | `/iq`         | Calculate a user's IQ score with classification tiers.                      |
+| **PP Calculator**       | `.pp`, `.dih`             | `/pp`         | Check a user's dih size with savage one-liners.                             |
+| **Gay Calculator**      | `.gay`, `.howgay`         | `/gay`        | Calculate gay percentage with category levels.                              |
+| **Lesbian Calculator**  | `.lesbian`, `.howlesbian` | `/lesbian`    | Calculate lesbian percentage with category levels.                          |
+| **Coin Flip**           | `.flip`, `.coin`, `.cf`   | `/flip`       | Flip a coin (Heads or Tails).                                               |
+| **Dice Roll**           | `.roll`, `.dice`          | `/roll`       | Roll a 6-sided dice (1–6).                                                  |
+| **Rock Paper Scissors** | `.rps`                    | `/rps`        | Challenge Tars or a server member to RPS.                                   |
+| **Tic-Tac-Toe**         | `.ttt`                    | `/ttt`        | Play 3x3 Tic-Tac-Toe against Tars or a friend.                              |
+| **Sarcastic Roast**     | `.roast`                  | `/roast`      | Unleash a customized sarcastic roast.                                       |
+| **Charismatic Wish**    | `.wish`                   | `/wish`       | Generate a charismatic wish for an occasion.                                |
+| **Reddit Memes**        | `.meme`                   | `/meme`       | Fetch fresh memes directly from Reddit.                                     |
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Framework & Library
-- **Framework:** Express (for status monitoring)
-- **Library:** Discord.js (v14)
+### Client (Web Dashboard)
 
-### Backend & AI Services
+- **Framework:** React 18 (Vite)
+- **Styling:** Tailwind CSS & Custom CSS Design Tokens
+- **Icons:** Lucide React
+
+### Server (Bot Backend)
+
+- **Runtime:** Node.js (v18+)
+- **Bot Framework:** Discord.js (v14)
+- **Web Server:** Express.js (for status API and web serving)
+- **AI Engine:** Google Gemini API (`@google/genai`)
 - **Database:** Firebase Admin SDK (Realtime Database)
-- **AI Core:** Google Gemini API (via `@google/genai` SDK)
-- **GIF Engine:** Giphy Search API
-- **Logger:** Winston
+- **Logging & Monitoring:** Winston Logger & Sentry Telemetry
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Setup Guide
 
-### Prerequisites
+### 1. Prerequisites
+
 - Node.js (v18 or higher recommended)
-- A Discord Application with a Bot Token
-- A Google Gemini API Key
-- A Giphy API Key (Developer account)
-- A Firebase project with Realtime Database enabled
+- Discord Bot Token with **Message Content Intent** enabled
+- Google Gemini API Key
+- Firebase Project (with Realtime Database enabled)
 
-### Installation
+### 2. Installation & Configuration
 
-1. Clone the repository and navigate to the project directory:
+1. **Clone the repository:**
+
    ```bash
-   cd "Tars Bot/server"
+   git clone https://github.com/Harshh-byte/Tars-Bot.git
+   cd Tars-Bot
    ```
 
-2. Install the dependencies:
+2. **Setup Server:**
+
    ```bash
+   cd server
    npm install
    ```
 
-3. Create a `.env` file in the `server` directory and add your credentials:
+3. **Configure Environment Variables:**
+   Create `.env` in the `server` directory:
+
    ```env
    DISCORD_BOT_TOKEN=your_discord_bot_token_here
    GEMINI_API_KEY=your_gemini_api_key_here
-   GIPHY_API_KEY=your_giphy_api_key_here
    PORT=3000
    ```
 
-4. Configure Firebase:
-   - Go to your Firebase Console and navigate to **Project Settings > Service Accounts**.
-   - Generate a new private key and download the JSON file.
-   - Rename the file to `serviceAccountKey.json` and place it in the `server` directory.
-   - Ensure the `databaseURL` in `database.js` matches your Firebase Realtime Database URL.
+4. **Firebase Admin Credentials:**
+   Place your Firebase service account key JSON as `server/serviceAccountKey.json`.
 
-5. Run the bot:
+5. **Start TARS Server:**
+
    ```bash
    npm start
    ```
 
-*Note: Make sure your Discord bot has the `Message Content Intent` and `Guilds` enabled in the Discord Developer Portal.*
+6. **Start Web Frontend (Optional):**
+   ```bash
+   cd ../client
+   npm install
+   npm run dev
+   ```
 
 ---
-
-## 🎨 Persona & Customization
-
-Tars uses a highly specific system prompt to drive his personality:
-- **Persona:** You can adjust Tars' behavior, tone, and rules by modifying the `tarsSystemPrompt` located in `config.js`.
-- **User Customization:** Context values (like usernames/displayNames) are parsed dynamically, so you don't need hardcoded server roles to run the bot.
-
-<br>
 
 <p align="center">
   <i>Built with 🤍 for Discord communities.</i>
