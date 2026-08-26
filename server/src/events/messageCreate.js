@@ -21,6 +21,71 @@ export async function execute(message, client, { buildAiReply }) {
     }
   }
 
+  if (!client.prefixCache) client.prefixCache = new Map();
+  const serverId = message.guild?.id || "DM";
+
+  if (message.guild && !client.prefixCache.has(serverId)) {
+    try {
+      const { getServerSettings } = await import("../services/database.js");
+      const settings = await getServerSettings(serverId).catch(() => ({}));
+      client.prefixCache.set(serverId, settings.prefix || ".");
+    } catch {
+      client.prefixCache.set(serverId, ".");
+    }
+  }
+
+  const PREFIX = client.prefixCache.get(serverId) || ".";
+
+  if (message.content.startsWith(PREFIX)) {
+    const args = message.content.slice(PREFIX.length).trim().split(/ +/);
+    const commandName = args.shift().toLowerCase();
+
+    const command = client.commands.get(commandName);
+    if (command) {
+      const targetUser = message.mentions.users.first() || null;
+      
+      const mockInteraction = {
+        commandName: commandName,
+        user: message.author,
+        member: message.member,
+        guild: message.guild,
+        channel: message.channel,
+        isButton: () => false,
+        isStringSelectMenu: () => false,
+        replied: false,
+        deferred: false,
+        options: {
+          getUser: (name) => (name === "opponent" || name === "user" ? targetUser : null),
+          getString: () => args.join(" ") || null,
+        },
+        deferReply: async () => {
+          mockInteraction.deferred = true;
+          await message.channel.sendTyping().catch(() => null);
+        },
+        reply: async (payload) => {
+          mockInteraction.replied = true;
+          return message.channel.send(payload);
+        },
+        followUp: async (payload) => {
+          return message.channel.send(payload);
+        },
+        editReply: async (payload) => {
+          mockInteraction.replied = true;
+          return message.channel.send(payload);
+        },
+        deleteReply: async () => {},
+      };
+
+      try {
+        await command.execute(mockInteraction, client, { buildAiReply });
+      } catch (err) {
+        logger.error(`Error executing prefix command .${commandName}:`, err);
+        Sentry.captureException(err);
+      }
+      return;
+    }
+  }
+
   if (!isMentioned && !isReplyToBot) return;
 
   try {

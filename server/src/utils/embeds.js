@@ -1,4 +1,16 @@
 import { EmbedBuilder } from "discord.js";
+
+export const EMBED_COLORS = {
+  INFO: 0x5865f2,
+  SUCCESS: 0x2ecc71,
+  ERROR: 0xff4757,
+  WARNING: 0xffa502,
+  PURPLE: 0x9b59b6,
+  BLUE: 0x3498db,
+  GREY: 0x2b2d31, // Premium sleek dark charcoal grey
+  TIMEOUT: 0x2b2d31,
+};
+
 export function infoEmbed({
   title,
   description,
@@ -7,7 +19,7 @@ export function infoEmbed({
   footer,
   author,
 }) {
-  const embed = new EmbedBuilder().setColor(0x5865f2);
+  const embed = new EmbedBuilder().setColor(EMBED_COLORS.INFO);
   if (title) embed.setTitle(title);
   if (description) embed.setDescription(description);
   if (fields.length) embed.addFields(fields);
@@ -21,7 +33,7 @@ export function infoEmbed({
 }
 export function successEmbed({ title = "Success", description, fields = [] }) {
   const embed = new EmbedBuilder()
-    .setColor(0x2ecc71)
+    .setColor(EMBED_COLORS.SUCCESS)
     .setTitle(`<:Success:1526228339910643793> **${title}**`);
   if (description) embed.setDescription(description);
   if (fields.length) embed.addFields(fields);
@@ -29,7 +41,7 @@ export function successEmbed({ title = "Success", description, fields = [] }) {
 }
 export function errorEmbed({ title = "Something went wrong", description }) {
   return new EmbedBuilder()
-    .setColor(0xff4757)
+    .setColor(EMBED_COLORS.ERROR)
     .setTitle(`<:Failed:1526228290413658184> **${title}**`)
     .setDescription(
       description ?? "An unexpected error occurred. Please try again later.",
@@ -37,7 +49,16 @@ export function errorEmbed({ title = "Something went wrong", description }) {
 }
 export function warningEmbed({ title = "Warning", description }) {
   return new EmbedBuilder()
-    .setColor(0xffa502)
+    .setColor(EMBED_COLORS.WARNING)
     .setTitle(`<:Warning:1526228248458035381> **${title}**`)
     .setDescription(description);
 }
+export function greyEmbed({ title, description, fields = [] }) {
+  const embed = new EmbedBuilder()
+    .setColor(EMBED_COLORS.GREY);
+  if (title) embed.setTitle(title);
+  if (description) embed.setDescription(description);
+  if (fields.length) embed.addFields(fields);
+  return embed;
+}
+

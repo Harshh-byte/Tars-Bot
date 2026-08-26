@@ -57,27 +57,14 @@ export default function Footer() {
 
                   <li>
                     <a
-                      href="#features"
+                      href="#parameters"
                       data-cursor="link"
                       className="group flex items-center gap-2 text-ds-muted hover:text-ds-text transition-colors rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ds-blurple"
                     >
                       <span className="font-bold text-ds-blurple opacity-0 transition-opacity group-hover:opacity-100">
                         &gt;
                       </span>
-                      Capabilities
-                    </a>
-                  </li>
-
-                  <li>
-                    <a
-                      href="#sandbox"
-                      data-cursor="link"
-                      className="group flex items-center gap-2 text-ds-muted hover:text-ds-text transition-colors rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ds-blurple"
-                    >
-                      <span className="font-bold text-ds-blurple opacity-0 transition-opacity group-hover:opacity-100">
-                        &gt;
-                      </span>
-                      Sandbox
+                      Parameters
                     </a>
                   </li>
                 </ul>

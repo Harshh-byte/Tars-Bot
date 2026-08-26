@@ -1,0 +1,243 @@
+import {
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+} from "discord.js";
+import logger from "../../utils/logger.js";
+import * as Sentry from "@sentry/node";
+import { EMBED_COLORS } from "../../utils/embeds.js";
+
+const FALLBACK_TRUTHS = [
+  "What is the most embarrassing thing you've done on a Discord call?",
+  "If you had to kick one server member forever, who would it be?",
+  "What is a secret you have never told anyone in this server?",
+  "What is the worst lie you've told to get out of hanging out with friends?",
+  "If you were forced to date someone from this server, who would you choose?",
+  "What is your biggest guilty pleasure that you're ashamed of?",
+  "Have you ever stalked someone's profile in this server for hours?",
+];
+
+const FALLBACK_DARES = [
+  "Send the 5th image in your gallery into this chat with zero context.",
+  "Change your server nickname to 'Tars's Loyal Servant' for 24 hours.",
+  "Voice call the last person you texted and sing them Happy Birthday.",
+  "Send a message to your crush or ex saying 'I miss you' and show proof.",
+  "Type your next 5 messages in this server using only your nose.",
+  "Post your most cringe selfie in this channel.",
+  "Let the channel pick your profile picture for the next 12 hours.",
+];
+
+export const aliases = ["truth", "dare", "tod"];
+
+export const data = {
+  name: "tod",
+  description: "Play Truth or Dare with Tars AI commentary.",
+  dm_permission: false,
+  options: [
+    {
+      name: "type",
+      description: "Choose Truth, Dare, or Random",
+      type: 3,
+      required: false,
+      choices: [
+        { name: "Truth", value: "truth" },
+        { name: "Dare", value: "dare" },
+        { name: "Random", value: "random" },
+      ],
+    },
+    {
+      name: "rating",
+      description: "Filter rating: PG, PG13, or R (Bold)",
+      type: 3,
+      required: false,
+      choices: [
+        { name: "PG (Family Friendly)", value: "pg" },
+        { name: "PG-13 (Teen)", value: "pg13" },
+        { name: "R (Bold / Spicy)", value: "r" },
+      ],
+    },
+    {
+      name: "user",
+      description: "Target user for the prompt",
+      type: 6,
+      required: false,
+    },
+  ],
+};
+
+async function fetchQuestion(type, rating = "pg") {
+  const chosenType = type === "random" ? (Math.random() > 0.5 ? "truth" : "dare") : type;
+  const targetRating = rating || "pg";
+  const ratingParam = `?rating=${encodeURIComponent(targetRating)}`;
+  const endpoint = `https://api.truthordarebot.xyz/v1/${chosenType}${ratingParam}`;
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(endpoint, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.question) {
+        return {
+          type: chosenType,
+          question: data.question,
+          rating: (data.rating || targetRating).toUpperCase(),
+        };
+      }
+    }
+  } catch (err) {
+    logger.warn(`TruthOrDare API failed, using fallback: ${err.message}`);
+  }
+
+  const fallbacks = chosenType === "truth" ? FALLBACK_TRUTHS : FALLBACK_DARES;
+  const question = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+  return { type: chosenType, question, rating: targetRating.toUpperCase() };
+}
+
+function buildButtons() {
+  return new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("tod_truth")
+      .setLabel("Truth")
+      .setEmoji("❓")
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("tod_dare")
+      .setLabel("Dare")
+      .setEmoji("🎯")
+      .setStyle(ButtonStyle.Danger),
+    new ButtonBuilder()
+      .setCustomId("tod_random")
+      .setLabel("Random")
+      .setEmoji("🎲")
+      .setStyle(ButtonStyle.Secondary)
+  );
+}
+
+export async function execute(interaction, client, { buildAiReply } = {}) {
+  try {
+    if (interaction.deferReply) {
+      await interaction.deferReply();
+    }
+
+    let rawInput = interaction.options?.getString("type")?.toLowerCase();
+    let ratingInput = interaction.options?.getString("rating")?.toLowerCase() || "pg";
+
+    if (interaction.commandName) {
+      if (interaction.commandName === "truth") rawInput = "truth";
+      else if (interaction.commandName === "dare") rawInput = "dare";
+
+      const rawArgs = interaction.options?.getString("new_prefix") || interaction.options?.getString("user");
+      if (typeof rawArgs === "string") {
+        const lower = rawArgs.toLowerCase();
+        if (lower.includes("r") || lower.includes("spicy") || lower.includes("bold")) ratingInput = "r";
+        else if (lower.includes("pg13")) ratingInput = "pg13";
+        else if (lower.includes("pg")) ratingInput = "pg";
+      }
+    }
+
+    const type = rawInput && ["truth", "dare"].includes(rawInput) ? rawInput : "random";
+    const targetUser = interaction.options?.getUser("user") || interaction.user;
+
+    const { type: promptType, question, rating } = await fetchQuestion(type, ratingInput);
+
+    let aiCommentary = "";
+    if (typeof buildAiReply === "function") {
+      try {
+        const aiResponse = await buildAiReply({
+          authorId: interaction.user.id,
+          inputText: `Give a witty 1-sentence sarcastic remark about giving this ${rating} ${promptType.toUpperCase()} question to ${targetUser.username}: "${question}"`,
+          mode: "normal",
+          guild: interaction.guild,
+        });
+        if (aiResponse?.text) {
+          aiCommentary = aiResponse.text.trim();
+        }
+      } catch (e) {
+        logger.warn(`Failed to generate AI commentary for tod: ${e.message}`);
+      }
+    }
+
+    const titleIcon = promptType === "truth" ? "❓" : "🎯";
+    const embed = new EmbedBuilder()
+      .setTitle(`${titleIcon} **${promptType.toUpperCase()}**`)
+      .setDescription(
+        `**Target:** <@${targetUser.id}>\n\n` +
+        `>>> **"${question}"**` +
+        (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "")
+      )
+      .setFooter({ text: `Rating: ${rating}` })
+      .setColor(EMBED_COLORS.GREY);
+
+    const payload = { embeds: [embed], components: [buildButtons()] };
+
+    let response;
+    if (interaction.deferred || interaction.replied) {
+      response = await interaction.editReply(payload);
+    } else {
+      response = await interaction.reply({ ...payload, fetchReply: true });
+    }
+
+    if (!response || typeof response.createMessageComponentCollector !== "function") {
+      return;
+    }
+
+    const collector = response.createMessageComponentCollector({
+      componentType: ComponentType.Button,
+      time: 60000,
+    });
+
+    collector.on("collect", async (btnInteraction) => {
+      try {
+        await btnInteraction.deferUpdate();
+        const selectedType = btnInteraction.customId.replace("tod_", "");
+        const nextPrompt = await fetchQuestion(selectedType, ratingInput);
+
+        let nextAiComment = "";
+        if (typeof buildAiReply === "function") {
+          try {
+            const res = await buildAiReply({
+              authorId: btnInteraction.user.id,
+              inputText: `Give a witty 1-sentence sarcastic remark about giving this ${nextPrompt.rating} ${nextPrompt.type.toUpperCase()} prompt to ${btnInteraction.user.username}: "${nextPrompt.question}"`,
+              mode: "normal",
+              guild: btnInteraction.guild,
+            });
+            if (res?.text) nextAiComment = res.text.trim();
+          } catch {}
+        }
+
+        const nextIcon = nextPrompt.type === "truth" ? "❓" : "🎯";
+        const newEmbed = new EmbedBuilder()
+          .setTitle(`${nextIcon} **${nextPrompt.type.toUpperCase()}**`)
+          .setDescription(
+            `**Target:** <@${btnInteraction.user.id}>\n\n` +
+            `>>> **"${nextPrompt.question}"**` +
+            (nextAiComment ? `\n\n*Tars: ${nextAiComment}*` : "")
+          )
+          .setFooter({ text: `Rating: ${nextPrompt.rating}` })
+          .setColor(EMBED_COLORS.GREY);
+
+        await btnInteraction.editReply({ embeds: [newEmbed], components: [buildButtons()] });
+      } catch (err) {
+        logger.error("Error in tod button handler:", err);
+      }
+    });
+
+    collector.on("end", async () => {
+      try {
+        const disabledButtons = new ActionRowBuilder().addComponents(
+          buildButtons().components.map((btn) => ButtonBuilder.from(btn).setDisabled(true))
+        );
+        await response.edit({ components: [disabledButtons] }).catch(() => null);
+      } catch {}
+    });
+
+  } catch (err) {
+    logger.error("Error in Truth or Dare command execution:", err);
+    Sentry.captureException(err);
+  }
+}
