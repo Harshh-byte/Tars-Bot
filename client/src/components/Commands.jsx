@@ -51,7 +51,7 @@ const commands = [
     category: "ai",
     title: "Rock, Paper, Scissors",
     description:
-      "Play Rock, Paper, Scissors against Tars or challenge a server member with custom match buttons.",
+      "Play Rock, Paper, Scissors against Tars or friends.",
     badge: "Games",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -60,7 +60,7 @@ const commands = [
     category: "ai",
     title: "Tic-Tac-Toe",
     description:
-      "Play interactive 3x3 Tic-Tac-Toe against Tars or challenge another player in real-time.",
+      "Play 3x3 Tic-Tac-Toe against Tars or friends.",
     badge: "Games",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
