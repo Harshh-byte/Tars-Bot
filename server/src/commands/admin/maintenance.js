@@ -1,4 +1,4 @@
-import { EmbedBuilder, MessageFlags } from "discord.js";
+import { EmbedBuilder, MessageFlags, PermissionFlagsBits } from "discord.js";
 import { errorEmbed } from "../../utils/embeds.js";
 import fs from "fs";
 
@@ -6,6 +6,7 @@ export const data = {
   name: "maintenance",
   description: "Manage system-wide maintenance mode.",
   dm_permission: false,
+  default_member_permissions: PermissionFlagsBits.Administrator.toString(),
   options: [
     {
       type: 1,

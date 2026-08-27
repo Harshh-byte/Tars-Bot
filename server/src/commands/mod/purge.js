@@ -3,6 +3,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
+  PermissionFlagsBits,
   MessageFlags,
 } from "discord.js";
 import { deleteUserData, deleteServerData } from "../../services/database.js";
@@ -11,6 +12,7 @@ export const data = {
   name: "purge",
   description: "Delete stored bot memory.",
   dm_permission: false,
+  default_member_permissions: PermissionFlagsBits.Administrator.toString(),
   options: [
     {
       type: 1,
