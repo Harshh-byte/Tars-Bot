@@ -20,15 +20,15 @@ export const data = {
 };
 
 function getLesbianCategory(percentage) {
-  if (percentage >= 85)
+  if (percentage >= 85) 
     return { category: "Sapphic Final Boss", emoji: "✂️" };
   if (percentage >= 60)
     return { category: "That's Not Very Straight", emoji: "🚨" };
-  if (percentage >= 35)
+  if (percentage >= 35) 
     return { category: "Certified Fruity", emoji: "🦄" };
-  if (percentage >= 15)
+  if (percentage >= 15) 
     return { category: "Hmm...Interesting", emoji: "👀" };
-  return { category: "Case Closed", emoji: "📋" };
+  return { category: "Allegations: Unfounded", emoji: "🗿" };
 }
 
 export async function execute(interaction, client) {
@@ -46,7 +46,7 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} lesbian percentage is \`${percentage}%\` \n*${category}*`
+        `${authorMention}: ${emoji} ${textPrefix} lesbian percentage is \`${percentage}%\` \n*${category}*`,
       )
       .setColor(EMBED_COLORS.GREY);
 

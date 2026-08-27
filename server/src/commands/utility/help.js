@@ -2,7 +2,8 @@ import {
   EmbedBuilder,
   ActionRowBuilder,
   StringSelectMenuBuilder,
-  ComponentType,
+  ButtonBuilder,
+  ButtonStyle,
 } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
@@ -24,11 +25,62 @@ export const data = {
   ],
 };
 
+const ITEMS_PER_PAGE = 5;
+
+const modulesCatalog = {
+  module_games: {
+    title: "<:Games:1542645834808565821> Games Module",
+    description: "Interactive Discord games and decision tools.",
+    commands: [
+      { name: "Rock, Paper, Scissors", cmd: "rps", desc: "Play against Tars or friends." },
+      { name: "Tic-Tac-Toe", cmd: "ttt", desc: "Play against Tars or friends." },
+      { name: "Truth or Dare", cmd: "tod", desc: "Play Truth or Dare with friends." },
+      { name: "Would You Rather", cmd: "wyr", desc: "Play Would You Rather with friends." },
+      { name: "Never Have I Ever", cmd: "nhie", desc: "Play Never Have I Ever with friends." },
+      { name: "Coin Flip", cmd: "flip", desc: "Flip a coin." },
+      { name: "Dice Roll", cmd: "roll", desc: "Roll a dice." },
+    ],
+  },
+  module_fun: {
+    title: "<:Fun:1542240014388170772> Fun Module",
+    description: "Calculators, memes, roasts, and wishes.",
+    commands: [
+      { name: "Gay Calculator", cmd: "gay", desc: "Calculate gay percentage." },
+      { name: "Lesbian Calculator", cmd: "lesbian", desc: "Calculate lesbian percentage." },
+      { name: "Bitches Calculator", cmd: "bitches", desc: "Calculate bitches count." },
+      { name: "Simp Calculator", cmd: "simp", desc: "Calculate simp percentage." },
+      { name: "Autism Calculator", cmd: "autism", desc: "Calculate autism percentage." },
+      { name: "PP Calculator", cmd: "pp", desc: "Check pp size." },
+      { name: "IQ Calculator", cmd: "iq", desc: "Calculate a user's IQ score." },
+      { name: "Sarcastic Roast", cmd: "roast", desc: "Customized verbal execution." },
+      { name: "Charismatic Wish", cmd: "wish", desc: "Generate custom event wishes." },
+      { name: "Reddit Memes", cmd: "meme", desc: "Fetch trending memes from Reddit." },
+    ],
+  },
+  module_actions: {
+    title: "<:Actions:1542647256782737559> Actions Module",
+    description: "Smoke and vape interactions.",
+    commands: [
+      { name: "Smoke", cmd: "smoke", desc: "Take a hit of smoke." },
+      { name: "Vape", cmd: "vape", desc: "Hit the vape." },
+    ],
+  },
+  module_utility: {
+    title: "<:Utility:1542239958612320306> Utility Module",
+    description: "System diagnostics and configuration tools.",
+    commands: [
+      { name: "Prefix", cmd: "prefix", desc: "View or update server prefix." },
+      { name: "Ping", cmd: "ping", desc: "Check bot latency." },
+      { name: "About", cmd: "about", desc: "View bot info and stats." },
+      { name: "Help", cmd: "help", desc: "Display command help menu." },
+    ],
+  },
+};
+
 export async function execute(interaction, client) {
   try {
-    const serverId = interaction.guild?.id || "DM";
-    const prefix = client.prefixCache?.get(serverId) || ".";
-    const botAvatar = client.user?.displayAvatarURL({ dynamic: true }) || null;
+    const serverId = interaction.guild?.id;
+    const prefix = client.prefixCache?.get(serverId);
 
     let queryCmd =
       interaction.options?.getString("command") ||
@@ -57,29 +109,38 @@ export async function execute(interaction, client) {
           ? targetCmd.aliases.map((a) => `\`${prefix}${a}\``).join(", ")
           : "None";
 
+      let usageText = `\`${prefix}${cmdName}\``;
+      if (targetCmd.data.options && targetCmd.data.options.length > 0) {
+        const hasSubcommands = targetCmd.data.options.some((opt) => opt.type === 1);
+        if (!hasSubcommands) {
+          const optStr = targetCmd.data.options
+            .map((opt) => (opt.required ? `[${opt.name}]` : `(${opt.name})`))
+            .join(" ");
+          usageText = `\`${prefix}${cmdName} ${optStr}\``;
+        } else {
+          const subNames = targetCmd.data.options.map((opt) => opt.name).join("|");
+          usageText = `\`${prefix}${cmdName} [${subNames}]\``;
+        }
+      }
+
       const detailEmbed = new EmbedBuilder()
         .setTitle(
-          `<:Book:1542272264710397992> **Command: ${prefix}${cmdName}**`,
+          `<:Book:1542647324570816532> **Command: ${prefix}${cmdName}**`,
         )
         .setDescription(cmdDesc)
         .addFields(
-          {
-            name: "Usage",
-            value: `\`${prefix}${cmdName}\` or \`/${cmdName}\``,
-            inline: true,
-          },
-          { name: "Aliases", value: cmdAliases, inline: true },
+          { name: "Usage", value: usageText, inline: false },
+          { name: "Aliases", value: cmdAliases, inline: false },
         )
-        .setThumbnail(botAvatar)
-        .setColor(EMBED_COLORS.GREY);
+        .setColor(EMBED_COLORS.WHITE);
 
       return interaction.reply({ embeds: [detailEmbed] });
     }
 
-    const totalCommands = new Set(client.commands?.values()).size || 11;
-    const totalModules = 2;
+    const totalCommands = new Set(client.commands?.values()).size;
+    const totalModules = 4;
 
-    const bookNotice = `<:Book:1542272264710397992> Use \`${prefix}help (command)\` for details on a specific command`;
+    const bookNotice = `<:Book:1542647324570816532> Use \`${prefix}help (command)\` for details on a specific command`;
 
     const mainEmbed = new EmbedBuilder()
       .setTitle("Tars Help")
@@ -96,8 +157,10 @@ export async function execute(interaction, client) {
           value: bookNotice,
         },
       )
-      .setThumbnail(botAvatar)
-      .setColor(EMBED_COLORS.GREY);
+      .setColor(EMBED_COLORS.WHITE);
+
+    let currentSelectedModule = "module_home";
+    let currentPage = 0;
 
     const buildMenu = (defaultValue = "module_home") => {
       const menu = new StringSelectMenuBuilder()
@@ -108,15 +171,29 @@ export async function execute(interaction, client) {
             label: "Home",
             description: "Main bot overview and system statistics.",
             value: "module_home",
-            emoji: "<:Home:1542239907584409672>",
+            emoji: "<:Home:1542647191691071548>",
             default: defaultValue === "module_home",
           },
           {
-            label: "Fun",
-            description: "Interactive games, fun tools, and entertainment.",
+            label: "Games",
+            description: "Interactive Discord games and decision tools.",
             value: "module_games",
-            emoji: "<:Fun:1542240014388170772>",
+            emoji: "<:Games:1542645834808565821>",
             default: defaultValue === "module_games",
+          },
+          {
+            label: "Fun",
+            description: "Calculators, memes, roasts, and wishes.",
+            value: "module_fun",
+            emoji: "<:Fun:1542240014388170772>",
+            default: defaultValue === "module_fun",
+          },
+          {
+            label: "Actions",
+            description: "Smoke, vape, slap, punch, and hug actions.",
+            value: "module_actions",
+            emoji: "<:Actions:1542647256782737559>",
+            default: defaultValue === "module_actions",
           },
           {
             label: "Utility",
@@ -129,30 +206,93 @@ export async function execute(interaction, client) {
       return new ActionRowBuilder().addComponents(menu);
     };
 
-    const replyPayload = {
-      embeds: [mainEmbed],
-      components: [buildMenu("module_home")],
+    const buildPaginationButtons = (page, totalPages) => {
+      if (totalPages <= 1) return null;
+
+      const prevBtn = new ButtonBuilder()
+        .setCustomId("help_prev_page")
+        .setEmoji("<:Left:1542658287894528100>")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(page === 0);
+
+      const pageIndicator = new ButtonBuilder()
+        .setCustomId("help_page_indicator")
+        .setLabel(`Page ${page + 1} of ${totalPages}`)
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(true);
+
+      const nextBtn = new ButtonBuilder()
+        .setCustomId("help_next_page")
+        .setEmoji("<:Right:1542658241400414298>")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(page === totalPages - 1);
+
+      return new ActionRowBuilder().addComponents(prevBtn, pageIndicator, nextBtn);
     };
 
+    const buildPayload = (selectedModule, page = 0) => {
+      if (selectedModule === "module_home") {
+        return {
+          embeds: [mainEmbed],
+          components: [buildMenu("module_home")],
+        };
+      }
+
+      const mod = modulesCatalog[selectedModule];
+      if (!mod) {
+        return {
+          embeds: [mainEmbed],
+          components: [buildMenu("module_home")],
+        };
+      }
+
+      const totalPages = Math.ceil(mod.commands.length / ITEMS_PER_PAGE) || 1;
+      const validPage = Math.max(0, Math.min(page, totalPages - 1));
+
+      const startIndex = validPage * ITEMS_PER_PAGE;
+      const pageCommands = mod.commands.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+      const fields = pageCommands.map((c) => ({
+        name: c.name,
+        value: `\`${prefix}${c.cmd}\` - ${c.desc}`,
+      }));
+
+      fields.push({ name: "\u200b", value: bookNotice });
+
+      const categoryEmbed = new EmbedBuilder()
+        .setTitle(mod.title)
+        .setDescription(`${mod.description}`)
+        .addFields(fields)
+        .setColor(EMBED_COLORS.WHITE);
+
+      const components = [buildMenu(selectedModule)];
+      const pageRow = buildPaginationButtons(validPage, totalPages);
+      if (pageRow) {
+        components.push(pageRow);
+      }
+
+      return {
+        embeds: [categoryEmbed],
+        components,
+      };
+    };
+
+    const initialPayload = buildPayload("module_home", 0);
+
     let response;
-    if (interaction.replied || interaction.deferred) {
-      response = await interaction.followUp({
-        ...replyPayload,
-        fetchReply: true,
-      });
-    } else if (
+    if (
       typeof interaction.isStringSelectMenu === "function" &&
       interaction.isStringSelectMenu()
     ) {
-      await interaction.update(replyPayload);
+      await interaction.update(initialPayload);
       response = await interaction.fetchReply();
+    } else if (interaction.deferred || interaction.replied) {
+      response = await interaction.editReply(initialPayload);
     } else {
-      response = await interaction.reply({ ...replyPayload, fetchReply: true });
+      response = await interaction.reply({ ...initialPayload, fetchReply: true });
     }
 
     const collector = response.createMessageComponentCollector({
-      componentType: ComponentType.StringSelect,
-      filter: (i) => i.customId === "help_category_select",
       time: 60000,
     });
 
@@ -164,111 +304,37 @@ export async function execute(interaction, client) {
         });
       }
 
-      const selected = i.values[0];
-      let categoryEmbed;
-
-      if (selected === "module_home") {
-        categoryEmbed = mainEmbed;
-      } else if (selected === "module_games") {
-        categoryEmbed = new EmbedBuilder()
-          .setTitle("<:Fun:1542240014388170772> Fun Module")
-          .setDescription(
-            `Interactive games and entertainment commands. (Prefix: \`${prefix}\`)`,
-          )
-          .addFields(
-            {
-              name: "Rock, Paper, Scissors",
-              value: `\`${prefix}rps\` - Play against Tars or friends.`,
-            },
-            {
-              name: "Tic-Tac-Toe",
-              value: `\`${prefix}ttt\` - Play against Tars or friends.`,
-            },
-            {
-              name: "Gay Calculator",
-              value: `\`${prefix}gay\` - Calculate gay percentage.`,
-            },
-            {
-              name: "Lesbian Calculator",
-              value: `\`${prefix}lesbian\` - Calculate lesbian percentage.`,
-            },
-            {
-              name: "PP Calculator",
-              value: `\`${prefix}pp\` - Check pp size.`,
-            },
-            {
-              name: "IQ Calculator",
-              value: `\`${prefix}iq\` - Calculate a user's IQ score.`,
-            },
-            {
-              name: "Sarcastic Roast",
-              value: `\`${prefix}roast\` - Customized verbal execution.`,
-            },
-            {
-              name: "Charismatic Wish",
-              value: `\`${prefix}wish\` - Generate custom event wishes.`,
-            },
-            {
-              name: "Reddit Memes",
-              value: `\`${prefix}meme\` - Fetch trending memes from Reddit.`,
-            },
-            {
-              name: "Truth or Dare",
-              value: `\`${prefix}tod\` - Play Truth or Dare with friends.`,
-            },
-            {
-              name: "Would You Rather",
-              value: `\`${prefix}wyr\` - Play Would You Rather with friends.`,
-            },
-            {
-              name: "Never Have I Ever",
-              value: `\`${prefix}nhie\` - Play Never Have I Ever with friends.`,
-            },
-            { name: "Coin Flip", value: `\`${prefix}flip\` - Flip a coin.` },
-            { name: "Dice Roll", value: `\`${prefix}roll\` - Roll a dice.` },
-            { name: "\u200b", value: bookNotice },
-          )
-          .setThumbnail(botAvatar)
-          .setColor(EMBED_COLORS.GREY);
-      } else if (selected === "module_utility") {
-        categoryEmbed = new EmbedBuilder()
-          .setTitle("<:Utility:1542239958612320306> Utility Module")
-          .setDescription(
-            `System diagnostics and configuration tools. (Prefix: \`${prefix}\`)`,
-          )
-          .addFields(
-            {
-              name: "Prefix Manager",
-              value: `\`${prefix}prefix\` - View or update server command prefix.`,
-            },
-            {
-              name: "Gateway Diagnostics",
-              value: `\`${prefix}ping\` - Check API & WebSocket latency.`,
-            },
-            {
-              name: "Cognitive Parameters",
-              value: `\`${prefix}about\` - View system status, quotients & credits.`,
-            },
-            {
-              name: "Help Menu",
-              value: `\`${prefix}help\` - Display interactive command menu.`,
-            },
-            { name: "\u200b", value: bookNotice },
-          )
-          .setThumbnail(botAvatar)
-          .setColor(EMBED_COLORS.GREY);
+      if (i.isStringSelectMenu() && i.customId === "help_category_select") {
+        currentSelectedModule = i.values[0];
+        currentPage = 0;
+      } else if (i.isButton()) {
+        if (i.customId === "help_prev_page") {
+          currentPage = Math.max(0, currentPage - 1);
+        } else if (i.customId === "help_next_page") {
+          currentPage++;
+        }
       }
 
-      await i.update({
-        embeds: [categoryEmbed],
-        components: [buildMenu(selected)],
-      });
+      const newPayload = buildPayload(currentSelectedModule, currentPage);
+      await i.update(newPayload);
     });
 
     collector.on("end", async () => {
-      const disabledRow = buildMenu();
-      disabledRow.components[0].setDisabled(true);
-      await response.edit({ components: [disabledRow] }).catch(() => null);
+      const disabledMenu = buildMenu(currentSelectedModule);
+      disabledMenu.components[0].setDisabled(true);
+      const components = [disabledMenu];
+
+      const mod = modulesCatalog[currentSelectedModule];
+      if (mod) {
+        const totalPages = Math.ceil(mod.commands.length / ITEMS_PER_PAGE) || 1;
+        if (totalPages > 1) {
+          const disabledPageRow = buildPaginationButtons(currentPage, totalPages);
+          disabledPageRow.components.forEach((btn) => btn.setDisabled(true));
+          components.push(disabledPageRow);
+        }
+      }
+
+      await response.edit({ components }).catch(() => null);
     });
   } catch (err) {
     logger.error("Error in Help command handler:", err);

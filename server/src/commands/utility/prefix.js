@@ -1,7 +1,7 @@
 import { EmbedBuilder, PermissionFlagsBits } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMBED_COLORS, errorEmbed, successEmbed } from "../../utils/embeds.js";
 import { updateServerSettings } from "../../services/database.js";
 
 export const aliases = ["pref"];
@@ -28,8 +28,8 @@ export async function execute(interaction, client) {
     if (!newPrefix || newPrefix.trim() === "") {
       const currentPrefix = client.prefixCache?.get(serverId) || ".";
       const embed = new EmbedBuilder()
-        .setDescription(`|>  Server prefix is \`${currentPrefix}\``)
-        .setColor(EMBED_COLORS.GREY);
+        .setDescription(`<:Prefix:1542236764465274910> Server prefix is \`${currentPrefix}\``)
+        .setColor(EMBED_COLORS.WHITE);
       return interaction.reply({ embeds: [embed] });
     }
 
@@ -39,17 +39,19 @@ export async function execute(interaction, client) {
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
       interaction.user.id !== process.env.OWNER_ID
     ) {
-      const errEmbed = new EmbedBuilder()
-        .setDescription("You need the `Manage Server` permission to change the bot prefix.")
-        .setColor(EMBED_COLORS.ERROR);
+      const errEmbed = errorEmbed({
+        title: "Permission Denied",
+        description: "You need the `Manage Server` permission to change the bot prefix.",
+      });
       return interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
 
     const cleanedPrefix = newPrefix.trim();
     if (cleanedPrefix.length > 5) {
-      const errEmbed = new EmbedBuilder()
-        .setDescription("Prefix cannot be longer than 5 characters.")
-        .setColor(EMBED_COLORS.ERROR);
+      const errEmbed = errorEmbed({
+        title: "Invalid Prefix",
+        description: "Prefix cannot be longer than 5 characters.",
+      });
       return interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
 
@@ -62,11 +64,12 @@ export async function execute(interaction, client) {
       });
     }
 
-    const embed = new EmbedBuilder()
-      .setDescription(`|>  Server prefix changed to \`${cleanedPrefix}\``)
-      .setColor(EMBED_COLORS.GREY);
+    const sEmbed = successEmbed({
+      title: "Prefix Updated",
+      description: `<:Prefix:1542236764465274910> Server prefix changed to \`${cleanedPrefix}\``,
+    });
 
-    await interaction.reply({ embeds: [embed] });
+    await interaction.reply({ embeds: [sEmbed] });
   } catch (err) {
     logger.error("Error in Prefix command handler:", err);
     Sentry.captureException(err);
