@@ -30,7 +30,9 @@ export async function execute(interaction, client) {
     const prefix = client.prefixCache?.get(serverId) || ".";
     const botAvatar = client.user?.displayAvatarURL({ dynamic: true }) || null;
 
-    let queryCmd = interaction.options?.getString("command") || interaction.options?.getString();
+    let queryCmd =
+      interaction.options?.getString("command") ||
+      interaction.options?.getString();
     if (typeof queryCmd === "string") {
       queryCmd = queryCmd.trim().split(/ +/)[0].toLowerCase();
     }
@@ -41,23 +43,32 @@ export async function execute(interaction, client) {
       if (!targetCmd) {
         const notFoundEmbed = new EmbedBuilder()
           .setTitle("<:Failed:1526228290413658184> Command Not Found")
-          .setDescription(`No command or alias found for \`${queryCmd}\`.\nType \`${prefix}help\` to view all commands.`)
+          .setDescription(
+            `No command or alias found for \`${queryCmd}\`.\nType \`${prefix}help\` to view all commands.`,
+          )
           .setColor(EMBED_COLORS.ERROR);
         return interaction.reply({ embeds: [notFoundEmbed] });
       }
 
       const cmdName = targetCmd.data.name;
       const cmdDesc = targetCmd.data.description || "No description provided.";
-      const cmdAliases = targetCmd.aliases && targetCmd.aliases.length > 0
-        ? targetCmd.aliases.map((a) => `\`${prefix}${a}\``).join(", ")
-        : "None";
+      const cmdAliases =
+        targetCmd.aliases && targetCmd.aliases.length > 0
+          ? targetCmd.aliases.map((a) => `\`${prefix}${a}\``).join(", ")
+          : "None";
 
       const detailEmbed = new EmbedBuilder()
-        .setTitle(`<:Book:1542272264710397992> **Command: ${prefix}${cmdName}**`)
+        .setTitle(
+          `<:Book:1542272264710397992> **Command: ${prefix}${cmdName}**`,
+        )
         .setDescription(cmdDesc)
         .addFields(
-          { name: "Usage", value: `\`${prefix}${cmdName}\` or \`/${cmdName}\``, inline: true },
-          { name: "Aliases", value: cmdAliases, inline: true }
+          {
+            name: "Usage",
+            value: `\`${prefix}${cmdName}\` or \`/${cmdName}\``,
+            inline: true,
+          },
+          { name: "Aliases", value: cmdAliases, inline: true },
         )
         .setThumbnail(botAvatar)
         .setColor(EMBED_COLORS.GREY);
@@ -73,7 +84,7 @@ export async function execute(interaction, client) {
     const mainEmbed = new EmbedBuilder()
       .setTitle("Tars Help")
       .setDescription(
-        "-# Experience the ultimate Discord bot designed for seamless management and community engagement."
+        "-# Experience the ultimate Discord bot designed for seamless management and community engagement.",
       )
       .addFields(
         {
@@ -83,7 +94,7 @@ export async function execute(interaction, client) {
         {
           name: "\u200b",
           value: bookNotice,
-        }
+        },
       )
       .setThumbnail(botAvatar)
       .setColor(EMBED_COLORS.GREY);
@@ -125,8 +136,14 @@ export async function execute(interaction, client) {
 
     let response;
     if (interaction.replied || interaction.deferred) {
-      response = await interaction.followUp({ ...replyPayload, fetchReply: true });
-    } else if (typeof interaction.isStringSelectMenu === "function" && interaction.isStringSelectMenu()) {
+      response = await interaction.followUp({
+        ...replyPayload,
+        fetchReply: true,
+      });
+    } else if (
+      typeof interaction.isStringSelectMenu === "function" &&
+      interaction.isStringSelectMenu()
+    ) {
       await interaction.update(replyPayload);
       response = await interaction.fetchReply();
     } else {
@@ -155,41 +172,97 @@ export async function execute(interaction, client) {
       } else if (selected === "module_games") {
         categoryEmbed = new EmbedBuilder()
           .setTitle("<:Fun:1542240014388170772> Fun Module")
-          .setDescription(`Interactive games and entertainment commands. (Prefix: \`${prefix}\`)`)
+          .setDescription(
+            `Interactive games and entertainment commands. (Prefix: \`${prefix}\`)`,
+          )
           .addFields(
-            { name: "Rock, Paper, Scissors", value: `\`${prefix}rps\` - Play against Tars or challenge members.` },
-            { name: "Tic-Tac-Toe", value: `\`${prefix}ttt\` - Play 3x3 Tic-Tac-Toe vs Tars or friends.` },
-            { name: "Gay Calculator", value: `\`${prefix}gay\` - Calculate gay percentage.` },
-            { name: "Lesbian Calculator", value: `\`${prefix}lesbian\` - Calculate lesbian percentage.` },
-            { name: "PP Calculator", value: `\`${prefix}pp\` - Check pp size.` },
-            { name: "Sarcastic Roast", value: `\`${prefix}roast\` - Customized verbal execution.` },
-            { name: "Charismatic Wish", value: `\`${prefix}wish\` - Generate custom event wishes.` },
-            { name: "Reddit Memes", value: `\`${prefix}meme\` - Fetch trending memes from Reddit.` },
-            { name: "Truth or Dare", value: `\`${prefix}tod\` - Play Truth or Dare with Tars or friends.` },
-            { name: "Would You Rather", value: `\`${prefix}wyr\` - Play Would You Rather with Tars or friends.` },
-            { name: "IQ Calculator", value: `\`${prefix}iq\` - Calculate a user's IQ score.` },
-            { name: "Coin Flip", value: `\`${prefix}flip\` - Flip a coin (Heads or Tails).` },
-            { name: "Dice Roll", value: `\`${prefix}roll\` - Roll a dice (1-6).` },
-            { name: "\u200b", value: bookNotice }
+            {
+              name: "Rock, Paper, Scissors",
+              value: `\`${prefix}rps\` - Play against Tars or friends.`,
+            },
+            {
+              name: "Tic-Tac-Toe",
+              value: `\`${prefix}ttt\` - Play against Tars or friends.`,
+            },
+            {
+              name: "Gay Calculator",
+              value: `\`${prefix}gay\` - Calculate gay percentage.`,
+            },
+            {
+              name: "Lesbian Calculator",
+              value: `\`${prefix}lesbian\` - Calculate lesbian percentage.`,
+            },
+            {
+              name: "PP Calculator",
+              value: `\`${prefix}pp\` - Check pp size.`,
+            },
+            {
+              name: "IQ Calculator",
+              value: `\`${prefix}iq\` - Calculate a user's IQ score.`,
+            },
+            {
+              name: "Sarcastic Roast",
+              value: `\`${prefix}roast\` - Customized verbal execution.`,
+            },
+            {
+              name: "Charismatic Wish",
+              value: `\`${prefix}wish\` - Generate custom event wishes.`,
+            },
+            {
+              name: "Reddit Memes",
+              value: `\`${prefix}meme\` - Fetch trending memes from Reddit.`,
+            },
+            {
+              name: "Truth or Dare",
+              value: `\`${prefix}tod\` - Play Truth or Dare with friends.`,
+            },
+            {
+              name: "Would You Rather",
+              value: `\`${prefix}wyr\` - Play Would You Rather with friends.`,
+            },
+            {
+              name: "Never Have I Ever",
+              value: `\`${prefix}nhie\` - Play Never Have I Ever with friends.`,
+            },
+            { name: "Coin Flip", value: `\`${prefix}flip\` - Flip a coin.` },
+            { name: "Dice Roll", value: `\`${prefix}roll\` - Roll a dice.` },
+            { name: "\u200b", value: bookNotice },
           )
           .setThumbnail(botAvatar)
           .setColor(EMBED_COLORS.GREY);
       } else if (selected === "module_utility") {
         categoryEmbed = new EmbedBuilder()
           .setTitle("<:Utility:1542239958612320306> Utility Module")
-          .setDescription(`System diagnostics and configuration tools. (Prefix: \`${prefix}\`)`)
+          .setDescription(
+            `System diagnostics and configuration tools. (Prefix: \`${prefix}\`)`,
+          )
           .addFields(
-            { name: "Prefix Manager", value: `\`${prefix}prefix\` - View or update server command prefix.` },
-            { name: "Gateway Diagnostics", value: `\`${prefix}ping\` - Check API & WebSocket latency.` },
-            { name: "Cognitive Parameters", value: `\`${prefix}about\` - View system status, quotients & credits.` },
-            { name: "Help Menu", value: `\`${prefix}help\` - Display interactive command menu.` },
-            { name: "\u200b", value: bookNotice }
+            {
+              name: "Prefix Manager",
+              value: `\`${prefix}prefix\` - View or update server command prefix.`,
+            },
+            {
+              name: "Gateway Diagnostics",
+              value: `\`${prefix}ping\` - Check API & WebSocket latency.`,
+            },
+            {
+              name: "Cognitive Parameters",
+              value: `\`${prefix}about\` - View system status, quotients & credits.`,
+            },
+            {
+              name: "Help Menu",
+              value: `\`${prefix}help\` - Display interactive command menu.`,
+            },
+            { name: "\u200b", value: bookNotice },
           )
           .setThumbnail(botAvatar)
           .setColor(EMBED_COLORS.GREY);
       }
 
-      await i.update({ embeds: [categoryEmbed], components: [buildMenu(selected)] });
+      await i.update({
+        embeds: [categoryEmbed],
+        components: [buildMenu(selected)],
+      });
     });
 
     collector.on("end", async () => {

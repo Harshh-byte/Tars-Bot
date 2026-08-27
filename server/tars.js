@@ -346,7 +346,10 @@ export async function buildAiReply({
   }
 
   let gifUrl = null;
-  if (replyObj.gifSearchQuery) {
+  const isExplicitGifRequest = /gif|image|pic|photo|meme/i.test(inputText);
+  const allowGif = isExplicitGifRequest || Math.random() < 0.2;
+
+  if (replyObj.gifSearchQuery && allowGif) {
     gifUrl = await searchGiphy(replyObj.gifSearchQuery);
     if (!gifUrl) {
       gifUrl = await searchKlipy(replyObj.gifSearchQuery);
