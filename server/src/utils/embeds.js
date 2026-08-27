@@ -5,9 +5,7 @@ export const EMBED_COLORS = {
   SUCCESS: 0x2ecc71,
   ERROR: 0xff4757,
   WARNING: 0xffa502,
-  PURPLE: 0x9b59b6,
-  BLUE: 0x3498db,
-  GREY: 0x2b2d31, // Premium sleek dark charcoal grey
+  GREY: 0x2b2d31,
   TIMEOUT: 0x2b2d31,
 };
 
@@ -53,12 +51,3 @@ export function warningEmbed({ title = "Warning", description }) {
     .setTitle(`<:Warning:1526228248458035381> **${title}**`)
     .setDescription(description);
 }
-export function greyEmbed({ title, description, fields = [] }) {
-  const embed = new EmbedBuilder()
-    .setColor(EMBED_COLORS.GREY);
-  if (title) embed.setTitle(title);
-  if (description) embed.setDescription(description);
-  if (fields.length) embed.addFields(fields);
-  return embed;
-}
-

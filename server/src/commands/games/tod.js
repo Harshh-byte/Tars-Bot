@@ -7,7 +7,6 @@ import {
 } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { EMBED_COLORS } from "../../utils/embeds.js";
 
 const FALLBACK_TRUTHS = [
   "What is the most embarrassing thing you've done on a Discord call?",
@@ -33,7 +32,7 @@ export const aliases = ["truth", "dare", "tod"];
 
 export const data = {
   name: "tod",
-  description: "Play Truth or Dare with Tars AI commentary.",
+  description: "Play Truth or Dare.",
   dm_permission: false,
   options: [
     {
@@ -162,16 +161,17 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       }
     }
 
+    const requestorName = interaction.member?.displayName || interaction.user.username;
+
     const titleIcon = promptType === "truth" ? "❓" : "🎯";
     const embed = new EmbedBuilder()
       .setTitle(`${titleIcon} **${promptType.toUpperCase()}**`)
       .setDescription(
-        `**Target:** <@${targetUser.id}>\n\n` +
-        `>>> **"${question}"**` +
+        `${question}` +
         (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "")
       )
-      .setFooter({ text: `Rating: ${rating}` })
-      .setColor(EMBED_COLORS.GREY);
+      .setFooter({ text: `Rating: ${rating} • Requestor: ${requestorName}` })
+      .setColor(Math.floor(Math.random() * 16777215));
 
     const payload = { embeds: [embed], components: [buildButtons()] };
 
@@ -182,62 +182,73 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       response = await interaction.reply({ ...payload, fetchReply: true });
     }
 
-    if (!response || typeof response.createMessageComponentCollector !== "function") {
-      return;
-    }
-
-    const collector = response.createMessageComponentCollector({
-      componentType: ComponentType.Button,
-      time: 60000,
-    });
-
-    collector.on("collect", async (btnInteraction) => {
-      try {
-        await btnInteraction.deferUpdate();
-        const selectedType = btnInteraction.customId.replace("tod_", "");
-        const nextPrompt = await fetchQuestion(selectedType, ratingInput);
-
-        let nextAiComment = "";
-        if (typeof buildAiReply === "function") {
-          try {
-            const res = await buildAiReply({
-              authorId: btnInteraction.user.id,
-              inputText: `Give a witty 1-sentence sarcastic remark about giving this ${nextPrompt.rating} ${nextPrompt.type.toUpperCase()} prompt to ${btnInteraction.user.username}: "${nextPrompt.question}"`,
-              mode: "normal",
-              guild: btnInteraction.guild,
-            });
-            if (res?.text) nextAiComment = res.text.trim();
-          } catch {}
-        }
-
-        const nextIcon = nextPrompt.type === "truth" ? "❓" : "🎯";
-        const newEmbed = new EmbedBuilder()
-          .setTitle(`${nextIcon} **${nextPrompt.type.toUpperCase()}**`)
-          .setDescription(
-            `**Target:** <@${btnInteraction.user.id}>\n\n` +
-            `>>> **"${nextPrompt.question}"**` +
-            (nextAiComment ? `\n\n*Tars: ${nextAiComment}*` : "")
-          )
-          .setFooter({ text: `Rating: ${nextPrompt.rating}` })
-          .setColor(EMBED_COLORS.GREY);
-
-        await btnInteraction.editReply({ embeds: [newEmbed], components: [buildButtons()] });
-      } catch (err) {
-        logger.error("Error in tod button handler:", err);
-      }
-    });
-
-    collector.on("end", async () => {
-      try {
-        const disabledButtons = new ActionRowBuilder().addComponents(
-          buildButtons().components.map((btn) => ButtonBuilder.from(btn).setDisabled(true))
-        );
-        await response.edit({ components: [disabledButtons] }).catch(() => null);
-      } catch {}
-    });
-
+    attachTodCollector(response, ratingInput, buildAiReply);
   } catch (err) {
     logger.error("Error in Truth or Dare command execution:", err);
     Sentry.captureException(err);
   }
+}
+
+function attachTodCollector(message, ratingInput, buildAiReply) {
+  if (!message || typeof message.createMessageComponentCollector !== "function") {
+    return;
+  }
+
+  const collector = message.createMessageComponentCollector({
+    componentType: ComponentType.Button,
+    time: 60000,
+  });
+
+  collector.on("collect", async (btnInteraction) => {
+    try {
+      await btnInteraction.deferUpdate();
+
+      const selectedType = btnInteraction.customId.replace("tod_", "");
+      const nextPrompt = await fetchQuestion(selectedType, ratingInput);
+
+      let nextAiComment = "";
+      if (typeof buildAiReply === "function") {
+        try {
+          const res = await buildAiReply({
+            authorId: btnInteraction.user.id,
+            inputText: `Give a witty 1-sentence sarcastic remark about giving this ${nextPrompt.rating} ${nextPrompt.type.toUpperCase()} prompt to ${btnInteraction.user.username}: "${nextPrompt.question}"`,
+            mode: "normal",
+            guild: btnInteraction.guild,
+          });
+          if (res?.text) nextAiComment = res.text.trim();
+        } catch {}
+      }
+
+      const requestorName = btnInteraction.member?.displayName || btnInteraction.user.username;
+
+      const nextIcon = nextPrompt.type === "truth" ? "❓" : "🎯";
+      const newEmbed = new EmbedBuilder()
+        .setTitle(`${nextIcon} **${nextPrompt.type.toUpperCase()}**`)
+        .setDescription(
+          `${nextPrompt.question}` +
+          (nextAiComment ? `\n\n*Tars: ${nextAiComment}*` : "")
+        )
+        .setFooter({ text: `Rating: ${nextPrompt.rating} • Requestor: ${requestorName}` })
+        .setColor(Math.floor(Math.random() * 16777215));
+
+      const newMsg = await btnInteraction.followUp({
+        embeds: [newEmbed],
+        components: [buildButtons()],
+        fetchReply: true,
+      });
+
+      attachTodCollector(newMsg, ratingInput, buildAiReply);
+    } catch (err) {
+      logger.error("Error in tod button handler:", err);
+    }
+  });
+
+  collector.on("end", async () => {
+    try {
+      const disabledButtons = new ActionRowBuilder().addComponents(
+        buildButtons().components.map((btn) => ButtonBuilder.from(btn).setDisabled(true))
+      );
+      await message.edit({ components: [disabledButtons] }).catch(() => null);
+    } catch {}
+  });
 }

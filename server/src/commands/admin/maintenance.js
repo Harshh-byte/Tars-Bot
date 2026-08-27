@@ -1,4 +1,4 @@
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, MessageFlags } from "discord.js";
 import { errorEmbed } from "../../utils/embeds.js";
 import fs from "fs";
 
@@ -57,6 +57,9 @@ export async function execute(interaction, client) {
       const startMsg = await interaction.channel.send({ embeds: [startEmbed] });
 
       client.maintenanceMode = true;
+      if (typeof client.updateBotPresence === "function") {
+        client.updateBotPresence();
+      }
       fs.writeFileSync(
         new URL("../../../../maintenance.json", import.meta.url),
         JSON.stringify(
@@ -83,6 +86,9 @@ export async function execute(interaction, client) {
   } else if (subcommand === "complete") {
     try {
       client.maintenanceMode = false;
+      if (typeof client.updateBotPresence === "function") {
+        client.updateBotPresence();
+      }
   
       let messageId = null;
       let channelId = null;

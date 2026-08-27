@@ -7,7 +7,8 @@ export const name = Events.MessageCreate;
 export async function execute(message, client, { buildAiReply }) {
   if (message.author.bot) return;
 
-  if (client.maintenanceMode && message.author.id !== process.env.OWNER_ID) return;
+  const EXEMPT_GUILD_ID = process.env.EXEMPT_GUILD_ID;
+  if (client.maintenanceMode && message.guild?.id !== EXEMPT_GUILD_ID && message.author.id !== process.env.OWNER_ID) return;
 
   const isMentioned = message.mentions.has(client.user);
   let isReplyToBot = false;
@@ -42,7 +43,7 @@ export async function execute(message, client, { buildAiReply }) {
 
     const command = client.commands.get(commandName);
     if (command) {
-      const targetUser = message.mentions.users.first() || null;
+      const targetUser = message.mentions.users.find((u) => message.content.includes(u.id)) || null;
       
       const mockInteraction = {
         commandName: commandName,

@@ -60,11 +60,12 @@ async function startGame(interaction, client, opponent) {
       const userDisplayName = interaction.member?.displayName || interaction.user.displayName || interaction.user.username;
 
       const embed = new EmbedBuilder()
-        .setTitle("🪨📄✂️ Rock, Paper, Scissors vs Tars")
+        .setTitle("🪨📄✂️ **ROCK, PAPER, SCISSORS**")
         .setDescription(
           `**${userDisplayName}**, choose your move below! Tars has already made his decision.`
         )
-        .setColor(0x3498db);
+        .setFooter({ text: `Requestor: ${userDisplayName}` })
+        .setColor(Math.floor(Math.random() * 16777215));
 
       const replyPayload = {
         embeds: [embed],
@@ -96,28 +97,29 @@ async function startGame(interaction, client, opponent) {
         const tarsChoice = tarsChoices[Math.floor(Math.random() * tarsChoices.length)];
 
         let resultText = "";
-        let color = EMBED_COLORS.GREY;
+        let color = EMBED_COLORS.WARNING;
 
         if (userChoice === tarsChoice) {
-          resultText = `**It's a tie!** Both chose ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.`;
+          resultText = `🤝 **It's a Tie!** Both chose ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.`;
         } else if (CHOICES[userChoice].beats === tarsChoice) {
-          resultText = `🎉 **You won!** Your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}** beats Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}**.\n*Tars: "My humor setting is set to 75%, but your luck is at 100%."*`;
+          resultText = `🎉 **You won!** Your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}** beats Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}**.\n\n*Tars: "My humor setting is set to 75%, but your luck is at 100%."*`;
           color = EMBED_COLORS.SUCCESS;
         } else {
-          resultText = `**Tars won!** Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}** beats your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.\n*Tars: "Predictable. Better luck next time."*`;
+          resultText = `🎉 **Tars won!** Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}** beats your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.\n\n*Tars: "Predictable. Better luck next time."*`;
           color = EMBED_COLORS.ERROR;
         }
 
         const resultEmbed = new EmbedBuilder()
-          .setTitle("Game Results")
+          .setTitle("🪨📄✂️ **MATCH RESULTS**")
           .setDescription(resultText)
+          .setFooter({ text: `Requestor: ${userDisplayName}` })
           .setColor(color);
 
         const playAgainRow = new ActionRowBuilder().addComponents(
           new ButtonBuilder()
             .setCustomId("rps_play_again")
             .setLabel("Play Again")
-            .setStyle(ButtonStyle.Secondary)
+            .setStyle(ButtonStyle.Primary)
         );
 
         await i.update({ embeds: [resultEmbed], components: [playAgainRow] });
@@ -202,15 +204,27 @@ async function startGame(interaction, client, opponent) {
         .setStyle(ButtonStyle.Danger)
     );
 
+    const playerChoices = {};
+
+    const getPvpContent = () => {
+      const p1Done = !!playerChoices[interaction.user.id];
+      const p2Done = !!playerChoices[opponent.id];
+      if (p1Done && p2Done) return null;
+      if (p1Done) return `<@${opponent.id}>`;
+      if (p2Done) return `<@${interaction.user.id}>`;
+      return `<@${interaction.user.id}> <@${opponent.id}>`;
+    };
+
     const embed = new EmbedBuilder()
-      .setTitle("🪨📄✂️ PvP Rock, Paper, Scissors")
+      .setTitle("🪨📄✂️ **ROCK, PAPER, SCISSORS**")
       .setDescription(
-        `**${userDisplayName}** challenged **${opponentDisplayName}**!\n\nBoth players, click your moves below. Choices are hidden until both respond!`
+        `**${userDisplayName}** vs **${opponentDisplayName}**!\n\nBoth players, click your moves below. Choices are hidden until both respond!`
       )
-      .setColor(EMBED_COLORS.PURPLE);
+      .setFooter({ text: `Requestor: ${userDisplayName}` })
+      .setColor(Math.floor(Math.random() * 16777215));
 
     const replyPayload = {
-      content: `<@${opponent.id}>`,
+      content: getPvpContent(),
       embeds: [embed],
       components: [row],
       fetchReply: true,
@@ -221,8 +235,6 @@ async function startGame(interaction, client, opponent) {
       : interaction.isButton()
       ? await interaction.update(replyPayload) || await interaction.fetchReply()
       : await interaction.reply(replyPayload);
-
-    const playerChoices = {};
 
     const collector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
@@ -249,13 +261,14 @@ async function startGame(interaction, client, opponent) {
       const p2Choice = playerChoices[opponent.id] ? "<:Picked:1542151058929746090> Picked" : "<:Timer:1542147643021725796> Waiting...";
 
       const updatedEmbed = new EmbedBuilder()
-        .setTitle("🪨📄✂️ PvP Rock, Paper, Scissors")
+        .setTitle("🪨📄✂️ **ROCK, PAPER, SCISSORS**")
         .setDescription(
           `**${userDisplayName}**: ${p1Choice}\n**${opponentDisplayName}**: ${p2Choice}`
         )
-        .setColor(EMBED_COLORS.PURPLE);
+        .setFooter({ text: `Requestor: ${userDisplayName}` })
+        .setColor(Math.floor(Math.random() * 16777215));
 
-      await response.edit({ embeds: [updatedEmbed] }).catch(() => null);
+      await response.edit({ content: getPvpContent(), embeds: [updatedEmbed] }).catch(() => null);
 
       if (playerChoices[interaction.user.id] && playerChoices[opponent.id]) {
         collector.stop("both_played");
@@ -268,10 +281,10 @@ async function startGame(interaction, client, opponent) {
         const c2 = playerChoices[opponent.id];
 
         let resultMsg = "";
-        let color = EMBED_COLORS.GREY;
+        let color = EMBED_COLORS.WARNING;
 
         if (c1 === c2) {
-          resultMsg = `**It's a tie!** Both players picked ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
+          resultMsg = `🤝 **It's a tie!** Both players picked ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
         } else if (CHOICES[c1].beats === c2) {
           resultMsg = `🎉 **${userDisplayName} wins!**\n${CHOICES[c1].emoji} **${CHOICES[c1].name}** beats ${CHOICES[c2].emoji} **${CHOICES[c2].name}**.`;
           color = EMBED_COLORS.SUCCESS;
@@ -281,18 +294,19 @@ async function startGame(interaction, client, opponent) {
         }
 
         const finalEmbed = new EmbedBuilder()
-          .setTitle("Match Results")
+          .setTitle("🪨📄✂️ **MATCH RESULTS**")
           .setDescription(resultMsg)
+          .setFooter({ text: `Requestor: ${userDisplayName}` })
           .setColor(color);
 
         const playAgainRow = new ActionRowBuilder().addComponents(
           new ButtonBuilder()
             .setCustomId("rps_play_again")
             .setLabel("Play Again")
-            .setStyle(ButtonStyle.Secondary)
+            .setStyle(ButtonStyle.Primary)
         );
 
-        await response.edit({ embeds: [finalEmbed], components: [playAgainRow] }).catch(() => null);
+        await response.edit({ content: null, embeds: [finalEmbed], components: [playAgainRow] }).catch(() => null);
 
         const pvpPlayAgainCollector = response.createMessageComponentCollector({
           componentType: ComponentType.Button,
@@ -309,7 +323,6 @@ async function startGame(interaction, client, opponent) {
             }
             pvpPlayAgainCollector.stop("restarted");
 
-            const newChallenger = paInteraction.user;
             const newOpponent = paInteraction.user.id === interaction.user.id ? opponent : interaction.user;
 
             return startGame(paInteraction, client, newOpponent);
@@ -334,7 +347,7 @@ async function startGame(interaction, client, opponent) {
           .setDescription("One or both players failed to make a move in time!")
           .setColor(EMBED_COLORS.TIMEOUT);
 
-        await response.edit({ embeds: [timeoutEmbed], components: [] }).catch(() => null);
+        await response.edit({ content: null, embeds: [timeoutEmbed], components: [] }).catch(() => null);
       }
     });
   } catch (err) {

@@ -39,11 +39,10 @@ const client = new Client({
 let maintenanceActive = false;
 try {
   const maintenanceData = JSON.parse(
-    fs.readFileSync(new URL("../maintenance.json", import.meta.url), "utf-8")
+    fs.readFileSync(new URL("../maintenance.json", import.meta.url), "utf-8"),
   );
   maintenanceActive = !!maintenanceData.active;
-} catch (e) {
-}
+} catch (e) {}
 client.maintenanceMode = maintenanceActive;
 
 client.commands = new Map();
@@ -167,7 +166,7 @@ function validateEmojiTags(text) {
       return match;
     }
     const fallback = client.emojis.cache.find(
-      (e) => e.name.toLowerCase() === name.toLowerCase()
+      (e) => e.name.toLowerCase() === name.toLowerCase(),
     );
     return fallback ? fallback.toString() : `:${name}:`;
   });
@@ -357,17 +356,35 @@ export async function buildAiReply({
   return { text: replyObj.text, reactions: replyObj.reactions, gifUrl };
 }
 
+client.updateBotPresence = function () {
+  if (!client.user) return;
+  if (client.maintenanceMode) {
+    client.user.setPresence({
+      status: "dnd",
+      activities: [
+        {
+          name: "custom",
+          state: "🛠️ System Maintenance",
+          type: ActivityType.Custom,
+        },
+      ],
+    });
+  } else {
+    client.user.setPresence({
+      status: "dnd",
+      activities: [
+        {
+          name: "your next bad take",
+          type: ActivityType.Watching,
+        },
+      ],
+    });
+  }
+};
+
 client.once(Events.ClientReady, async (c) => {
   logger.info(`${c.user.tag} is online.`);
-  c.user.setPresence({
-    status: "dnd",
-    activities: [
-  {
-    name: "your next bad take",
-    type: ActivityType.Watching,
-  },
-],
-  });
+  client.updateBotPresence();
 
   const uniqueCommandsMap = new Map();
   for (const cmd of client.commands.values()) {
@@ -379,7 +396,11 @@ client.once(Events.ClientReady, async (c) => {
 
   await c.application.commands
     .set(slashDataArray)
-    .then(() => logger.info(`Successfully synced ${slashDataArray.length} slash commands.`))
+    .then(() =>
+      logger.info(
+        `Successfully synced ${slashDataArray.length} slash commands.`,
+      ),
+    )
     .catch((err) => logger.error("Sync Failure", err));
 });
 

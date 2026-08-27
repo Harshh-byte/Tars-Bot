@@ -7,7 +7,6 @@ import {
 } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { EMBED_COLORS } from "../../utils/embeds.js";
 
 const FALLBACK_WYR = [
   "Would you rather lose the ability to speak or lose the ability to read?",
@@ -36,12 +35,6 @@ export const data = {
         { name: "PG-13 (Teen)", value: "pg13" },
         { name: "R (Bold / Spicy)", value: "r" },
       ],
-    },
-    {
-      name: "user",
-      description: "Target user for the prompt",
-      type: 6,
-      required: false,
     },
   ],
 };
@@ -76,32 +69,39 @@ async function fetchWyrQuestion(rating = "pg") {
 function buildWyrButtons() {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
-      .setCustomId("wyr_option1")
-      .setLabel("Option 1")
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId("wyr_option2")
-      .setLabel("Option 2")
-      .setStyle(ButtonStyle.Success),
-    new ButtonBuilder()
       .setCustomId("wyr_next")
       .setLabel("Next Question")
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Primary)
   );
 }
 
-async function sendWyrMessage(interaction, ratingInput, isFollowUp = false) {
-  const targetUser = interaction.options?.getUser("user") || interaction.user;
+async function sendWyrMessage(interaction, ratingInput, isFollowUp = false, buildAiReply) {
+  const requestorName = interaction.member?.displayName || interaction.user.username;
   const { question, rating } = await fetchWyrQuestion(ratingInput);
+
+  let aiCommentary = "";
+  if (typeof buildAiReply === "function") {
+    try {
+      const res = await buildAiReply({
+        authorId: interaction.user.id,
+        inputText: `Give a witty 1-sentence sarcastic remark about this ${rating} WOULD YOU RATHER dilemma: "${question}"`,
+        mode: "normal",
+        guild: interaction.guild,
+      });
+      if (res?.text) aiCommentary = res.text.trim();
+    } catch (e) {
+      logger.warn(`Failed to generate AI commentary for wyr: ${e.message}`);
+    }
+  }
 
   const embed = new EmbedBuilder()
     .setTitle("🤔 **WOULD YOU RATHER**")
     .setDescription(
-      `**Target:** <@${targetUser.id}>\n\n` +
-      `>>> **"${question}"**`
+      `${question}` +
+      (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "")
     )
-    .setFooter({ text: `Rating: ${rating}` })
-    .setColor(EMBED_COLORS.GREY);
+    .setFooter({ text: `Rating: ${rating} • Requestor: ${requestorName}` })
+    .setColor(Math.floor(Math.random() * 16777215));
 
   const payload = { embeds: [embed], components: [buildWyrButtons()] };
 
@@ -125,30 +125,9 @@ async function sendWyrMessage(interaction, ratingInput, isFollowUp = false) {
 
   collector.on("collect", async (btnInteraction) => {
     try {
-      if (btnInteraction.customId === "wyr_option1" || btnInteraction.customId === "wyr_option2") {
-        await btnInteraction.deferUpdate();
-        const choiceLabel = btnInteraction.customId === "wyr_option1" ? "Option 1" : "Option 2";
-        const chosenEmbed = new EmbedBuilder()
-          .setTitle("🤔 **WOULD YOU RATHER**")
-          .setDescription(
-            `**<@${btnInteraction.user.id}> chose ${choiceLabel}!**\n\n` +
-            `>>> **"${question}"**`
-          )
-          .setFooter({ text: `Rating: ${rating}` })
-          .setColor(EMBED_COLORS.GREY);
-
-        await btnInteraction.editReply({ embeds: [chosenEmbed], components: [buildWyrButtons()] });
-        return;
-      }
-
       if (btnInteraction.customId === "wyr_next") {
-        const disabledButtons = new ActionRowBuilder().addComponents(
-          buildWyrButtons().components.map((btn) => ButtonBuilder.from(btn).setDisabled(true))
-        );
-        await btnInteraction.update({ components: [disabledButtons] });
-
-        // Spawn a brand new message in the channel for the Next Question
-        await sendWyrMessage(btnInteraction, ratingInput, true);
+        await btnInteraction.deferUpdate();
+        await sendWyrMessage(btnInteraction, ratingInput, true, buildAiReply);
       }
     } catch (err) {
       logger.error("Error in wyr button handler:", err);
@@ -165,7 +144,7 @@ async function sendWyrMessage(interaction, ratingInput, isFollowUp = false) {
   });
 }
 
-export async function execute(interaction) {
+export async function execute(interaction, client, { buildAiReply } = {}) {
   try {
     if (interaction.deferReply) {
       await interaction.deferReply();
@@ -183,7 +162,7 @@ export async function execute(interaction) {
       }
     }
 
-    await sendWyrMessage(interaction, ratingInput, false);
+    await sendWyrMessage(interaction, ratingInput, false, buildAiReply);
   } catch (err) {
     logger.error("Error in WYR command execution:", err);
     Sentry.captureException(err);

@@ -19,33 +19,29 @@ export const data = {
   ],
 };
 
-function getPpSarcasm(inches) {
-  if (inches >= 12) {
-    return "Did you use a cheat code or are you storing a secondary weapon?";
-  } else if (inches >= 8) {
-    return "Respectable statistics. Don't flex too hard.";
-  } else if (inches >= 4) {
-    return "Aggressively average. Perfectly fine, nothing to write home about.";
-  } else {
-    return "Requires NASA satellite imagery and a magnifying glass to confirm existence.";
-  }
+function getPpCategory(inches) {
+  if (inches >= 12) return { category: "Massive", emoji: "🫦" };
+  if (inches >= 8) return { category: "Above Average", emoji: "🍆" };
+  if (inches >= 4) return { category: "Average", emoji: "🍌" };
+  return { category: "Microscopic", emoji: "🤏" };
 }
 
-export async function execute(interaction) {
+export async function execute(interaction, client) {
   try {
     const targetUser = interaction.options?.getUser("user") || interaction.user;
     const isSelf = targetUser.id === interaction.user.id;
 
     const inches = Math.floor(Math.random() * 15) + 1;
-    const sarcasm = getPpSarcasm(inches);
+    const { category, emoji } = getPpCategory(inches);
 
-    const userMention = `<@${targetUser.id}>`;
-    const textPrefix = isSelf ? "Your" : `${targetUser.username}'s`;
+    const authorMention = `<@${interaction.user.id}>`;
+    const targetMention = `<@${targetUser.id}>`;
+
+    const textPrefix = isSelf ? "Your" : targetMention;
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${userMention}: 📏 ${textPrefix} dih size is **${inches} inches**\n\n` +
-        `*Tars: ${sarcasm}*`
+        `${authorMention}: ${emoji} ${textPrefix} dih is \`${inches} inches\` \n*${category}*`
       )
       .setColor(EMBED_COLORS.GREY);
 

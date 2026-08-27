@@ -32,7 +32,7 @@ export const data = {
     },
   ],
 };
-export async function execute(interaction) {
+export async function execute(interaction, client) {
   if (interaction.user.id !== process.env.OWNER_ID) {
     return interaction.reply({
       embeds: [

@@ -138,31 +138,47 @@ async function startGame(interaction, client, opponent) {
       : (interaction.guild?.members.cache.get(opponent.id)?.displayName || opponent.displayName || opponent.username);
 
     const getEmbed = (winner = null) => {
-      const embed = new EmbedBuilder()
-        .setTitle("Tic-Tac-Toe");
+      const embed = new EmbedBuilder().setTitle("⚔️ **TIC-TAC-TOE**");
 
       if (winner === "X") {
-        embed.setDescription(`🎉 **${playerXName} won the Match!**`)
+        embed
+          .setDescription(`🎉 **<@${playerX.id}> won the match!**`)
           .setColor(EMBED_COLORS.SUCCESS);
       } else if (winner === "O") {
         const oColor = isVsTars ? EMBED_COLORS.ERROR : EMBED_COLORS.SUCCESS;
-        embed.setDescription(`🎉 **${playerOName} won the Match!**` + (isVsTars ? `\n*Tars: "Predictable outcome."*` : ""))
+        const winnerMention = isVsTars ? "**Tars**" : `<@${playerO.id}>`;
+        embed
+          .setDescription(
+            `🎉 **${winnerMention} won the match!**` +
+            (isVsTars ? `\n\n*Tars: "Predictable outcome."*` : "")
+          )
           .setColor(oColor);
       } else if (winner === "TIE") {
-        embed.setDescription(`🤝 **It's a Tie Game!**`)
-          .setColor(EMBED_COLORS.GREY);
+        embed
+          .setDescription(`🤝 **It's a Tie Game!**`)
+          .setColor(EMBED_COLORS.WARNING);
       } else {
-        const currentTurnName = turnUserId === playerX.id ? playerXName : playerOName;
         const symbol = turnUserId === playerX.id ? SYMBOLS.X : SYMBOLS.O;
-        embed.setDescription(
-          `**${playerXName}** vs **${playerOName}**\n\nIt is ${symbol} **${currentTurnName}**'s turn!`
-        ).setColor(EMBED_COLORS.BLUE);
+        embed
+          .setDescription(
+            `**${playerXName}** vs **${playerOName}**\n\n` +
+            `Turn: ${symbol} **<@${turnUserId}>**`
+          )
+          .setColor(Math.floor(Math.random() * 16777215));
       }
+
+      embed.setFooter({ text: `Requestor: ${playerXName}` });
       return embed;
     };
 
+    const getContent = (winner = null) => {
+      if (winner) return null;
+      if (isVsTars) return undefined;
+      return `<@${turnUserId}>`;
+    };
+
     const replyPayload = {
-      content: isVsTars ? undefined : `<@${opponent.id}>`,
+      content: getContent(),
       embeds: [getEmbed()],
       components: buildGridComponents(board),
       fetchReply: true,
@@ -185,10 +201,11 @@ async function startGame(interaction, client, opponent) {
         new ButtonBuilder()
           .setCustomId("ttt_play_again")
           .setLabel("Play Again")
-          .setStyle(ButtonStyle.Secondary)
+          .setStyle(ButtonStyle.Primary)
       );
 
       await lastInteraction.update({
+        content: getContent(winner),
         embeds: [getEmbed(winner)],
         components: [playAgainRow],
       });
@@ -269,6 +286,7 @@ async function startGame(interaction, client, opponent) {
       }
 
       await i.update({
+        content: getContent(),
         embeds: [getEmbed()],
         components: buildGridComponents(board),
       });

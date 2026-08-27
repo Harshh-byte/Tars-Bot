@@ -5,8 +5,7 @@ const commands = [
     trigger: "/tod",
     category: "ai",
     title: "Truth or Dare",
-    description:
-      "Play Truth or Dare with rating selection (PG, PG13, R) and Tars responses.",
+    description: "Play Truth or Dare.",
     badge: "Games",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -14,8 +13,15 @@ const commands = [
     trigger: "/wyr",
     category: "ai",
     title: "Would You Rather",
-    description:
-      "Play Would You Rather with rating options and interactive choices.",
+    description: "Play Would You Rather.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/nhie",
+    category: "ai",
+    title: "Never Have I Ever",
+    description: "Play Never Have I Ever.",
     badge: "Games",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -23,8 +29,7 @@ const commands = [
     trigger: "/iq",
     category: "ai",
     title: "IQ Calculator",
-    description:
-      "Calculate a user's IQ score with classification tiers and sarcastic remarks.",
+    description: "Calculate a user's IQ score.",
     badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -50,8 +55,7 @@ const commands = [
     trigger: "/rps",
     category: "ai",
     title: "Rock, Paper, Scissors",
-    description:
-      "Play Rock, Paper, Scissors against Tars or friends.",
+    description: "Play Rock, Paper, Scissors.",
     badge: "Games",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -59,8 +63,7 @@ const commands = [
     trigger: "/ttt",
     category: "ai",
     title: "Tic-Tac-Toe",
-    description:
-      "Play 3x3 Tic-Tac-Toe against Tars or friends.",
+    description: "Play Tic-Tac-Toe.",
     badge: "Games",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -68,8 +71,7 @@ const commands = [
     trigger: "/gay",
     category: "ai",
     title: "Gay Calculator",
-    description:
-      "Calculate how gay a user is with category levels and Tars sarcasm.",
+    description: "Calculate how gay a user is.",
     badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -77,8 +79,7 @@ const commands = [
     trigger: "/lesbian",
     category: "ai",
     title: "Lesbian Calculator",
-    description:
-      "Calculate how lesbian a user is with category levels and Tars sarcasm.",
+    description: "Calculate how lesbian a user is.",
     badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -86,8 +87,7 @@ const commands = [
     trigger: "/pp",
     category: "ai",
     title: "PP Size Calculator",
-    description:
-      "Check a user's pp size with sarcastic Tars one-liners.",
+    description: "Check a user's dih size.",
     badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -95,8 +95,7 @@ const commands = [
     trigger: "/roast",
     category: "ai",
     title: "Sarcastic Roasting",
-    description:
-      "Calculates a customized verbal execution based on user variables.",
+    description: "Roast yourself or a user.",
     badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -104,8 +103,7 @@ const commands = [
     trigger: "/wish",
     category: "ai",
     title: "Premium Wishes",
-    description:
-      "Generates highly charismatic congratulations for customized celebrations.",
+    description: "Send a wish message.",
     badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -113,8 +111,7 @@ const commands = [
     trigger: "/meme",
     category: "ai",
     title: "Dank Memes",
-    description:
-      "Fetches real, trending memes directly from Reddit.",
+    description: "Fetch fresh memes directly from Reddit.",
     badge: "Fun",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
@@ -122,8 +119,7 @@ const commands = [
     trigger: "/prefix",
     category: "util",
     title: "Prefix Manager",
-    description:
-      "View or update the server's command prefix.",
+    description: "View or change command prefix.",
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },
@@ -131,8 +127,7 @@ const commands = [
     trigger: "/ping",
     category: "util",
     title: "Gateway Diagnostics",
-    description:
-      "Runs gateway checks on the connection, returning system latency stats.",
+    description: "Sends pong.",
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },
@@ -140,8 +135,7 @@ const commands = [
     trigger: "/about",
     category: "util",
     title: "Bot Info & Stats",
-    description:
-      "View bot system statistics, developer info, and quotients.",
+    description: "View information about the bot.",
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },
@@ -149,8 +143,7 @@ const commands = [
     trigger: "/help",
     category: "util",
     title: "Help Menu",
-    description:
-      "Displays interactive help menu and command detail inspection.",
+    description: "View available commands or get help for a specific command.",
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },
