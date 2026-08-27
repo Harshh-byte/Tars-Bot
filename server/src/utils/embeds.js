@@ -6,6 +6,7 @@ export const EMBED_COLORS = {
   ERROR: 0xff4757,
   WARNING: 0xffa502,
   GREY: 0x2b2d31,
+  WHITE: 0xffffff,
   TIMEOUT: 0x2b2d31,
 };
 
@@ -22,32 +23,38 @@ export function infoEmbed({
   if (description) embed.setDescription(description);
   if (fields.length) embed.addFields(fields);
   if (thumbnail) embed.setThumbnail(thumbnail);
-  if (footer)
-    embed.setFooter({
-      text: footer,
-    });
+  if (footer) embed.setFooter({ text: footer });
   if (author) embed.setAuthor(author);
   return embed;
 }
-export function successEmbed({ title = "Success", description, fields = [] }) {
+
+export function successEmbed({
+  title = "Success",
+  description,
+  fields = [],
+  author,
+}) {
   const embed = new EmbedBuilder()
     .setColor(EMBED_COLORS.SUCCESS)
     .setTitle(`<:Success:1526228339910643793> **${title}**`);
+  if (author) embed.setAuthor(author);
   if (description) embed.setDescription(description);
   if (fields.length) embed.addFields(fields);
   return embed;
 }
-export function errorEmbed({ title = "Something went wrong", description }) {
-  return new EmbedBuilder()
-    .setColor(EMBED_COLORS.ERROR)
-    .setTitle(`<:Failed:1526228290413658184> **${title}**`)
-    .setDescription(
-      description ?? "An unexpected error occurred. Please try again later.",
-    );
+
+export function errorEmbed({ title, description, author }) {
+  const embed = new EmbedBuilder().setColor(EMBED_COLORS.ERROR);
+  if (author) embed.setAuthor(author);
+  if (title) embed.setTitle(`<:Failed:1526228290413658184> **${title}**`);
+  if (description) embed.setDescription(description);
+  return embed;
 }
-export function warningEmbed({ title = "Warning", description }) {
-  return new EmbedBuilder()
-    .setColor(EMBED_COLORS.WARNING)
-    .setTitle(`<:Warning:1526228248458035381> **${title}**`)
-    .setDescription(description);
+
+export function warningEmbed({ title = "Warning", description, author }) {
+  const embed = new EmbedBuilder().setColor(EMBED_COLORS.WARNING);
+  if (author) embed.setAuthor(author);
+  if (title) embed.setTitle(`<:Warning:1526228248458035381> **${title}**`);
+  if (description) embed.setDescription(description);
+  return embed;
 }

@@ -19,12 +19,14 @@ db.settings({
 });
 
 const serversRef = db.collection("servers");
+const usersRef = db.collection("users");
 const MAX_MESSAGES = 10;
 const DELETE_BATCH_SIZE = 500;
 const DATA_RETENTION_MS = 1000 * 60 * 60 * 24 * 30 * 6;
 const serverDoc = (serverId) => serversRef.doc(serverId);
 const memberDoc = (serverId, userId) =>
   serverDoc(serverId).collection("members").doc(userId);
+const userDoc = (userId) => usersRef.doc(userId);
 
 function validateIds(serverId, userId) {
   if (!serverId) throw new Error("serverId is required.");
@@ -84,6 +86,51 @@ export async function updateProfile(serverId, userId, key, value) {
     },
     { merge: true },
   );
+}
+
+export async function incrementUserStat(serverId, userId, statKey) {
+  validateIds(serverId, userId);
+  const ref = memberDoc(serverId, userId);
+  try {
+    await ref.set(
+      {
+        [`stats.${statKey}`]: FieldValue.increment(1),
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+    const snapshot = await ref.get();
+    return snapshot.data()?.stats?.[statKey] || 1;
+  } catch (err) {
+    if (!global.memoryStatsCache) global.memoryStatsCache = new Map();
+    const key = `${serverId}_${userId}_${statKey}`;
+    const current = (global.memoryStatsCache.get(key) || 0) + 1;
+    global.memoryStatsCache.set(key, current);
+    return current;
+  }
+}
+
+export async function incrementGlobalUserStat(userId, statKey) {
+  if (!userId) throw new Error("userId is required.");
+  const ref = userDoc(userId);
+  try {
+    await ref.set(
+      {
+        userId,
+        [`stats.${statKey}`]: FieldValue.increment(1),
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+    const snapshot = await ref.get();
+    return snapshot.data()?.stats?.[statKey] || 1;
+  } catch (err) {
+    if (!global.memoryGlobalStatsCache) global.memoryGlobalStatsCache = new Map();
+    const key = `${userId}_${statKey}`;
+    const current = (global.memoryGlobalStatsCache.get(key) || 0) + 1;
+    global.memoryGlobalStatsCache.set(key, current);
+    return current;
+  }
 }
 
 export async function getServerSettings(serverId) {

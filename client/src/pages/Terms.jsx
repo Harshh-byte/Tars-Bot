@@ -32,7 +32,7 @@ export default function Terms() {
                 Tars<span className="text-ds-blurple">.</span>
               </span>
             </Link>
-            <div className="h-5 w-[2px] bg-ds-border/40" />
+            <div className="h-5 w-0.5 bg-ds-border/40" />
             <span className="text-xs sm:text-sm font-bold text-ds-muted tracking-wider">
               Terms of Service
             </span>
@@ -131,7 +131,7 @@ export default function Terms() {
 
           <section className="pt-8 border-t border-ds-border/40 mt-8">
             <p className="text-sm font-medium text-ds-muted">
-              Last Updated: July 2026
+              Last Updated: August 2026
             </p>
           </section>
         </div>

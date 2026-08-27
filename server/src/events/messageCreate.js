@@ -1,6 +1,8 @@
 import { Events } from "discord.js";
 import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
+import { checkCooldown } from "../utils/cooldowns.js";
+import { errorEmbed } from "../utils/embeds.js";
 
 export const name = Events.MessageCreate;
 
@@ -8,7 +10,12 @@ export async function execute(message, client, { buildAiReply }) {
   if (message.author.bot) return;
 
   const EXEMPT_GUILD_ID = process.env.EXEMPT_GUILD_ID;
-  if (client.maintenanceMode && message.guild?.id !== EXEMPT_GUILD_ID && message.author.id !== process.env.OWNER_ID) return;
+  if (
+    client.maintenanceMode &&
+    message.guild?.id !== EXEMPT_GUILD_ID &&
+    message.author.id !== process.env.OWNER_ID
+  )
+    return;
 
   const isMentioned = message.mentions.has(client.user);
   let isReplyToBot = false;
@@ -43,8 +50,30 @@ export async function execute(message, client, { buildAiReply }) {
 
     const command = client.commands.get(commandName);
     if (command) {
-      const targetUser = message.mentions.users.find((u) => message.content.includes(u.id)) || null;
-      
+      const cooldown = checkCooldown(
+        message.author.id,
+        command.data.name,
+        command.cooldown || 3,
+      );
+
+      if (cooldown.onCooldown) {
+        const userAvatar = message.author.displayAvatarURL({ dynamic: true });
+        const cooldownEmbed = errorEmbed({
+          author: {
+            name: message.member?.displayName || message.author.username,
+            iconURL: userAvatar,
+          },
+          description: `<:Timer:1542147643021725796> You can use \`${PREFIX}${commandName}\` again <t:${cooldown.expirationTimestamp}:R>.`,
+        });
+
+        await message.reply({ embeds: [cooldownEmbed] }).catch(() => null);
+        return;
+      }
+      const targetUser =
+        message.mentions.users.find((u) => message.content.includes(u.id)) ||
+        null;
+
+      let sentMessage = null;
       const mockInteraction = {
         commandName: commandName,
         user: message.author,
@@ -56,7 +85,8 @@ export async function execute(message, client, { buildAiReply }) {
         replied: false,
         deferred: false,
         options: {
-          getUser: (name) => (name === "opponent" || name === "user" ? targetUser : null),
+          getUser: (name) =>
+            name === "opponent" || name === "user" ? targetUser : null,
           getString: () => args.join(" ") || null,
         },
         deferReply: async () => {
@@ -65,16 +95,27 @@ export async function execute(message, client, { buildAiReply }) {
         },
         reply: async (payload) => {
           mockInteraction.replied = true;
-          return message.channel.send(payload);
+          sentMessage = await message.channel.send(payload);
+          return sentMessage;
         },
         followUp: async (payload) => {
-          return message.channel.send(payload);
+          if (sentMessage) {
+            return sentMessage.edit(payload);
+          }
+          sentMessage = await message.channel.send(payload);
+          return sentMessage;
         },
         editReply: async (payload) => {
           mockInteraction.replied = true;
-          return message.channel.send(payload);
+          if (sentMessage) {
+            return sentMessage.edit(payload);
+          }
+          sentMessage = await message.channel.send(payload);
+          return sentMessage;
         },
-        deleteReply: async () => {},
+        deleteReply: async () => {
+          if (sentMessage) await sentMessage.delete().catch(() => null);
+        },
       };
 
       try {

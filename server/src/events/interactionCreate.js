@@ -1,6 +1,8 @@
 import { Events, EmbedBuilder, MessageFlags } from "discord.js";
 import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
+import { checkCooldown } from "../utils/cooldowns.js";
+import { errorEmbed } from "../utils/embeds.js";
 
 export const name = Events.InteractionCreate;
 
@@ -48,6 +50,28 @@ export async function execute(interaction, client, context) {
   const command = client.commands.get(interaction.commandName);
 
   if (!command) return;
+
+  const cooldown = checkCooldown(
+    interaction.user.id,
+    interaction.commandName,
+    command.cooldown || 3,
+  );
+
+  if (cooldown.onCooldown) {
+    const userAvatar = interaction.user.displayAvatarURL({ dynamic: true });
+    const cooldownEmbed = errorEmbed({
+      author: {
+        name: interaction.member?.displayName || interaction.user.username,
+        iconURL: userAvatar,
+      },
+      description: `<:Timer:1542147643021725796> You can use \`/${interaction.commandName}\` again <t:${cooldown.expirationTimestamp}:R>.`,
+    });
+
+    return interaction.reply({
+      embeds: [cooldownEmbed],
+      flags: MessageFlags.Ephemeral,
+    });
+  }
 
   try {
     await command.execute(interaction, client, context);

@@ -3,26 +3,30 @@ import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
 
+export const aliases = ["dih"];
+
 export const data = {
-  name: "iq",
-  description: "Calculate a user's IQ.",
+  name: "pp",
+  description: "Check a user's pp size.",
   dm_permission: false,
   options: [
     {
       name: "user",
-      description: "User to calculate IQ for.",
+      description: "User to check.",
       type: 6,
       required: false,
     },
   ],
 };
 
-function getIqCategory(iq) {
-  if (iq >= 130) return { category: "Gifted / Very Superior", emoji: "🍷" };
-  if (iq >= 115) return { category: "Above Average", emoji: "🎓" };
-  if (iq >= 85) return { category: "Average Intelligence", emoji: "🧠" };
-  if (iq >= 70) return { category: "Below Average", emoji: "📉" };
-  return { category: "Extremely Low", emoji: "🤡" };
+function getPpCategory(inches) {
+  if (inches >= 12)
+    return { category: "Massive", emoji: "<:lipbite:1491137163570712668>" };
+  if (inches >= 8) 
+    return { category: "Above Average", emoji: "🍆" };
+  if (inches >= 4) 
+    return { category: "Average", emoji: "🍌" };
+  return { category: "Microscopic", emoji: "<:no_dih:1483730499850604594>" };
 }
 
 export async function execute(interaction, client) {
@@ -30,8 +34,8 @@ export async function execute(interaction, client) {
     const targetUser = interaction.options?.getUser("user") || interaction.user;
     const isSelf = targetUser.id === interaction.user.id;
 
-    const iq = Math.floor(Math.random() * 101) + 50;
-    const { category, emoji } = getIqCategory(iq);
+    const inches = Math.floor(Math.random() * 15) + 1;
+    const { category, emoji } = getPpCategory(inches);
 
     const authorMention = `<@${interaction.user.id}>`;
     const targetMention = `<@${targetUser.id}>`;
@@ -40,13 +44,13 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} IQ is \`${iq}\` \n*${category}*`
+        `${authorMention}: ${emoji} ${textPrefix} dih is \`${inches} inches\` \n*${category}*`,
       )
       .setColor(EMBED_COLORS.GREY);
 
     await interaction.reply({ embeds: [embed] });
   } catch (err) {
-    logger.error("Error in IQ command handler:", err);
+    logger.error("Error in PP command handler:", err);
     Sentry.captureException(err);
   }
 }
