@@ -18,50 +18,29 @@ export const data = {
 };
 
 function getIqCategory(iq) {
-  if (iq >= 130) {
-    return {
-      category: "Gifted / Very Superior (Top 2%)",
-      sarcasm: "Did you inspect element or is your brain actually functioning today?",
-    };
-  } else if (iq >= 115) {
-    return {
-      category: "Above Average",
-      sarcasm: "Slightly above room temperature. Impressive for a human.",
-    };
-  } else if (iq >= 85) {
-    return {
-      category: "Average Intelligence",
-      sarcasm: "Aggressively average. Pure NPC energy detected.",
-    };
-  } else if (iq >= 70) {
-    return {
-      category: "Below Average / Borderline",
-      sarcasm: "Struggling with basic arithmetic and life decisions, aren't we?",
-    };
-  } else {
-    return {
-      category: "Extremely Low",
-      sarcasm: "My sarcasm quotient was set higher than your entire score.",
-    };
-  }
+  if (iq >= 130) return { category: "Gifted / Very Superior", emoji: "🍷" };
+  if (iq >= 115) return { category: "Above Average", emoji: "🎓" };
+  if (iq >= 85) return { category: "Average Intelligence", emoji: "🧠" };
+  if (iq >= 70) return { category: "Below Average", emoji: "📉" };
+  return { category: "Extremely Low", emoji: "🤡" };
 }
 
-export async function execute(interaction) {
+export async function execute(interaction, client) {
   try {
     const targetUser = interaction.options?.getUser("user") || interaction.user;
     const isSelf = targetUser.id === interaction.user.id;
 
     const iq = Math.floor(Math.random() * 101) + 50;
-    const { category, sarcasm } = getIqCategory(iq);
+    const { category, emoji } = getIqCategory(iq);
 
-    const userMention = `<@${targetUser.id}>`;
-    const textPrefix = isSelf ? "Your" : `${targetUser.username}'s`;
+    const authorMention = `<@${interaction.user.id}>`;
+    const targetMention = `<@${targetUser.id}>`;
+
+    const textPrefix = isSelf ? "Your" : targetMention;
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${userMention}: 🧠 Your IQ is **${iq}**\n\n` +
-        `**Classification:** ${category}\n` +
-        `*Tars: ${sarcasm}*`
+        `${authorMention}: ${emoji} ${textPrefix} IQ is \`${iq}\` \n*${category}*`
       )
       .setColor(EMBED_COLORS.GREY);
 

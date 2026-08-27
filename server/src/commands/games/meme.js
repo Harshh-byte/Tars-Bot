@@ -35,7 +35,7 @@ const SUBREDDITS = [
   "comics",
 ];
 
-export async function execute(interaction) {
+export async function execute(interaction, client) {
   try {
     await interaction.deferReply();
 

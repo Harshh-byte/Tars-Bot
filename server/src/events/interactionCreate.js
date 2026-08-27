@@ -1,4 +1,4 @@
-import { Events, EmbedBuilder } from "discord.js";
+import { Events, EmbedBuilder, MessageFlags } from "discord.js";
 import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 
@@ -25,7 +25,12 @@ function getFormattedDateTime() {
 export async function execute(interaction, client, context) {
   if (!interaction.isChatInputCommand()) return;
 
-  if (client.maintenanceMode && interaction.user.id !== process.env.OWNER_ID) {
+  const EXEMPT_GUILD_ID = process.env.EXEMPT_GUILD_ID;
+  if (
+    client.maintenanceMode &&
+    interaction.guild?.id !== EXEMPT_GUILD_ID &&
+    interaction.user.id !== process.env.OWNER_ID
+  ) {
     const maintenanceEmbed = new EmbedBuilder()
       .setColor(0xffa502)
       .setTitle("<:Updates:1526472917964030053> **System Maintenance**")
