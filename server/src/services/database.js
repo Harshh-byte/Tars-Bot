@@ -94,13 +94,16 @@ export async function incrementUserStat(serverId, userId, statKey) {
   try {
     await ref.set(
       {
-        [`stats.${statKey}`]: FieldValue.increment(1),
+        stats: {
+          [statKey]: FieldValue.increment(1),
+        },
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },
     );
     const snapshot = await ref.get();
-    return snapshot.data()?.stats?.[statKey] || 1;
+    const data = snapshot.data();
+    return data?.stats?.[statKey] ?? data?.[`stats.${statKey}`] ?? 1;
   } catch (err) {
     if (!global.memoryStatsCache) global.memoryStatsCache = new Map();
     const key = `${serverId}_${userId}_${statKey}`;
@@ -117,13 +120,16 @@ export async function incrementGlobalUserStat(userId, statKey) {
     await ref.set(
       {
         userId,
-        [`stats.${statKey}`]: FieldValue.increment(1),
+        stats: {
+          [statKey]: FieldValue.increment(1),
+        },
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },
     );
     const snapshot = await ref.get();
-    return snapshot.data()?.stats?.[statKey] || 1;
+    const data = snapshot.data();
+    return data?.stats?.[statKey] ?? data?.[`stats.${statKey}`] ?? 1;
   } catch (err) {
     if (!global.memoryGlobalStatsCache) global.memoryGlobalStatsCache = new Map();
     const key = `${userId}_${statKey}`;

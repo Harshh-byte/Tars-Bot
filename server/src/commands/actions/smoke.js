@@ -2,22 +2,21 @@ import { EmbedBuilder } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import { incrementUserStat } from "../../services/database.js";
+import { incrementGlobalUserStat } from "../../services/database.js";
 
-export const aliases = ["cigar", "cigarette"];
+export const aliases = ["cigar"];
 
 export const data = {
   name: "smoke",
   description: "Take a hit of smoke.",
-  dm_permission: false,
+  dm_permission: true,
 };
 
 export async function execute(interaction, client) {
   try {
-    const serverId = interaction.guild?.id || "DM";
     const userId = interaction.user.id;
 
-    const count = await incrementUserStat(serverId, userId, "smokeCount");
+    const count = await incrementGlobalUserStat(userId, "smokeCount");
     const authorMention = `<@${userId}>`;
 
     const embed = new EmbedBuilder()
