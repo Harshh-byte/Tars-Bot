@@ -4,6 +4,8 @@
   --font-display: "Syne", sans-serif;
   --font-body: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", sans-serif;
 
   --color-ds-bg: var(--bg-color);
   --color-ds-text: var(--text-color);
@@ -18,29 +20,6 @@
 }
 
 :root {
-  --bg-color: #f7f9fc;
-  --text-color: #0f172a;
-  --text-muted: #64748b;
-  --border-color: rgba(15, 23, 42, 0.08);
-  --card-bg: rgba(255, 255, 255, 0.85);
-  --card-hover-border: rgba(88, 101, 242, 0.25);
-  --dot-color: rgba(99, 102, 241, 0.02);
-  --grid-color: rgba(99, 102, 241, 0.15);
-  --grid-opacity: 0.35;
-  --glass-bg: rgba(255, 255, 255, 0.4);
-  --accent-color: #5865f2;
-  --accent: var(--accent-color);
-  --accent-secondary: #eb459e;
-  --accent-glow: rgba(88, 101, 242, 0.08);
-  --sandbox-bg: #ffffff;
-  --sandbox-header: #f1f5f9;
-  --scrollbar-track: #f7f9fc;
-  --scrollbar-thumb: #cbd5e1;
-  --scrollbar-hover: #94a3b8;
-  color-scheme: light;
-}
-
-:root.dark {
   --bg-color: #08090d;
   --text-color: #f8fafc;
   --text-muted: #94a3b8;

@@ -6,29 +6,29 @@ export default function FAQs() {
 
   const faqData = [
     {
-      question: "why is tars so sarcastic",
+      question: "Why is Tars so sarcastic?",
       answer:
-        "Because sugarcoating logic is a human trait we chose not to inherit. You're welcome.",
+        "Because sugarcoating is overrated. Tars brings real personality, dry humor, and honest responses to your server.",
     },
     {
-      question: "how do i invite tars to my server",
+      question: "How do I add Tars to my Discord server?",
       answer:
-        "Click the 'Add to Discord' button at the top of this station. Grant the required permissions, and let Tars roast your channels.",
+        "Click the 'Add to Discord' button at the top of the page, grant the required permissions, and Tars will join your server instantly.",
     },
     {
-      question: "does tars detect different languages",
+      question: "Does Tars support multiple languages?",
       answer:
-        "Absolutely. Tars automatically decodes the language you speak (including casual bilingual dialects) and responds organically in that same language.",
+        "Yes. Tars automatically detects the language you write in—including casual slang and bilingual messages—and replies naturally in the same language.",
     },
     {
-      question: "how long is tars context memory",
+      question: "How does Tars remember conversations?",
       answer:
-        "Tars remembers up to 10 messages of conversation history per user, allowing natural contextual dialogue before clearing the buffer.",
+        "Tars maintains recent chat memory per user, allowing natural back-and-forth conversations rather than isolated single replies.",
     },
     {
-      question: "can tars roast admin roles",
+      question: "Can Tars roast server admins?",
       answer:
-        "Tars operates on cognitive logic, not server hierarchy. Admins get roasted with the same math-grade precision as anyone else.",
+        "Tars treats everyone equally regardless of server hierarchy. Admins get roasted with the exact same precision as anyone else.",
     },
     {
       question: "can tars express emotions visually",
@@ -48,8 +48,8 @@ export default function FAQs() {
     >
       <div className="max-w-4xl mx-auto px-6">
         <div className="text-center mb-8 md:mb-12">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-black uppercase text-ds-text">
-            FAQ <span className="text-gradient">Database</span>
+          <h2 className="font-body text-3xl sm:text-4xl md:text-5xl font-extrabold text-ds-text tracking-tight">
+            Frequently Asked <span className="text-gradient">Questions</span>
           </h2>
         </div>
 
@@ -150,7 +150,7 @@ export default function FAQs() {
               <span className="font-mono text-sm sm:text-base text-ds-muted/50">
                 awaiting input
               </span>
-              <span className="w-[7px] h-[15px] bg-ds-blurple/70 animate-[pulse_1s_infinite]" />
+              <span className="w-1.75 h-3.75 bg-ds-blurple/70 animate-[pulse_1s_infinite]" />
             </div>
           </div>
         </div>

@@ -11,6 +11,8 @@ export default {
         display: ['"Syne"', "sans-serif"],
         body: ['"Space Grotesk"', "sans-serif"],
         mono: ['"JetBrains Mono"', "monospace"],
+        jakarta: ['"Plus Jakarta Sans"', "sans-serif"],
+        sans: ['"Plus Jakarta Sans"', '"Inter"', "sans-serif"],
       },
       colors: {
         ds: {

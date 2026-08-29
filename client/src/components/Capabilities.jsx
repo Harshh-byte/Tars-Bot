@@ -1,52 +1,65 @@
 import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Brain, Flame, Sliders, Gift } from "lucide-react";
+import { Flame, PartyPopper, GamepadDirectional, Gift, MessagesSquare, ShieldCheck } from "lucide-react";
 import SpotlightCard from "./ui/SpotlightCard";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const capabilities = [
   {
-    icon: Brain,
-    title: "Context Retention",
-    description:
-      "Unlike simple reply bots, Tars maintains context up to 10 messages deep, naturally tracking the flow of conversations and remembering past roasts.",
-    iconColor: "text-ds-blurple",
-    spotlightColor: "rgba(88, 101, 242, 0.15)",
-    span: true,
-  },
-  {
     icon: Flame,
-    title: "Savage Roasts",
+    title: "Adaptive Roasts & Chat",
     description:
-      "Proactive and reactive verbal execution. Will roast you or your targets in one line of absolute destruction if provoked.",
+      "Chill and witty by default. If provoked, Tars unleashes absolute verbal destruction with zero filter.",
     iconColor: "text-ds-red",
     spotlightColor: "rgba(237, 66, 69, 0.15)",
     span: false,
   },
   {
-    icon: Sliders,
-    title: "Tone Adjuster",
-    description: (
-      <>
-        Automatically adapts pronouns and personality tones based on specific
-        roles in your server (e.g. <i>alpha-homie</i> or <i>smooth-dominant</i>
-        ).
-      </>
-    ),
+    icon: PartyPopper,
+    title: "Party Games",
+    description:
+      "Host multiplayer mini-games, truth challenges, dilemma games, and instant chat showdowns.",
+    iconColor: "text-ds-blurple",
+    spotlightColor: "rgba(88, 101, 242, 0.15)",
+    span: false,
+  },
+  {
+    icon: GamepadDirectional,
+    title: "Entertainment & Ratings",
+    description:
+      "Instant IQ checks, simp meters, size calculators, personality ratings, and fresh memes on demand.",
     iconColor: "text-ds-yellow",
     spotlightColor: "rgba(254, 231, 92, 0.15)",
     span: false,
   },
   {
     icon: Gift,
-    title: "Premium Wishes",
+    title: "Smooth Wishes",
     description:
-      'Need to congratulate a friend? Tars switches to "Smooth Alpha" mode—charming, cool, heartfelt, and memorable.',
+      'Switches to charming mode for birthdays & achievements.',
     iconColor: "text-ds-fuchsia",
     spotlightColor: "rgba(235, 69, 158, 0.15)",
-    span: true,
+    span: false,
+  },
+  {
+    icon: MessagesSquare,
+    title: "Chat Actions",
+    description:
+      "Expressive animated interactions and casual smoke actions to keep channel conversations active.",
+    iconColor: "text-ds-green",
+    spotlightColor: "rgba(87, 242, 135, 0.15)",
+    span: false,
+  },
+  {
+    icon: ShieldCheck,
+    title: "Server & Moderation Tools",
+    description:
+      "Inspect server & user stats, check avatars, and bulk purge channel spam in seconds.",
+    iconColor: "text-ds-blurple",
+    spotlightColor: "rgba(88, 101, 242, 0.15)",
+    span: false,
   },
 ];
 
@@ -90,13 +103,12 @@ export default function Capabilities() {
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="max-w-3xl mb-8 md:mb-10">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase text-ds-text leading-[1.15] mb-4">
-            Built for Menace &amp;{" "}
-            <span className="block sm:inline">Mischief</span>
+          <h2 className="font-body text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-ds-text leading-[1.15] mb-4">
+            Built for Chaos &amp;{" "}
+            <span className="block sm:inline">Zero Chill</span>
           </h2>
           <p className="text-ds-muted text-base md:text-lg leading-relaxed max-w-xl font-medium">
-            Loaded with advanced cognitive parameters to adjust dynamically from
-            supportive homie to verbal wrecking ball.
+            Packed with savage responses, interactive party games, and just enough utility to keep the server alive.
           </p>
         </div>
 
@@ -118,7 +130,7 @@ export default function Capabilities() {
                   <Icon className="w-8 h-8" aria-hidden="true" />
                 </div>
                 <div className={cap.span ? "flex-1" : undefined}>
-                  <h3 className="font-display text-xl font-black text-ds-text uppercase mb-1">
+                  <h3 className="font-body text-xl font-bold tracking-tight text-ds-text mb-1.5">
                     {cap.title}
                   </h3>
                   <p className="text-ds-muted text-sm leading-relaxed font-medium">

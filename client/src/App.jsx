@@ -10,35 +10,10 @@ import Footer from "./components/Footer";
 import SEO from "./components/shared/SEO";
 import CustomCursor from "./components/CustomCursor";
 
-function getInitialTheme() {
-  const saved = localStorage.getItem("theme");
-  if (saved === "dark" || saved === "light") return saved;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
 export default function App() {
-  const [theme, setTheme] = useState(getInitialTheme);
-
   const prefersReducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const handleToggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-
-    if (document.startViewTransition && !prefersReducedMotion) {
-      document.startViewTransition(() => setTheme(nextTheme));
-    } else {
-      setTheme(nextTheme);
-    }
-  };
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -88,7 +63,7 @@ export default function App() {
   return (
     <div className="min-h-screen overflow-x-hidden transition-colors duration-300">
       <SEO />
-      <Navbar theme={theme} onToggleTheme={handleToggleTheme} />
+      <Navbar />
       <Hero />
       <Capabilities />
       <Commands />

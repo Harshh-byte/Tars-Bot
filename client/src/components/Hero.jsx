@@ -200,7 +200,7 @@ export default function Hero() {
             <div className="absolute w-48 h-48 rounded-full bg-linear-to-tr from-ds-blurple/25 to-ds-fuchsia/20 blur-xl pointer-events-none" />
 
             <CircularText
-              text="• Savage Replies • Smart Automation • Community Management "
+              text="• ADAPTIVE COMPANION • SAVAGE REPLIES • GAMES • DISCORD UTILITY "
               radius={120}
               fontSize="9px"
               className="scale-75 xs:scale-90 sm:scale-100 text-ds-muted opacity-80"
@@ -210,7 +210,7 @@ export default function Hero() {
                 <img
                   src="/Icon.png"
                   alt="Tars Avatar"
-                  className="w-full h-full object-cover rounded-full bg-black"
+                  className="w-full h-full object-cover rounded-full bg-black transform-gpu backface-hidden"
                 />
               </div>
             </CircularText>
