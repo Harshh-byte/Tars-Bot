@@ -69,9 +69,16 @@ export async function execute(message, client, { buildAiReply }) {
         await message.reply({ embeds: [cooldownEmbed] }).catch(() => null);
         return;
       }
-      const targetUser =
+      let targetUser =
         message.mentions.users.find((u) => message.content.includes(u.id)) ||
         null;
+
+      if (!targetUser && args.length > 0) {
+        const idMatch = args.join(" ").match(/\d{17,20}/)?.[0];
+        if (idMatch) {
+          targetUser = await client.users.fetch(idMatch).catch(() => null);
+        }
+      }
 
       let sentMessage = null;
       const mockInteraction = {

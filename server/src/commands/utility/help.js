@@ -13,12 +13,12 @@ export const aliases = ["h"];
 
 export const data = {
   name: "help",
-  description: "View available commands or get help for a specific command.",
+  description: "View command list or help.",
   dm_permission: false,
   options: [
     {
       name: "command",
-      description: "Specific command name or alias to inspect",
+      description: "Command to inspect.",
       type: 3,
       required: false,
     },
@@ -32,11 +32,11 @@ const modulesCatalog = {
     title: "<:Games:1542645834808565821> Games Module",
     description: "Interactive Discord games and decision tools.",
     commands: [
-      { name: "Rock, Paper, Scissors", cmd: "rps", desc: "Play against Tars or friends." },
-      { name: "Tic-Tac-Toe", cmd: "ttt", desc: "Play against Tars or friends." },
-      { name: "Truth or Dare", cmd: "tod", desc: "Play Truth or Dare with friends." },
-      { name: "Would You Rather", cmd: "wyr", desc: "Play Would You Rather with friends." },
-      { name: "Never Have I Ever", cmd: "nhie", desc: "Play Never Have I Ever with friends." },
+      { name: "Rock, Paper, Scissors", cmd: "rps", desc: "Play Rock, Paper, Scissors." },
+      { name: "Tic-Tac-Toe", cmd: "ttt", desc: "Play Tic-Tac-Toe." },
+      { name: "Truth or Dare", cmd: "tod", desc: "Play Truth or Dare." },
+      { name: "Would You Rather", cmd: "wyr", desc: "Play Would You Rather." },
+      { name: "Never Have I Ever", cmd: "nhie", desc: "Play Never Have I Ever." },
       { name: "Coin Flip", cmd: "flip", desc: "Flip a coin." },
       { name: "Dice Roll", cmd: "roll", desc: "Roll a dice." },
     ],
@@ -45,16 +45,16 @@ const modulesCatalog = {
     title: "<:Fun:1542240014388170772> Fun Module",
     description: "Calculators, memes, roasts, and wishes.",
     commands: [
-      { name: "Gay Calculator", cmd: "gay", desc: "Calculate gay percentage." },
-      { name: "Lesbian Calculator", cmd: "lesbian", desc: "Calculate lesbian percentage." },
-      { name: "Bitches Calculator", cmd: "bitches", desc: "Calculate bitches count." },
-      { name: "Simp Calculator", cmd: "simp", desc: "Calculate simp percentage." },
-      { name: "Autism Calculator", cmd: "autism", desc: "Calculate autism percentage." },
-      { name: "PP Calculator", cmd: "pp", desc: "Check pp size." },
+      { name: "Gay Calculator", cmd: "gay", desc: "Calculate how gay a user is." },
+      { name: "Lesbian Calculator", cmd: "lesbian", desc: "Calculate how lesbian a user is." },
+      { name: "Bitches Calculator", cmd: "bitches", desc: "Calculate how many bitches a user has." },
+      { name: "Simp Calculator", cmd: "simp", desc: "Calculate how simp a user is." },
+      { name: "Autism Calculator", cmd: "autism", desc: "Calculate how autism a user is." },
+      { name: "PP Calculator", cmd: "pp", desc: "Check a user's pp size." },
       { name: "IQ Calculator", cmd: "iq", desc: "Calculate a user's IQ score." },
-      { name: "Sarcastic Roast", cmd: "roast", desc: "Customized verbal execution." },
-      { name: "Charismatic Wish", cmd: "wish", desc: "Generate custom event wishes." },
-      { name: "Reddit Memes", cmd: "meme", desc: "Fetch trending memes from Reddit." },
+      { name: "Sarcastic Roast", cmd: "roast", desc: "Roast a user." },
+      { name: "Charismatic Wish", cmd: "wish", desc: "Send a wish message." },
+      { name: "Reddit Memes", cmd: "meme", desc: "Display a trending meme from Reddit!" },
     ],
   },
   module_actions: {
@@ -69,10 +69,13 @@ const modulesCatalog = {
     title: "<:Utility:1542239958612320306> Utility Module",
     description: "System diagnostics and configuration tools.",
     commands: [
-      { name: "Prefix", cmd: "prefix", desc: "View or update server prefix." },
+      { name: "ServerInfo", cmd: "serverinfo", desc: "Gets information about the server." },
+      { name: "UserInfo", cmd: "userinfo", desc: "Gets information about a user." },
+      { name: "Avatar", cmd: "avatar", desc: "View a user's avatar." },
+      { name: "Prefix", cmd: "prefix", desc: "View or change command prefix." },
       { name: "Ping", cmd: "ping", desc: "Check bot latency." },
-      { name: "About", cmd: "about", desc: "View bot info and stats." },
-      { name: "Help", cmd: "help", desc: "Display command help menu." },
+      { name: "About", cmd: "about", desc: "View information about the bot." },
+      { name: "Help", cmd: "help", desc: "View command list or help." },
     ],
   },
 };
@@ -292,9 +295,7 @@ export async function execute(interaction, client) {
       response = await interaction.reply({ ...initialPayload, fetchReply: true });
     }
 
-    const collector = response.createMessageComponentCollector({
-      time: 60000,
-    });
+    const collector = response.createMessageComponentCollector();
 
     collector.on("collect", async (i) => {
       if (i.user.id !== interaction.user.id) {
@@ -317,24 +318,6 @@ export async function execute(interaction, client) {
 
       const newPayload = buildPayload(currentSelectedModule, currentPage);
       await i.update(newPayload);
-    });
-
-    collector.on("end", async () => {
-      const disabledMenu = buildMenu(currentSelectedModule);
-      disabledMenu.components[0].setDisabled(true);
-      const components = [disabledMenu];
-
-      const mod = modulesCatalog[currentSelectedModule];
-      if (mod) {
-        const totalPages = Math.ceil(mod.commands.length / ITEMS_PER_PAGE) || 1;
-        if (totalPages > 1) {
-          const disabledPageRow = buildPaginationButtons(currentPage, totalPages);
-          disabledPageRow.components.forEach((btn) => btn.setDisabled(true));
-          components.push(disabledPageRow);
-        }
-      }
-
-      await response.edit({ components }).catch(() => null);
     });
   } catch (err) {
     logger.error("Error in Help command handler:", err);

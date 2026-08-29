@@ -43,10 +43,11 @@ export function successEmbed({
   return embed;
 }
 
-export function errorEmbed({ title, description, author }) {
-  const embed = new EmbedBuilder().setColor(EMBED_COLORS.ERROR);
+export function errorEmbed({ title = "Error", description, author }) {
+  const embed = new EmbedBuilder()
+    .setColor(EMBED_COLORS.ERROR)
+    .setTitle(`<:Failed:1526228290413658184> **${title}**`);
   if (author) embed.setAuthor(author);
-  if (title) embed.setTitle(`<:Failed:1526228290413658184> **${title}**`);
   if (description) embed.setDescription(description);
   return embed;
 }

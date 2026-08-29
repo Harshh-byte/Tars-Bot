@@ -21,12 +21,12 @@ export const data = {
 
 function getPpCategory(inches) {
   if (inches >= 12)
-    return { category: "Massive", emoji: "<:lipbite:1491137163570712668>" };
+    return { category: "Massive", emoji: "<:lipbite:1543158624572932156>" };
   if (inches >= 8) 
     return { category: "Above Average", emoji: "🍆" };
   if (inches >= 4) 
     return { category: "Average", emoji: "🍌" };
-  return { category: "Microscopic", emoji: "<:no_dih:1483730499850604594>" };
+  return { category: "Microscopic", emoji: "<:nopepe:1543158686870937661>" };
 }
 
 export async function execute(interaction, client) {

@@ -27,7 +27,7 @@ function getGayCategory(percentage) {
   if (percentage >= 35)
     return { category: "That's Looking Zesty", emoji: "💅" };
   if (percentage >= 15)
-    return { category: "Lowkey Sus", emoji: "<:eyes_sus:1119215988181848075>" };
+    return { category: "Lowkey Sus", emoji: "<:suseyes:1543158740985839638>" };
   return { category: "No Evidence Found", emoji: "📋" };
 }
 

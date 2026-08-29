@@ -4,7 +4,7 @@ import { EmbedBuilder } from "discord.js";
 
 export const data = {
   name: "meme",
-  description: "Display a random trending meme from Reddit!",
+  description: "Display a trending meme from Reddit!",
   dm_permission: false,
   options: [
     {
