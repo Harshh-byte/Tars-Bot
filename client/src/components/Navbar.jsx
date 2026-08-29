@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function Navbar({ theme, onToggleTheme }) {
+export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -75,44 +75,6 @@ export default function Navbar({ theme, onToggleTheme }) {
           </ul>
 
           <div className="hidden md:flex items-center gap-4">
-            <button
-              data-cursor="theme"
-              onClick={onToggleTheme}
-              className={`theme-toggle-btn w-10 h-10 rounded-full border border-ds-border bg-ds-card/85 backdrop-blur-md flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-ds-text hover:bg-ds-border shadow-sm relative overflow-hidden active:scale-95 ${
-                theme === "dark" ? "dark-active" : ""
-              }`}
-              aria-label="Toggle theme"
-            >
-              <div className="relative w-5 h-5 flex items-center justify-center text-ds-text">
-                <svg
-                  className="sun-icon w-5 h-5 absolute"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <circle cx="12" cy="12" r="5"></circle>
-                  <line x1="12" y1="1" x2="12" y2="3"></line>
-                  <line x1="12" y1="21" x2="12" y2="23"></line>
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                  <line x1="1" y1="12" x2="3" y2="12"></line>
-                  <line x1="21" y1="12" x2="23" y2="12"></line>
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-                <svg
-                  className="moon-icon w-5 h-5 absolute text-ds-yellow"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-              </div>
-            </button>
-
             <a
               href="https://discord.com/users/569766329960103941"
               className="btn-primary flex items-center justify-center gap-2.5"
@@ -133,60 +95,23 @@ export default function Navbar({ theme, onToggleTheme }) {
           </div>
 
           <div className="flex items-center gap-3 md:hidden">
-            <button
-              data-cursor="theme"
-              onClick={onToggleTheme}
-              className={`theme-toggle-btn w-9 h-9 rounded-full border bg-ds-card/85 flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-ds-text active:scale-95 ${
-                theme === "dark" ? "dark-active" : ""
-              }`}
-              aria-label="Toggle theme"
-            >
-              <div className="relative w-5 h-5 flex items-center justify-center text-ds-text">
-                <svg
-                  className="sun-icon w-5 h-5 absolute"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <circle cx="12" cy="12" r="5"></circle>
-                  <line x1="12" y1="1" x2="12" y2="3"></line>
-                  <line x1="12" y1="21" x2="12" y2="23"></line>
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                  <line x1="1" y1="12" x2="3" y2="12"></line>
-                  <line x1="21" y1="12" x2="23" y2="12"></line>
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-                <svg
-                  className="moon-icon w-5 h-5 absolute text-ds-yellow"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-              </div>
-            </button>
 
             <button
               onClick={toggleMobileMenu}
               className="flex flex-col gap-1.5 p-2 focus:outline-none relative z-50"
             >
               <span
-                className={`w-6 h-[2px] bg-ds-text rounded-full block transition-transform duration-300 origin-center ${
+                className={`w-6 h-0.5 bg-ds-text rounded-full block transition-transform duration-300 origin-center ${
                   isMobileMenuOpen ? "rotate-45 translate-y-2" : ""
                 }`}
               ></span>
               <span
-                className={`w-6 h-[2px] bg-ds-text rounded-full block transition-opacity duration-300 ${
+                className={`w-6 h-0.5 bg-ds-text rounded-full block transition-opacity duration-300 ${
                   isMobileMenuOpen ? "opacity-0" : ""
                 }`}
               ></span>
               <span
-                className={`w-6 h-[2px] bg-ds-text rounded-full block transition-transform duration-300 origin-center ${
+                className={`w-6 h-0.5 bg-ds-text rounded-full block transition-transform duration-300 origin-center ${
                   isMobileMenuOpen ? "-rotate-45 -translate-y-2" : ""
                 }`}
               ></span>

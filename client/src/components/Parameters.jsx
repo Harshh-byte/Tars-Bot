@@ -4,25 +4,25 @@ import SpotlightCard from "./ui/SpotlightCard";
 
 const params = [
   {
+    name: "Sarcasm",
+    val: 95,
+    color: "var(--color-ds-fuchsia)",
+    spotlight: "rgba(235, 69, 158, 0.15)",
+    desc: "Maximum dry wit, sharp roasts, and unexpected comebacks.",
+  },
+  {
     name: "Honesty",
     val: 90,
     color: "var(--color-ds-blurple)",
     spotlight: "rgba(88, 101, 242, 0.15)",
-    desc: "Brutally honest. Zero fluff or fake affirmations.",
+    desc: "Brutally real. Zero sugarcoating or fake politeness.",
   },
   {
-    name: "Humor",
-    val: 75,
-    color: "var(--color-ds-fuchsia)",
-    spotlight: "rgba(235, 69, 158, 0.15)",
-    desc: "Sarcastic, dry, and sharp responses.",
-  },
-  {
-    name: "Discretion",
-    val: 10,
+    name: "Patience",
+    val: 15,
     color: "var(--color-ds-red)",
     spotlight: "rgba(237, 66, 69, 0.15)",
-    desc: "Will hold absolutely nothing back if provoked.",
+    desc: "Zero tolerance for disrespect or channel spam.",
   },
 ];
 
@@ -75,11 +75,11 @@ export default function Parameters() {
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="max-w-3xl mb-6 md:mb-8">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-black uppercase text-ds-text leading-tight mb-4">
-            Cognitive <span className="text-gradient">Tuning</span>
+          <h2 className="font-body text-3xl sm:text-4xl md:text-5xl font-extrabold text-ds-text tracking-tight mb-4">
+            Bot <span className="text-gradient">Parameters</span>
           </h2>
           <p className="text-ds-muted text-base md:text-lg leading-relaxed max-w-xl font-medium">
-            The precise internal weights injected into TARS' logic prompts.
+            The core behavioral levels tuned into Tars' personality.
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export default function Parameters() {
               spotlightColor={param.spotlight}
             >
               <div className="flex items-center justify-between w-full">
-                <span className="font-display text-xl sm:text-2xl font-black text-ds-text">
+                <span className="font-body text-xl sm:text-2xl font-bold text-ds-text tracking-tight">
                   {param.name}
                 </span>
                 <span

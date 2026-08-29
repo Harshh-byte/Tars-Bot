@@ -233,8 +233,8 @@ export default function Commands() {
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-black uppercase text-ds-text">
-            Command <span className="text-gradient">Console</span>
+          <h2 className="font-body text-3xl sm:text-4xl md:text-5xl font-extrabold text-ds-text tracking-tight">
+            Command <span className="text-gradient">Directory</span>
           </h2>
         </div>
 
@@ -263,15 +263,15 @@ export default function Commands() {
           })}
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {filteredCommands.map((cmd) => (
             <div
               key={cmd.trigger}
-              className="custom-card flex flex-col justify-between min-h-55"
+              className="custom-card flex flex-col justify-between p-4 sm:p-5 h-full"
             >
               <div>
-                <div className="flex justify-between items-center mb-6">
-                  <code className="text-ds-text font-mono bg-ds-border/50 px-2.5 py-1 rounded text-xs font-bold border border-ds-border">
+                <div className="flex justify-between items-center mb-3">
+                  <code className="text-ds-text font-mono bg-ds-border/50 px-2 py-0.5 rounded text-xs font-bold border border-ds-border">
                     {cmd.trigger}
                   </code>
                   <span
@@ -280,10 +280,10 @@ export default function Commands() {
                     {cmd.badge}
                   </span>
                 </div>
-                <h4 className="font-display text-lg font-bold text-ds-text mb-2">
+                <h3 className="font-body text-base font-bold text-ds-text mb-1">
                   {cmd.title}
-                </h4>
-                <p className="text-ds-muted text-sm leading-relaxed">
+                </h3>
+                <p className="text-ds-muted text-xs sm:text-sm leading-relaxed">
                   {cmd.description}
                 </p>
               </div>
