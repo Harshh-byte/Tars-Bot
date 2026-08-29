@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 const capabilities = [
   {
     icon: Flame,
-    title: "Adaptive Roasts & Chat",
+    title: "Adaptive Roasts",
     description:
       "Chill and witty by default. If provoked, Tars unleashes absolute verbal destruction with zero filter.",
     iconColor: "text-ds-red",
@@ -21,13 +21,13 @@ const capabilities = [
     title: "Party Games",
     description:
       "Host multiplayer mini-games, truth challenges, dilemma games, and instant chat showdowns.",
-    iconColor: "text-ds-blurple",
-    spotlightColor: "rgba(88, 101, 242, 0.15)",
+    iconColor: "text-cyan-400",
+    spotlightColor: "rgba(34, 211, 238, 0.15)",
     span: false,
   },
   {
     icon: GamepadDirectional,
-    title: "Entertainment & Ratings",
+    title: "Entertainment",
     description:
       "Instant IQ checks, simp meters, size calculators, personality ratings, and fresh memes on demand.",
     iconColor: "text-ds-yellow",
@@ -54,7 +54,7 @@ const capabilities = [
   },
   {
     icon: ShieldCheck,
-    title: "Server & Moderation Tools",
+    title: "Server Tools",
     description:
       "Inspect server & user stats, check avatars, and bulk purge channel spam in seconds.",
     iconColor: "text-ds-blurple",
