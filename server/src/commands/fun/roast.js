@@ -12,11 +12,18 @@ export const data = {
       type: 6,
       required: false,
     },
+    {
+      name: "reason",
+      description: "Specific reason for the roast.",
+      type: 3,
+      required: false,
+    },
   ],
 };
 
 export async function execute(interaction, client, { buildAiReply }) {
   const targetUser = interaction.options.getUser("user") || interaction.user;
+  const reason = interaction.options.getString("reason");
   const isSelf = targetUser.id === interaction.user.id;
 
   if (targetUser.id === client.user.id) {
@@ -35,9 +42,17 @@ export async function execute(interaction, client, { buildAiReply }) {
       .catch(() => null);
 
     const targetName = targetUser.displayName || targetUser.username;
-    const roastPrompt = isSelf
-      ? "Roast me with maximum savage brutality. No holding back, no polite filler—hit me with a clever, ruthless, and devastating roast."
-      : `Roast @${targetName} (<@${targetUser.id}>) with maximum savage brutality. No holding back, no polite filler—hit them with a clever, ruthless, and devastating roast.`;
+    
+    let roastPrompt;
+    if (isSelf) {
+      roastPrompt = reason
+        ? `Roast me with maximum savage brutality. Topic/Reason: "${reason}". No holding back, no polite filler—hit me with a clever, ruthless burn.`
+        : `Roast me with maximum savage brutality. No holding back, no polite filler—hit me with a clever, ruthless, and devastating roast.`;
+    } else {
+      roastPrompt = reason
+        ? `Roast @${targetName} (<@${targetUser.id}>) with maximum savage brutality. Topic/Reason: "${reason}". No holding back, no polite filler—hit them with a clever, ruthless, and devastating burn based on this topic.`
+        : `Roast @${targetName} (<@${targetUser.id}>) with maximum savage brutality. No holding back, no polite filler—hit them with a clever, ruthless, and devastating roast.`;
+    }
 
     const replyData = await buildAiReply({
       authorId: interaction.user.id,

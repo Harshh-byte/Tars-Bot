@@ -120,7 +120,7 @@ export default function Hero() {
           direction="diagonal"
           speed={0.4}
           squareSize={40}
-          borderColor="var(--dot-color)"
+          borderColor="var(--grid-color)"
           hoverFillColor="var(--accent-glow)"
         />
       </div>
