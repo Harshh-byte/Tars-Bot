@@ -52,7 +52,7 @@ export default function Squares({
       }
 
       ctx.strokeStyle = borderColor;
-      ctx.lineWidth = 1;
+      ctx.lineWidth = typeof window !== "undefined" && window.devicePixelRatio > 1.2 ? 1.25 : 1;
 
       const startX = (gridOffset.current.x % squareSize) - squareSize;
       const startY = (gridOffset.current.y % squareSize) - squareSize;

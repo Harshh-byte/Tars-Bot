@@ -26,8 +26,8 @@
   --border-color: rgba(255, 255, 255, 0.08);
   --card-bg: rgba(16, 20, 30, 0.6);
   --card-hover-border: rgba(88, 101, 242, 0.4);
-  --dot-color: rgba(255, 255, 255, 0.08);
-  --grid-color: rgba(255, 255, 255, 0.18);
+  --dot-color: rgba(255, 255, 255, 0.14);
+  --grid-color: rgba(255, 255, 255, 0.25);
   --grid-opacity: 0.85;
   --glass-bg: rgba(9, 10, 15, 0.5);
   --accent-color: #5865f2;
