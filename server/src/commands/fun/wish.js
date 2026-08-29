@@ -14,7 +14,7 @@ export const data = {
     },
     {
       name: "event",
-      description: "Event name (birthday, anniversary, congrats etc.).",
+      description: "Event name (default: birthday).",
       type: 3,
       required: false,
     },
@@ -23,7 +23,7 @@ export const data = {
 
 export async function execute(interaction, client, { buildAiReply }) {
   const targetUser = interaction.options.getUser("user") || interaction.user;
-  const event = interaction.options.getString("event") || "this occasion";
+  const event = interaction.options.getString("event") || "birthday";
   const isSelf = targetUser.id === interaction.user.id;
 
   try {
