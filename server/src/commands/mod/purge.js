@@ -17,11 +17,11 @@ export const data = {
     {
       type: 1,
       name: "user",
-      description: "Delete one user's memory.",
+      description: "Delete a user's memory.",
       options: [
         {
           name: "user",
-          description: "User whose memory should be deleted.",
+          description: "User to purge.",
           type: 6,
           required: true,
         },
@@ -30,7 +30,7 @@ export const data = {
     {
       type: 1,
       name: "server",
-      description: "Delete every stored memory in this server.",
+      description: "Delete server memory.",
     },
   ],
 };

@@ -1,6 +1,6 @@
 export const data = {
   name: "ping",
-  description: "Sends pong.",
+  description: "Check bot latency.",
   dm_permission: false,
 };
 

@@ -4,19 +4,19 @@ import fs from "fs";
 
 export const data = {
   name: "maintenance",
-  description: "Manage system-wide maintenance mode.",
+  description: "Manage maintenance mode.",
   dm_permission: false,
   default_member_permissions: PermissionFlagsBits.Administrator.toString(),
   options: [
     {
       type: 1,
       name: "start",
-      description: "Start maintenance mode and block commands for normal users.",
+      description: "Start maintenance mode.",
     },
     {
       type: 1,
       name: "complete",
-      description: "Complete maintenance mode and restore normal operations.",
+      description: "Complete maintenance mode.",
     },
   ],
 };

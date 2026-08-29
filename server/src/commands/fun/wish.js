@@ -33,9 +33,14 @@ export async function execute(interaction, client, { buildAiReply }) {
       .fetch(targetUser.id)
       .catch(() => null);
 
+    const targetName = targetUser.displayName || targetUser.username;
+    const wishPrompt = isSelf
+      ? `Give me a smooth, charismatic, premium, and deeply memorable wish for ${event}. Make it uplifting, stylish, and personal with zero toxicity or backhanded compliments.`
+      : `Give @${targetName} (<@${targetUser.id}>) a smooth, charismatic, premium, and deeply memorable wish for ${event}. Make it uplifting, stylish, and personal with zero toxicity or backhanded compliments.`;
+
     const replyData = await buildAiReply({
       authorId: interaction.user.id,
-      inputText: `Wish <@${targetUser.id}> for ${event}`,
+      inputText: wishPrompt,
       mode: "wish",
       authorMember: interaction.member,
       targetMember: targetMember,

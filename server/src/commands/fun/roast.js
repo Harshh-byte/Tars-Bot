@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/node";
 
 export const data = {
   name: "roast",
-  description: "Roast yourself or a user.",
+  description: "Roast a user.",
   dm_permission: false,
   options: [
     {
@@ -26,15 +26,22 @@ export async function execute(interaction, client, { buildAiReply }) {
   }
 
   try {
-    await interaction.deferReply();
+    if (!interaction.deferred && !interaction.replied) {
+      await interaction.deferReply().catch(() => null);
+    }
 
     const targetMember = await interaction.guild.members
       .fetch(targetUser.id)
       .catch(() => null);
 
+    const targetName = targetUser.displayName || targetUser.username;
+    const roastPrompt = isSelf
+      ? "Roast me with maximum savage brutality. No holding back, no polite filler—hit me with a clever, ruthless, and devastating roast."
+      : `Roast @${targetName} (<@${targetUser.id}>) with maximum savage brutality. No holding back, no polite filler—hit them with a clever, ruthless, and devastating roast.`;
+
     const replyData = await buildAiReply({
       authorId: interaction.user.id,
-      inputText: isSelf ? "Roast me." : `Roast <@${targetUser.id}>`,
+      inputText: roastPrompt,
       mode: "roast",
       authorMember: interaction.member,
       targetMember: targetMember,
