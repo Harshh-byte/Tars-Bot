@@ -25,8 +25,6 @@ function getFormattedDateTime() {
 }
 
 export async function execute(interaction, client, context) {
-  if (!interaction.isChatInputCommand()) return;
-
   const EXEMPT_GUILD_ID = process.env.EXEMPT_GUILD_ID;
   if (
     client.maintenanceMode &&
@@ -41,11 +39,19 @@ export async function execute(interaction, client, context) {
       )
       .setFooter({ text: getFormattedDateTime() });
 
+    if (interaction.deferred || interaction.replied) {
+      return interaction.followUp({
+        embeds: [maintenanceEmbed],
+        flags: MessageFlags.Ephemeral,
+      }).catch(() => null);
+    }
     return interaction.reply({
       embeds: [maintenanceEmbed],
       flags: MessageFlags.Ephemeral,
-    });
+    }).catch(() => null);
   }
+
+  if (!interaction.isChatInputCommand()) return;
 
   const command = client.commands.get(interaction.commandName);
 

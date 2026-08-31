@@ -48,7 +48,7 @@ export const data = {
     },
     {
       name: "rating",
-      description: "Filter rating: PG, PG13, or R (Bold)",
+      description: "Filter rating: PG, PG13, or R",
       type: 3,
       required: false,
       choices: [
