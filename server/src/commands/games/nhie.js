@@ -33,7 +33,7 @@ export const data = {
       choices: [
         { name: "PG (Family Friendly)", value: "pg" },
         { name: "PG-13 (Teen)", value: "pg13" },
-        { name: "R (Bold / Spicy)", value: "r" },
+        { name: "R (Spicy)", value: "r" },
       ],
     },
   ],

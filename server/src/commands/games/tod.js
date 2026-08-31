@@ -54,14 +54,8 @@ export const data = {
       choices: [
         { name: "PG (Family Friendly)", value: "pg" },
         { name: "PG-13 (Teen)", value: "pg13" },
-        { name: "R (Bold / Spicy)", value: "r" },
+        { name: "R (Spicy)", value: "r" },
       ],
-    },
-    {
-      name: "user",
-      description: "Target user for the prompt",
-      type: 6,
-      required: false,
     },
   ],
 };
@@ -130,7 +124,7 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       if (interaction.commandName === "truth") rawInput = "truth";
       else if (interaction.commandName === "dare") rawInput = "dare";
 
-      const rawArgs = interaction.options?.getString("new_prefix") || interaction.options?.getString("user");
+      const rawArgs = interaction.options?.getString("new_prefix");
       if (typeof rawArgs === "string") {
         const lower = rawArgs.toLowerCase();
         if (lower.includes("r") || lower.includes("spicy") || lower.includes("bold")) ratingInput = "r";
@@ -140,7 +134,6 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
     }
 
     const type = rawInput && ["truth", "dare"].includes(rawInput) ? rawInput : "random";
-    const targetUser = interaction.options?.getUser("user") || interaction.user;
 
     const { type: promptType, question, rating } = await fetchQuestion(type, ratingInput);
 
@@ -149,7 +142,7 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       try {
         const aiResponse = await buildAiReply({
           authorId: interaction.user.id,
-          inputText: `Give a witty 1-sentence sarcastic remark about giving this ${rating} ${promptType.toUpperCase()} question to ${targetUser.username}: "${question}"`,
+          inputText: `Give a witty 1-sentence sarcastic remark about giving this ${rating} ${promptType.toUpperCase()} question to ${interaction.user.username}: "${question}"`,
           mode: "normal",
           guild: interaction.guild,
         });
