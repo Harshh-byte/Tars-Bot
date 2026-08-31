@@ -26,6 +26,14 @@ const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
+    trigger: "/para",
+    category: "games",
+    title: "Paranoia",
+    description: "Play Paranoia.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
     trigger: "/flip",
     category: "games",
     title: "Coin Flip",
