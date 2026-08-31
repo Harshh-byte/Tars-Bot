@@ -43,7 +43,7 @@ const modulesCatalog = {
   },
   module_fun: {
     title: "<:Fun:1542240014388170772> Fun Module",
-    description: "Calculators, memes, roasts, and wishes.",
+    description: "Entertaining Discord calculators, roasts, and memes.",
     commands: [
       { name: "Gay Calculator", cmd: "gay", desc: "Calculate how gay a user is." },
       { name: "Lesbian Calculator", cmd: "lesbian", desc: "Calculate how lesbian a user is." },
@@ -59,7 +59,7 @@ const modulesCatalog = {
   },
   module_actions: {
     title: "<:Actions:1542647256782737559> Actions Module",
-    description: "Smoke and vape interactions.",
+    description: "Interactive server smoke and vape counters.",
     commands: [
       { name: "Smoke", cmd: "smoke", desc: "Take a hit of smoke." },
       { name: "Vape", cmd: "vape", desc: "Hit the vape." },
@@ -67,7 +67,7 @@ const modulesCatalog = {
   },
   module_utility: {
     title: "<:Utility:1542239958612320306> Utility Module",
-    description: "System diagnostics and configuration tools.",
+    description: "Essential server diagnostics and configuration tools.",
     commands: [
       { name: "ServerInfo", cmd: "serverinfo", desc: "Gets information about the server." },
       { name: "UserInfo", cmd: "userinfo", desc: "Gets information about a user." },
@@ -172,7 +172,7 @@ export async function execute(interaction, client) {
         .addOptions([
           {
             label: "Home",
-            description: "Main bot overview and system statistics.",
+            description: "Bot system overview and general statistics.",
             value: "module_home",
             emoji: "<:Home:1542647191691071548>",
             default: defaultValue === "module_home",
@@ -186,21 +186,21 @@ export async function execute(interaction, client) {
           },
           {
             label: "Fun",
-            description: "Calculators, memes, roasts, and wishes.",
+            description: "Entertaining Discord calculators, roasts, and memes.",
             value: "module_fun",
             emoji: "<:Fun:1542240014388170772>",
             default: defaultValue === "module_fun",
           },
           {
             label: "Actions",
-            description: "Smoke, vape, slap, punch, and hug actions.",
+            description: "Interactive server smoke and vape counters.",
             value: "module_actions",
             emoji: "<:Actions:1542647256782737559>",
             default: defaultValue === "module_actions",
           },
           {
             label: "Utility",
-            description: "Prefix configuration, latency, and system status.",
+            description: "Essential server diagnostics and configuration tools.",
             value: "module_utility",
             emoji: "<:Utility:1542239958612320306>",
             default: defaultValue === "module_utility",

@@ -1,4 +1,4 @@
-import { Events } from "discord.js";
+import { Events, EmbedBuilder } from "discord.js";
 import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { checkCooldown } from "../utils/cooldowns.js";
@@ -6,28 +6,26 @@ import { errorEmbed } from "../utils/embeds.js";
 
 export const name = Events.MessageCreate;
 
+function getFormattedDateTime() {
+  const now = new Date();
+  const options = { timeZone: "Asia/Kolkata" };
+  const localDate = new Date(now.toLocaleString("en-US", options));
+  const day = localDate.getDate();
+  const month = localDate.getMonth() + 1;
+  const year = String(localDate.getFullYear()).slice(-2);
+  const dateStr = `${day}/${month}/${year}`;
+
+  const timeStr = new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(now);
+  return `${dateStr} • ${timeStr}`;
+}
+
 export async function execute(message, client, { buildAiReply }) {
   if (message.author.bot) return;
-
-  const EXEMPT_GUILD_ID = process.env.EXEMPT_GUILD_ID;
-  if (
-    client.maintenanceMode &&
-    message.guild?.id !== EXEMPT_GUILD_ID &&
-    message.author.id !== process.env.OWNER_ID
-  )
-    return;
-
-  const isMentioned = message.mentions.has(client.user);
-  let isReplyToBot = false;
-
-  if (message.reference?.messageId) {
-    try {
-      const original = await message.fetchReference();
-      isReplyToBot = original?.author?.id === client.user.id;
-    } catch {
-      isReplyToBot = false;
-    }
-  }
 
   if (!client.prefixCache) client.prefixCache = new Map();
   const serverId = message.guild?.id || "DM";
@@ -43,6 +41,38 @@ export async function execute(message, client, { buildAiReply }) {
   }
 
   const PREFIX = client.prefixCache.get(serverId) || ".";
+
+  const isMentioned = message.mentions.has(client.user);
+  let isReplyToBot = false;
+
+  if (message.reference?.messageId) {
+    try {
+      const original = await message.fetchReference();
+      isReplyToBot = original?.author?.id === client.user.id;
+    } catch {
+      isReplyToBot = false;
+    }
+  }
+
+  const EXEMPT_GUILD_ID = process.env.EXEMPT_GUILD_ID;
+  if (
+    client.maintenanceMode &&
+    message.guild?.id !== EXEMPT_GUILD_ID &&
+    message.author.id !== process.env.OWNER_ID
+  ) {
+    if (message.content.startsWith(PREFIX) || isMentioned || isReplyToBot) {
+      const maintenanceEmbed = new EmbedBuilder()
+        .setColor(0xffa502)
+        .setTitle("<:Updates:1526472917964030053> **System Maintenance**")
+        .setDescription(
+          "Tars is currently undergoing scheduled maintenance and will be back online shortly."
+        )
+        .setFooter({ text: getFormattedDateTime() });
+
+      await message.reply({ embeds: [maintenanceEmbed] }).catch(() => null);
+    }
+    return;
+  }
 
   if (message.content.startsWith(PREFIX)) {
     const args = message.content.slice(PREFIX.length).trim().split(/ +/);
