@@ -37,6 +37,7 @@ const modulesCatalog = {
       { name: "Truth or Dare", cmd: "tod", desc: "Play Truth or Dare." },
       { name: "Would You Rather", cmd: "wyr", desc: "Play Would You Rather." },
       { name: "Never Have I Ever", cmd: "nhie", desc: "Play Never Have I Ever." },
+      { name: "Paranoia", cmd: "para", desc: "Play Paranoia." },
       { name: "Coin Flip", cmd: "flip", desc: "Flip a coin." },
       { name: "Dice Roll", cmd: "roll", desc: "Roll a dice." },
     ],
