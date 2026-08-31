@@ -22,7 +22,7 @@ export const aliases = ["paranoia", "para"];
 
 export const data = {
   name: "para",
-  description: "Play Paranoia game.",
+  description: "Play Paranoia.",
   dm_permission: false,
   options: [
     {
@@ -66,13 +66,82 @@ async function fetchParanoiaQuestion(rating = "pg") {
   return { question, rating: targetRating.toUpperCase() };
 }
 
-function buildButtons() {
+function buildParaButtons() {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
-      .setCustomId("paranoia_next")
+      .setCustomId("para_next")
       .setLabel("Next Question")
       .setStyle(ButtonStyle.Primary)
   );
+}
+
+async function sendParaMessage(interaction, ratingInput, isFollowUp = false, buildAiReply) {
+  const requestorName = interaction.member?.displayName || interaction.user.username;
+  const { question, rating } = await fetchParanoiaQuestion(ratingInput);
+
+  let aiCommentary = "";
+  if (typeof buildAiReply === "function") {
+    try {
+      const res = await buildAiReply({
+        authorId: interaction.user.id,
+        inputText: `Give a witty 1-sentence sarcastic remark about this ${rating} PARANOIA question: "${question}"`,
+        mode: "normal",
+        guild: interaction.guild,
+      });
+      if (res?.text) aiCommentary = res.text.trim();
+    } catch (e) {
+      logger.warn(`Failed to generate AI commentary for paranoia: ${e.message}`);
+    }
+  }
+
+  const embed = new EmbedBuilder()
+    .setTitle("🤫 **PARANOIA**")
+    .setDescription(
+      `${question}` +
+      (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "")
+    )
+    .setFooter({ text: `Rating: ${rating} • Requestor: ${requestorName}` })
+    .setColor(Math.floor(Math.random() * 16777215));
+
+  const payload = { embeds: [embed], components: [buildParaButtons()] };
+
+  let response;
+  if (isFollowUp) {
+    response = await interaction.followUp({ ...payload, fetchReply: true });
+  } else if (interaction.deferred || interaction.replied) {
+    response = await interaction.editReply(payload);
+  } else {
+    response = await interaction.reply({ ...payload, fetchReply: true });
+  }
+
+  if (!response || typeof response.createMessageComponentCollector !== "function") {
+    return;
+  }
+
+  const collector = response.createMessageComponentCollector({
+    componentType: ComponentType.Button,
+    time: 60000,
+  });
+
+  collector.on("collect", async (btnInteraction) => {
+    try {
+      if (btnInteraction.customId === "para_next") {
+        await btnInteraction.deferUpdate();
+        await sendParaMessage(btnInteraction, ratingInput, true, buildAiReply);
+      }
+    } catch (err) {
+      logger.error("Error in para button handler:", err);
+    }
+  });
+
+  collector.on("end", async () => {
+    try {
+      const disabledButtons = new ActionRowBuilder().addComponents(
+        buildParaButtons().components.map((btn) => ButtonBuilder.from(btn).setDisabled(true))
+      );
+      await response.edit({ components: [disabledButtons] }).catch(() => null);
+    } catch {}
+  });
 }
 
 export async function execute(interaction, client, { buildAiReply } = {}) {
@@ -93,110 +162,9 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       }
     }
 
-    const { question, rating } = await fetchParanoiaQuestion(ratingInput);
-
-    let aiCommentary = "";
-    if (typeof buildAiReply === "function") {
-      try {
-        const aiResponse = await buildAiReply({
-          authorId: interaction.user.id,
-          inputText: `Give a witty 1-sentence sarcastic remark about giving this ${rating} PARANOIA question to ${interaction.user.username}: "${question}"`,
-          mode: "normal",
-          guild: interaction.guild,
-        });
-        if (aiResponse?.text) {
-          aiCommentary = aiResponse.text.trim();
-        }
-      } catch (e) {
-        logger.warn(`Failed to generate AI commentary for paranoia: ${e.message}`);
-      }
-    }
-
-    const requestorName = interaction.member?.displayName || interaction.user.username;
-
-    const embed = new EmbedBuilder()
-      .setTitle("🤫 **PARANOIA**")
-      .setDescription(
-        `${question}` +
-        (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "")
-      )
-      .setFooter({ text: `Rating: ${rating} • Requestor: ${requestorName}` })
-      .setColor(0x7289da);
-
-    const payload = { embeds: [embed], components: [buildButtons()] };
-
-    let response;
-    if (interaction.deferred || interaction.replied) {
-      response = await interaction.editReply(payload);
-    } else {
-      response = await interaction.reply({ ...payload, fetchReply: true });
-    }
-
-    attachParanoiaCollector(response, ratingInput, buildAiReply);
+    await sendParaMessage(interaction, ratingInput, false, buildAiReply);
   } catch (err) {
     logger.error("Error in Paranoia command execution:", err);
     Sentry.captureException(err);
   }
-}
-
-function attachParanoiaCollector(message, ratingInput, buildAiReply) {
-  if (!message || typeof message.createMessageComponentCollector !== "function") {
-    return;
-  }
-
-  const collector = message.createMessageComponentCollector({
-    componentType: ComponentType.Button,
-    time: 60000,
-  });
-
-  collector.on("collect", async (btnInteraction) => {
-    try {
-      await btnInteraction.deferUpdate();
-
-      const nextPrompt = await fetchParanoiaQuestion(ratingInput);
-
-      let nextAiComment = "";
-      if (typeof buildAiReply === "function") {
-        try {
-          const res = await buildAiReply({
-            authorId: btnInteraction.user.id,
-            inputText: `Give a witty 1-sentence sarcastic remark about giving this ${nextPrompt.rating} PARANOIA prompt to ${btnInteraction.user.username}: "${nextPrompt.question}"`,
-            mode: "normal",
-            guild: btnInteraction.guild,
-          });
-          if (res?.text) nextAiComment = res.text.trim();
-        } catch {}
-      }
-
-      const requestorName = btnInteraction.member?.displayName || btnInteraction.user.username;
-
-      const newEmbed = new EmbedBuilder()
-        .setTitle("🤫 **PARANOIA**")
-        .setDescription(
-          `${nextPrompt.question}` +
-          (nextAiComment ? `\n\n*Tars: ${nextAiComment}*` : "")
-        )
-        .setFooter({ text: `Rating: ${nextPrompt.rating} • Requestor: ${requestorName}` })
-        .setColor(0x7289da);
-
-      const newMsg = await btnInteraction.followUp({
-        embeds: [newEmbed],
-        components: [buildButtons()],
-        fetchReply: true,
-      });
-
-      attachParanoiaCollector(newMsg, ratingInput, buildAiReply);
-    } catch (err) {
-      logger.error("Error in paranoia button handler:", err);
-    }
-  });
-
-  collector.on("end", async () => {
-    try {
-      const disabledButtons = new ActionRowBuilder().addComponents(
-        buildButtons().components.map((btn) => ButtonBuilder.from(btn).setDisabled(true))
-      );
-      await message.edit({ components: [disabledButtons] }).catch(() => null);
-    } catch {}
-  });
 }
