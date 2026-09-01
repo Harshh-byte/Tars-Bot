@@ -46,6 +46,7 @@ const modulesCatalog = {
     title: "<:Fun:1542240014388170772> Fun Module",
     description: "Entertaining Discord calculators, roasts, and memes.",
     commands: [
+      { name: "Love Calculator", cmd: "ship", desc: "Calculate love percentage between two users!" },
       { name: "Gay Calculator", cmd: "gay", desc: "Calculate how gay a user is." },
       { name: "Lesbian Calculator", cmd: "lesbian", desc: "Calculate how lesbian a user is." },
       { name: "Bitches Calculator", cmd: "bitches", desc: "Calculate how many bitches a user has." },

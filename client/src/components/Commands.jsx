@@ -66,6 +66,14 @@ const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
+    trigger: "/ship",
+    category: "fun",
+    title: "Love Calculator",
+    description: "Calculate love percentage between two users!",
+    badge: "Fun",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
     trigger: "/iq",
     category: "fun",
     title: "IQ Calculator",
