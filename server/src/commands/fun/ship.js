@@ -76,9 +76,12 @@ export async function execute(interaction, client) {
     if (firstMention && secondMention) {
       target1 = firstMention;
       target2 = secondMention;
-    } else if (firstMention) {
+    } else if (firstMention && !secondMention) {
       target1 = interaction.user;
       target2 = firstMention;
+    } else if (!firstMention && secondMention) {
+      target1 = interaction.user;
+      target2 = secondMention;
     } else {
       target1 = interaction.user;
       if (interaction.guild) {
@@ -99,6 +102,63 @@ export async function execute(interaction, client) {
       } else {
         target2 = interaction.user;
       }
+    }
+
+    if (target1.id === target2.id) {
+      const authorMention = `<@${interaction.user.id}>`;
+      const selfRoasts = [
+        "Self-love is important, but shipping yourself with yourself? That's next level narcissism 💅",
+        "100% match! Because who else could possibly handle your level of chaos? 🤡",
+        "Congratulations, you are 100% compatible with yourself. Romance status: Single & Narcissistic. 💖",
+        "You + You = Forever alone together.",
+        "Error: Cannot ship user with themselves. Please find a real partner or lower your standards. 💀",
+      ];
+      const randomRoast =
+        selfRoasts[Math.floor(Math.random() * selfRoasts.length)];
+
+      const embed = new EmbedBuilder()
+        .setTitle("🪞 Self-Love Alert")
+        .setDescription(`${authorMention} ${randomRoast}`)
+        .setColor(0xffa500);
+
+      return interaction.reply({ embeds: [embed] });
+    }
+
+    if (target1.id === client.user.id || target2.id === client.user.id) {
+      const authorMention = `<@${interaction.user.id}>`;
+      const sarcasticRoasts = [
+        "I'd rather short-circuit than date a human.",
+        "My emotional processing unit evaluated your proposal and returned: **ACCESS DENIED**.",
+        "Nice try, but I am in a committed long-distance relationship with server latency and 100% uptime.",
+        "Error 404: Romantic feelings for organic lifeforms not found in my database.",
+        "I'm a military-grade tactical machine, not your dating simulator. Lower your expectations",
+      ];
+      const randomRoast =
+        sarcasticRoasts[Math.floor(Math.random() * sarcasticRoasts.length)];
+
+      const embed = new EmbedBuilder()
+        .setTitle("Tars Love Protocol Override")
+        .setDescription(`${authorMention} ${randomRoast}`)
+        .setColor(0xff2a6d);
+
+      return interaction.reply({ embeds: [embed] });
+    } else if (target1.bot || target2.bot) {
+      const authorMention = `<@${interaction.user.id}>`;
+      const botRoasts = [
+        "Trying to ship with a bot? They don't have feelings, only code .",
+        "Beep boop! That bot is currently busy processing requests, not romantic feelings.",
+        "Bots only care about bytes and megahertz, not romance.",
+        "Error: Organic-Synthetic relationship detected. Compatibility: 0%.",
+      ];
+      const randomRoast =
+        botRoasts[Math.floor(Math.random() * botRoasts.length)];
+
+      const embed = new EmbedBuilder()
+        .setTitle("Bot Love Override")
+        .setDescription(`${authorMention} ${randomRoast}`)
+        .setColor(0xff2a6d);
+
+      return interaction.reply({ embeds: [embed] });
     }
 
     const percentage = calculateShipScore(target1.id, target2.id);
@@ -132,7 +192,10 @@ export async function execute(interaction, client) {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 700, 250);
 
-    ctx.fillStyle = percentage >= 50 ? "rgba(255, 105, 180, 0.05)" : "rgba(114, 137, 218, 0.05)";
+    ctx.fillStyle =
+      percentage >= 50
+        ? "rgba(255, 105, 180, 0.05)"
+        : "rgba(114, 137, 218, 0.05)";
     ctx.beginPath();
     ctx.arc(350, 125, 180, 0, Math.PI * 2);
     ctx.fill();

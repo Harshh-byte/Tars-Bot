@@ -37,13 +37,16 @@ const client = new Client({
   ],
 });
 let maintenanceActive = false;
+let maintenanceStartTime = null;
 try {
   const maintenanceData = JSON.parse(
     fs.readFileSync(new URL("../maintenance.json", import.meta.url), "utf-8"),
   );
   maintenanceActive = !!maintenanceData.active;
+  maintenanceStartTime = maintenanceData.startTime || null;
 } catch (e) {}
 client.maintenanceMode = maintenanceActive;
+client.maintenanceStartTime = maintenanceStartTime;
 
 client.commands = new Map();
 

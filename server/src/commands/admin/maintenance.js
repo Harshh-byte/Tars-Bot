@@ -57,7 +57,9 @@ export async function execute(interaction, client) {
 
       const startMsg = await interaction.channel.send({ embeds: [startEmbed] });
 
+      const startTime = Date.now();
       client.maintenanceMode = true;
+      client.maintenanceStartTime = startTime;
       if (typeof client.updateBotPresence === "function") {
         client.updateBotPresence();
       }
@@ -68,6 +70,7 @@ export async function execute(interaction, client) {
             active: true,
             messageId: startMsg.id,
             channelId: startMsg.channel.id,
+            startTime: startTime,
           },
           null,
           2
@@ -87,6 +90,7 @@ export async function execute(interaction, client) {
   } else if (subcommand === "complete") {
     try {
       client.maintenanceMode = false;
+      client.maintenanceStartTime = null;
       if (typeof client.updateBotPresence === "function") {
         client.updateBotPresence();
       }
@@ -124,22 +128,22 @@ export async function execute(interaction, client) {
         )
         .setTimestamp();
 
-      let edited = false;
+      let repliedToStart = false;
       if (messageId && channelId) {
         try {
           const targetChannel = await client.channels.fetch(channelId);
           if (targetChannel) {
             const startMsg = await targetChannel.messages.fetch(messageId);
             if (startMsg) {
-              await startMsg.edit({ embeds: [completeEmbed] });
-              edited = true;
+              await startMsg.reply({ embeds: [completeEmbed] });
+              repliedToStart = true;
             }
           }
         } catch (err) {
         }
       }
 
-      if (!edited) {
+      if (!repliedToStart) {
         await interaction.channel.send({ embeds: [completeEmbed] });
       }
 

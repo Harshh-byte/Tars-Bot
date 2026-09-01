@@ -6,22 +6,15 @@ import { errorEmbed } from "../utils/embeds.js";
 
 export const name = Events.MessageCreate;
 
-function getFormattedDateTime() {
-  const now = new Date();
-  const options = { timeZone: "Asia/Kolkata" };
-  const localDate = new Date(now.toLocaleString("en-US", options));
-  const day = localDate.getDate();
-  const month = localDate.getMonth() + 1;
-  const year = String(localDate.getFullYear()).slice(-2);
-  const dateStr = `${day}/${month}/${year}`;
-
+function getFormattedMaintenanceTime(startTime) {
+  const date = startTime ? new Date(startTime) : new Date();
   const timeStr = new Intl.DateTimeFormat("en-IN", {
     timeZone: "Asia/Kolkata",
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
-  }).format(now);
-  return `${dateStr} • ${timeStr}`;
+  }).format(date);
+  return `Today at ${timeStr}`;
 }
 
 export async function execute(message, client, { buildAiReply }) {
@@ -67,7 +60,7 @@ export async function execute(message, client, { buildAiReply }) {
         .setDescription(
           "Tars is currently undergoing scheduled maintenance and will be back online shortly."
         )
-        .setFooter({ text: getFormattedDateTime() });
+        .setFooter({ text: getFormattedMaintenanceTime(client.maintenanceStartTime) });
 
       await message.reply({ embeds: [maintenanceEmbed] }).catch(() => null);
     }
