@@ -8,7 +8,8 @@ import {
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import { addPokemonScore, getTopPokemonPlayers } from "../../services/database.js";
+import { addPokemonScore } from "../../services/database.js";
+import { showLeaderboard } from "./guessboard.js";
 
 const recentPokemonMap = new Map();
 const channelSkipsMap = new Map();
@@ -123,10 +124,10 @@ async function fetchRandomPokemon(gen = "gen1", channelId = "default") {
   };
 }
 
-export const aliases = ["poke", "pokemon"];
+export const aliases = ["poke"];
 
 export const data = {
-  name: "guess",
+  name: "pokemon",
   description: "Who's That Pokémon guessing game!",
   dm_permission: false,
   options: [
@@ -150,32 +151,19 @@ function buildButtons() {
       .setLabel("Next Pokémon")
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
-      .setCustomId("guess_lb_pokemon")
+      .setCustomId("show_lb_pokemon")
       .setLabel("Leaderboard")
       .setEmoji("🏆")
-      .setStyle(ButtonStyle.Secondary),
+      .setStyle(ButtonStyle.Secondary)
   );
 }
 
 export async function execute(interaction, client, { buildAiReply } = {}) {
-  const cmdName = (interaction.commandName || "").toLowerCase();
   const rawArgs = (
     interaction.options?.getString("generation") ||
     interaction.options?.getString("getString") ||
     ""
   ).toLowerCase();
-
-  // Detect Leaderboard
-  if (
-    cmdName === "guessboard" ||
-    cmdName === "guesslb" ||
-    cmdName === "pklb" ||
-    cmdName === "plb" ||
-    rawArgs.includes("lb") ||
-    rawArgs.includes("leaderboard")
-  ) {
-    return showLeaderboard(interaction, client);
-  }
 
   let genInput = interaction.options?.getString("generation")?.toLowerCase() || "gen1";
   if (rawArgs.includes("all")) genInput = "all";
@@ -183,55 +171,12 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
   return startPokemonGame(interaction, client, false, genInput, buildAiReply);
 }
 
-export async function showLeaderboard(interaction, client) {
-  const serverId = interaction.guild?.id;
-  if (!serverId) {
-    const errorPayload = {
-      content: "Leaderboard is only available inside a server!",
-      ephemeral: true,
-    };
-    return interaction.isButton && interaction.isButton()
-      ? interaction.reply(errorPayload)
-      : interaction.replied || interaction.deferred
-        ? interaction.followUp(errorPayload)
-        : interaction.reply(errorPayload);
-  }
-
-  const topPlayers = await getTopPokemonPlayers(serverId, 10);
-
-  let embed;
-  if (!topPlayers || topPlayers.length === 0) {
-    embed = new EmbedBuilder()
-      .setTitle("🏆 **Pokémon Leaderboard**")
-      .setDescription("No scores recorded yet! Play `/guess` to score points!")
-      .setColor(EMBED_COLORS.WHITE);
-  } else {
-    const leaderboardLines = topPlayers.map((player, index) => {
-      const medal =
-        index === 0 ? "🥇 " : index === 1 ? "🥈 " : index === 2 ? "🥉 " : "";
-      return `${medal}<@${player.userId}> — **${player.points}** Pts *(${player.wins} guessed)*`;
-    });
-
-    embed = new EmbedBuilder()
-      .setTitle("🏆 **Pokémon Leaderboard**")
-      .setDescription(leaderboardLines.join("\n"))
-      .setFooter({ text: "Earn points by playing /guess!" })
-      .setColor(EMBED_COLORS.SUCCESS);
-  }
-
-  return interaction.isButton && interaction.isButton()
-    ? interaction.update({ embeds: [embed], components: [] })
-    : interaction.replied || interaction.deferred
-      ? interaction.followUp({ embeds: [embed] })
-      : interaction.reply({ embeds: [embed] });
-}
-
 async function startPokemonGame(
   interaction,
   client,
   isFollowUp = false,
   genSelection = "gen1",
-  buildAiReply,
+  buildAiReply
 ) {
   try {
     const channelId =
@@ -256,7 +201,7 @@ async function startPokemonGame(
         `**Type:** ${targetPokemon.types}\n` +
           `**Hint:** ${initialHint}\n\n` +
           `You have 30 seconds to guess the Pokémon.\n` +
-          `*Type your answer in the chat or \`.skip\` to skip.*`,
+          `*Type your answer in the chat or \`.skip\` to skip.*`
       )
       .setColor(EMBED_COLORS.GREY);
 
@@ -289,7 +234,7 @@ async function startPokemonGame(
             `**Type:** ${targetPokemon.types}\n` +
               `**Hint:** ${secondHint}\n\n` +
               `You have 30 seconds to guess the Pokémon.\n` +
-              `*Type your answer in the chat or \`.skip\` to skip.*`,
+              `*Type your answer in the chat or \`.skip\` to skip.*`
           );
           if (response && typeof response.edit === "function") {
             await response.edit({ embeds: [updatedEmbed] }).catch(() => null);
@@ -321,7 +266,7 @@ async function startPokemonGame(
       }
 
       const isCorrect = targetPokemon.aliases.some(
-        (alias) => alias.toLowerCase() === input,
+        (alias) => alias.toLowerCase() === input
       );
 
       if (isCorrect) {
@@ -333,7 +278,7 @@ async function startPokemonGame(
           .catch(() =>
             m
               .react("<:Success:1526228339910643793>")
-              .catch(() => m.react("✅").catch(() => null)),
+              .catch(() => m.react("✅").catch(() => null))
           );
       } else if (isCloseMatch(input, targetPokemon.aliases)) {
         if (!closeMatchUsers.has(m.author.id)) {
@@ -358,7 +303,7 @@ async function startPokemonGame(
             .setTitle("**Pokémon Skipped!**")
             .setDescription(
               `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                `*Skips remaining for this game:* **${remainingSkips}/5**`,
+                `*Skips remaining for this game:* **${remainingSkips}/5**`
             )
             .setThumbnail(targetPokemon.imageUrl)
             .setColor(EMBED_COLORS.WARNING);
@@ -371,7 +316,7 @@ async function startPokemonGame(
               client,
               true,
               genSelection,
-              buildAiReply,
+              buildAiReply
             );
           }, 1500);
         } else if (reason === "correct" && winnerMessage) {
@@ -391,7 +336,7 @@ async function startPokemonGame(
             .setDescription(
               `${winnerMention} guessed it right!\n` +
                 `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                `🏆 **+${pointsGained} Points** *(Total: **${scoreData.totalPoints}** Pts)*`,
+                `🏆 **+${pointsGained} Points** *(Total: **${scoreData.totalPoints}** Pts)*`
             )
             .setThumbnail(targetPokemon.imageUrl)
             .setColor(EMBED_COLORS.SUCCESS);
@@ -404,7 +349,7 @@ async function startPokemonGame(
               client,
               true,
               genSelection,
-              buildAiReply,
+              buildAiReply
             );
           }, 1500);
         } else {
@@ -413,7 +358,7 @@ async function startPokemonGame(
             .setTitle("⌛ **Time's Up!**")
             .setDescription(
               `Nobody guessed the Pokémon in time!\n\n` +
-                `The correct answer was **${targetPokemon.name}**.`,
+                `The correct answer was **${targetPokemon.name}**.`
             )
             .setThumbnail(targetPokemon.imageUrl)
             .setColor(EMBED_COLORS.TIMEOUT);
@@ -423,12 +368,12 @@ async function startPokemonGame(
             components: [buildButtons()],
           });
 
-          attachGuessNextCollector(
+          attachPokemonNextCollector(
             resultMsg,
             interaction,
             client,
             genSelection,
-            buildAiReply,
+            buildAiReply
           );
         }
       } catch (err) {
@@ -441,12 +386,12 @@ async function startPokemonGame(
   }
 }
 
-function attachGuessNextCollector(
+function attachPokemonNextCollector(
   message,
   originalInteraction,
   client,
   extraSetting,
-  buildAiReply,
+  buildAiReply
 ) {
   if (!message || typeof message.createMessageComponentCollector !== "function")
     return;
@@ -469,13 +414,13 @@ function attachGuessNextCollector(
           client,
           true,
           extraSetting,
-          buildAiReply,
+          buildAiReply
         );
-      } else if (btnInteraction.customId === "guess_lb_pokemon") {
-        await showLeaderboard(btnInteraction, client);
+      } else if (btnInteraction.customId === "show_lb_pokemon") {
+        await showLeaderboard(btnInteraction, client, "pokemon");
       }
     } catch (err) {
-      logger.error("Error in guess button execution:", err);
+      logger.error("Error in pokemon button execution:", err);
     }
   });
 }
