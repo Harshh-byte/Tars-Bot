@@ -142,14 +142,14 @@ async function startGame(interaction, client, opponent) {
 
       if (winner === "X") {
         embed
-          .setDescription(`🎉 **<@${playerX.id}> won the match!**`)
+          .setDescription(`<a:Tada:1544329561955770488> **<@${playerX.id}> won the match!**`)
           .setColor(EMBED_COLORS.SUCCESS);
       } else if (winner === "O") {
         const oColor = isVsTars ? EMBED_COLORS.ERROR : EMBED_COLORS.SUCCESS;
         const winnerMention = isVsTars ? "**Tars**" : `<@${playerO.id}>`;
         embed
           .setDescription(
-            `🎉 **${winnerMention} won the match!**` +
+            `<a:Tada:1544329561955770488> **${winnerMention} won the match!**` +
             (isVsTars ? `\n\n*Tars: "Predictable outcome."*` : "")
           )
           .setColor(oColor);

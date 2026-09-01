@@ -71,8 +71,25 @@ function generateHint(name, level = 0) {
 }
 
 async function fetchRandomPokemon(gen = "gen1", channelId = "default") {
-  const minId = 1;
-  const maxId = gen === "gen1" ? 151 : 898;
+  let minId = 1;
+  let maxId = 151;
+
+  if (gen === "gen2") {
+    minId = 152;
+    maxId = 251;
+  } else if (gen === "gen3") {
+    minId = 252;
+    maxId = 386;
+  } else if (gen === "gen4") {
+    minId = 387;
+    maxId = 493;
+  } else if (gen === "gen5") {
+    minId = 494;
+    maxId = 649;
+  } else if (gen === "all") {
+    minId = 1;
+    maxId = 898;
+  }
 
   if (!recentPokemonMap.has(channelId)) {
     recentPokemonMap.set(channelId, []);
@@ -128,16 +145,20 @@ export const aliases = ["poke"];
 
 export const data = {
   name: "pokemon",
-  description: "Who's That Pokémon guessing game!",
+  description: "Who's That Pokémon?",
   dm_permission: false,
   options: [
     {
       name: "generation",
-      description: "Select Generation: Gen 1 or All",
+      description: "Select Generation.",
       type: 3,
       required: false,
       choices: [
         { name: "Gen 1 (Kanto)", value: "gen1" },
+        { name: "Gen 2 (Johto)", value: "gen2" },
+        { name: "Gen 3 (Hoenn)", value: "gen3" },
+        { name: "Gen 4 (Sinnoh)", value: "gen4" },
+        { name: "Gen 5 (Unova)", value: "gen5" },
         { name: "All Generations", value: "all" },
       ],
     },
@@ -165,8 +186,15 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
     ""
   ).toLowerCase();
 
-  let genInput = interaction.options?.getString("generation")?.toLowerCase() || "gen1";
-  if (rawArgs.includes("all")) genInput = "all";
+  let genInput = interaction.options?.getString("generation")?.toLowerCase();
+  if (!genInput) {
+    if (rawArgs.includes("gen2") || rawArgs.includes("johto")) genInput = "gen2";
+    else if (rawArgs.includes("gen3") || rawArgs.includes("hoenn")) genInput = "gen3";
+    else if (rawArgs.includes("gen4") || rawArgs.includes("sinnoh")) genInput = "gen4";
+    else if (rawArgs.includes("gen5") || rawArgs.includes("unova")) genInput = "gen5";
+    else if (rawArgs.includes("all")) genInput = "all";
+    else genInput = "gen1";
+  }
 
   return startPokemonGame(interaction, client, false, genInput, buildAiReply);
 }

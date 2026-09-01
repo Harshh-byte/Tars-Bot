@@ -102,10 +102,10 @@ async function startGame(interaction, client, opponent) {
         if (userChoice === tarsChoice) {
           resultText = `🤝 **It's a Tie!** Both chose ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.`;
         } else if (CHOICES[userChoice].beats === tarsChoice) {
-          resultText = `🎉 **You won!** Your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}** beats Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}**.\n\n*Tars: "My humor setting is set to 75%, but your luck is at 100%."*`;
+          resultText = `<a:Tada:1544329561955770488> **You won!** Your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}** beats Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}**.\n\n*Tars: "My humor setting is set to 75%, but your luck is at 100%."*`;
           color = EMBED_COLORS.SUCCESS;
         } else {
-          resultText = `🎉 **Tars won!** Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}** beats your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.\n\n*Tars: "Predictable. Better luck next time."*`;
+          resultText = `<a:Tada:1544329561955770488> **Tars won!** Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}** beats your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.\n\n*Tars: "Predictable. Better luck next time."*`;
           color = EMBED_COLORS.ERROR;
         }
 
@@ -273,10 +273,10 @@ async function startGame(interaction, client, opponent) {
         if (c1 === c2) {
           resultMsg = `🤝 **It's a tie!** Both players picked ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
         } else if (CHOICES[c1].beats === c2) {
-          resultMsg = `🎉 **${userDisplayName} wins!**\n${CHOICES[c1].emoji} **${CHOICES[c1].name}** beats ${CHOICES[c2].emoji} **${CHOICES[c2].name}**.`;
+          resultMsg = `<a:Tada:1544329561955770488> **${userDisplayName} wins!**\n${CHOICES[c1].emoji} **${CHOICES[c1].name}** beats ${CHOICES[c2].emoji} **${CHOICES[c2].name}**.`;
           color = EMBED_COLORS.SUCCESS;
         } else {
-          resultMsg = `🎉 **${opponentDisplayName} wins!**\n${CHOICES[c2].emoji} **${CHOICES[c2].name}** beats ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
+          resultMsg = `<a:Tada:1544329561955770488> **${opponentDisplayName} wins!**\n${CHOICES[c2].emoji} **${CHOICES[c2].name}** beats ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
           color = EMBED_COLORS.SUCCESS;
         }
 
