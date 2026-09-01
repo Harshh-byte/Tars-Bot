@@ -64,10 +64,10 @@ export const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
-    trigger: "/flag",
+    trigger: "/guess",
     category: "games",
-    title: "Guess the Flag",
-    description: "Guess the country by its flag.",
+    title: "Guessing Games",
+    description: "Play guessing mini-games!",
     badge: "Games",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
