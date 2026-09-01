@@ -9,6 +9,7 @@
   "license": "ISC",
   "dependencies": {
     "@google/genai": "^1.47.0",
+    "@napi-rs/canvas": "^1.0.8",
     "@sentry/node": "^10.63.0",
     "discord.js": "^14.22.1",
     "dotenv": "^17.2.2",

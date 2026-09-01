@@ -26,7 +26,7 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 | **Utility** | `.help`, `.prefix`, `.ping`, `.about` | Interactive menus, prefix control, diagnostics & bot info |
 | **Actions** | `.smoke`, `.vape` | Per-server hit counters with animated emojis |
 | **Games** | `.tod`, `.wyr`, `.nhie`, `.rps`, `.ttt`, `.flip`, `.roll` | Interactive party games & decision tools |
-| **Fun** | `.iq`, `.pp`, `.gay`, `.lesbian`, `.bitches`, `.autism`, `.roast`, `.wish`, `.meme` | Calculators, AI roasts, wishes & Reddit memes |
+| **Fun** | `.ship`, `.iq`, `.pp`, `.gay`, `.lesbian`, `.bitches`, `.autism`, `.roast`, `.wish`, `.meme` | Calculators, AI roasts, wishes & Reddit memes |
 | **Admin** | `/maintenance` | Toggle bot maintenance mode |
 
 ---

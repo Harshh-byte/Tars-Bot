@@ -122,8 +122,17 @@ export async function execute(message, client, { buildAiReply }) {
         replied: false,
         deferred: false,
         options: {
-          getUser: (name) =>
-            name === "opponent" || name === "user" ? targetUser : null,
+          getUser: (name) => {
+            if (name === "user" || name === "user1") {
+              const mentions = Array.from(message.mentions.users.values());
+              return mentions[0] || targetUser;
+            }
+            if (name === "target" || name === "user2") {
+              const mentions = Array.from(message.mentions.users.values());
+              return mentions[1] || null;
+            }
+            return name === "opponent" ? targetUser : null;
+          },
           getString: () => args.join(" ") || null,
         },
         deferReply: async () => {
