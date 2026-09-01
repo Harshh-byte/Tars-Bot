@@ -146,7 +146,7 @@ async function buildLbPayload(serverId, category, guildName) {
       .setFooter({
         text: `Earn points by playing /${isPokemon ? "pokemon" : "flag"}!`,
       })
-      .setColor(EMBED_COLORS.SUCCESS);
+      .setColor(EMBED_COLORS.WHITE);
   }
 
   const toggleRow = buildLbToggleRow(category);
