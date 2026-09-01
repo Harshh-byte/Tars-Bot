@@ -68,20 +68,25 @@ function calculateShipScore() {
 
 export async function execute(interaction, client) {
   try {
-    let target1 = interaction.options?.getUser("user");
-    let target2 = interaction.options?.getUser("target");
+    let firstMention = interaction.options?.getUser("user");
+    let secondMention = interaction.options?.getUser("target");
 
-    if (!target1) {
+    let target1, target2;
+
+    if (firstMention && secondMention) {
+      target1 = firstMention;
+      target2 = secondMention;
+    } else if (firstMention) {
       target1 = interaction.user;
-    }
-
-    if (!target2) {
+      target2 = firstMention;
+    } else {
+      target1 = interaction.user;
       if (interaction.guild) {
         try {
           const members = await interaction.guild.members.fetch();
           const validUsers = members
             .map((m) => m.user)
-            .filter((u) => !u.bot && u.id !== target1.id);
+            .filter((u) => !u.bot && u.id !== interaction.user.id);
 
           if (validUsers.length > 0) {
             target2 = validUsers[Math.floor(Math.random() * validUsers.length)];

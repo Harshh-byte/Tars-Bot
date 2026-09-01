@@ -123,12 +123,11 @@ export async function execute(message, client, { buildAiReply }) {
         deferred: false,
         options: {
           getUser: (name) => {
+            const mentions = Array.from(message.mentions.users.values());
             if (name === "user" || name === "user1") {
-              const mentions = Array.from(message.mentions.users.values());
-              return mentions[0] || targetUser;
+              return mentions[0] || null;
             }
             if (name === "target" || name === "user2") {
-              const mentions = Array.from(message.mentions.users.values());
               return mentions[1] || null;
             }
             return name === "opponent" ? targetUser : null;
