@@ -184,6 +184,6 @@ cron.schedule("0 0 * * *", async () => {
       await batch.commit();
     }
   } catch (error) {
-    throw error;
+    logger.error("Error in data retention cron job:", error);
   }
 });
