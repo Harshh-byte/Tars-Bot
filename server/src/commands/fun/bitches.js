@@ -41,11 +41,11 @@ export async function execute(interaction, client) {
     const authorMention = `<@${interaction.user.id}>`;
     const targetMention = `<@${targetUser.id}>`;
 
-    const textPrefix = isSelf ? "Your" : targetMention;
+    const textPrefix = isSelf ? "You have" : `${targetMention} has`;
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} has \`${count}\` bitches\n*${category}*`
+        `${authorMention}: ${emoji} ${textPrefix} \`${count}\` bitches\n*${category}*`
       )
       .setColor(EMBED_COLORS.GREY);
 
