@@ -43,9 +43,7 @@ export async function getConversation(serverId, userId) {
 
   if (!snapshot.exists) {
     const newConversation = {
-      userId,
       messages: [],
-      profile: {},
       updatedAt: FieldValue.serverTimestamp(),
     };
 
@@ -55,7 +53,6 @@ export async function getConversation(serverId, userId) {
 
   const data = snapshot.data();
   data.messages ??= [];
-  data.profile ??= {};
   return data;
 }
 
@@ -69,19 +66,6 @@ export async function saveConversation(serverId, userId, data) {
   await memberDoc(serverId, userId).set(
     {
       ...data,
-      userId,
-      updatedAt: FieldValue.serverTimestamp(),
-    },
-    { merge: true },
-  );
-}
-
-export async function updateProfile(serverId, userId, key, value) {
-  validateIds(serverId, userId);
-
-  await memberDoc(serverId, userId).set(
-    {
-      [`profile.${key}`]: value,
       updatedAt: FieldValue.serverTimestamp(),
     },
     { merge: true },
@@ -173,7 +157,6 @@ export async function addFlagScore(serverId, userId, pointsGained) {
   try {
     await ref.set(
       {
-        userId,
         stats: {
           flag_points: FieldValue.increment(pointsGained),
           flag_wins: FieldValue.increment(1),
@@ -226,7 +209,6 @@ export async function addPokemonScore(serverId, userId, pointsGained) {
   try {
     await ref.set(
       {
-        userId,
         stats: {
           pokemon_points: FieldValue.increment(pointsGained),
           pokemon_wins: FieldValue.increment(1),

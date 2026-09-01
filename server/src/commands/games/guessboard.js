@@ -12,7 +12,7 @@ import {
   getTopPokemonPlayers,
 } from "../../services/database.js";
 
-export const aliases = ["flb", "plb", "flaglb", "pokelb", "guesslb"];
+export const aliases = ["flb", "plb", "guesslb"];
 
 export const data = {
   name: "guessboard",
@@ -75,7 +75,6 @@ export async function execute(interaction, client) {
     lbCategory = "pokemon";
   } else if (
     cmdName === "flb" ||
-    cmdName === "flaglb" ||
     rawArgs.includes("flb") ||
     rawArgs.includes("flag")
   ) {

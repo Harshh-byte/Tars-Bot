@@ -217,7 +217,7 @@ export const data = {
   options: [
     {
       name: "difficulty",
-      description: "Difficulty: Easy, Medium, or Hard",
+      description: "Difficulty",
       type: 3,
       required: false,
       choices: [
