@@ -102,17 +102,36 @@ export async function execute(interaction, client) {
     const canvas = createCanvas(700, 250);
     const ctx = canvas.getContext("2d");
 
+    let centerIcon = "❤️";
+    if (percentage === 100) centerIcon = "💖";
+    else if (percentage >= 85) centerIcon = "💕";
+    else if (percentage >= 70) centerIcon = "❤️";
+    else if (percentage >= 50) centerIcon = "💗";
+    else if (percentage >= 30) centerIcon = "💛";
+    else centerIcon = "💔";
+
     const gradient = ctx.createLinearGradient(0, 0, 700, 250);
-    gradient.addColorStop(0, "#1e102a");
-    gradient.addColorStop(0.5, "#2a0845");
-    gradient.addColorStop(1, "#12051f");
+    if (percentage >= 70) {
+      gradient.addColorStop(0, "#2b0a1f");
+      gradient.addColorStop(0.5, "#4a0e2e");
+      gradient.addColorStop(1, "#1c0413");
+    } else if (percentage >= 40) {
+      gradient.addColorStop(0, "#1e102a");
+      gradient.addColorStop(0.5, "#2a0845");
+      gradient.addColorStop(1, "#12051f");
+    } else {
+      gradient.addColorStop(0, "#0c1524");
+      gradient.addColorStop(0.5, "#182238");
+      gradient.addColorStop(1, "#070c17");
+    }
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 700, 250);
 
-    ctx.fillStyle = "rgba(255, 105, 180, 0.05)";
+    ctx.fillStyle = percentage >= 50 ? "rgba(255, 105, 180, 0.05)" : "rgba(114, 137, 218, 0.05)";
     ctx.beginPath();
     ctx.arc(350, 125, 180, 0, Math.PI * 2);
     ctx.fill();
+
     const avatarUrl1 = target1.displayAvatarURL({
       extension: "png",
       size: 256,
@@ -127,7 +146,23 @@ export async function execute(interaction, client) {
       loadImage(avatarUrl2).catch(() => null),
     ]);
 
+    let ringColor = "#5865f2";
+    if (percentage === 100) ringColor = "#ffd700";
+    else if (percentage >= 80) ringColor = "#ff0055";
+    else if (percentage >= 50) ringColor = "#ff4081";
+    else if (percentage >= 25) ringColor = "#ff9800";
+
     if (avatar1Img) {
+      ctx.save();
+      ctx.shadowColor = ringColor;
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.arc(130, 110, 67, 0, Math.PI * 2);
+      ctx.strokeStyle = ringColor;
+      ctx.lineWidth = 5;
+      ctx.stroke();
+      ctx.restore();
+
       ctx.save();
       ctx.beginPath();
       ctx.arc(130, 110, 65, 0, Math.PI * 2, true);
@@ -135,15 +170,19 @@ export async function execute(interaction, client) {
       ctx.clip();
       ctx.drawImage(avatar1Img, 65, 45, 130, 130);
       ctx.restore();
-
-      ctx.beginPath();
-      ctx.arc(130, 110, 67, 0, Math.PI * 2);
-      ctx.strokeStyle = "#ff4081";
-      ctx.lineWidth = 5;
-      ctx.stroke();
     }
 
     if (avatar2Img) {
+      ctx.save();
+      ctx.shadowColor = ringColor;
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.arc(570, 110, 67, 0, Math.PI * 2);
+      ctx.strokeStyle = ringColor;
+      ctx.lineWidth = 5;
+      ctx.stroke();
+      ctx.restore();
+
       ctx.save();
       ctx.beginPath();
       ctx.arc(570, 110, 65, 0, Math.PI * 2, true);
@@ -151,22 +190,12 @@ export async function execute(interaction, client) {
       ctx.clip();
       ctx.drawImage(avatar2Img, 505, 45, 130, 130);
       ctx.restore();
-
-      ctx.beginPath();
-      ctx.arc(570, 110, 67, 0, Math.PI * 2);
-      ctx.strokeStyle = "#ff4081";
-      ctx.lineWidth = 5;
-      ctx.stroke();
     }
 
-    ctx.font = "bold 42px sans-serif";
-    ctx.fillStyle = "#ff4081";
-    ctx.textAlign = "center";
-    ctx.fillText("⚡❤️⚡", 350, 95);
-
-    ctx.font = "bold 32px sans-serif";
+    ctx.font = "bold 44px sans-serif";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(`${percentage}%`, 350, 135);
+    ctx.textAlign = "center";
+    ctx.fillText(`${percentage}%`, 350, 115);
 
     const barX = 180;
     const barY = 190;
@@ -181,8 +210,16 @@ export async function execute(interaction, client) {
 
     const fillWidth = Math.max(12, (barW * percentage) / 100);
     const fillGradient = ctx.createLinearGradient(barX, 0, barX + fillWidth, 0);
-    fillGradient.addColorStop(0, "#ff2a6d");
-    fillGradient.addColorStop(1, "#ff62a5");
+    if (percentage >= 70) {
+      fillGradient.addColorStop(0, "#ff0055");
+      fillGradient.addColorStop(1, "#ff5599");
+    } else if (percentage >= 40) {
+      fillGradient.addColorStop(0, "#ff2a6d");
+      fillGradient.addColorStop(1, "#ff62a5");
+    } else {
+      fillGradient.addColorStop(0, "#3f51b5");
+      fillGradient.addColorStop(1, "#7986cb");
+    }
 
     ctx.fillStyle = fillGradient;
     ctx.beginPath();
