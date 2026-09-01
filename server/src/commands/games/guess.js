@@ -20,18 +20,103 @@ const recentFlagsMap = new Map();
 const recentPokemonMap = new Map();
 const channelSkipsMap = new Map();
 
-// --- FLAG GAME DATA & HELPERS ---
 const EASY_CODES = new Set([
-  "us", "ca", "gb", "fr", "de", "it", "es", "jp", "cn", "in", "br", "ar", "au",
-  "mx", "kr", "ru", "eg", "my", "tr", "ch", "gr", "za", "se", "nl", "pt", "id", "sa",
-  "sg", "th", "ph", "vn", "nz", "ie", "no", "fi", "dk", "be", "at", "pl", "ua", "cl",
-  "co", "pe", "pk", "bd", "ae", "qa", "jm", "np", "is", "ma", "ng", "cu", "uy"
+  "us",
+  "ca",
+  "gb",
+  "fr",
+  "de",
+  "it",
+  "es",
+  "jp",
+  "cn",
+  "in",
+  "br",
+  "ar",
+  "au",
+  "mx",
+  "kr",
+  "ru",
+  "eg",
+  "my",
+  "tr",
+  "ch",
+  "gr",
+  "za",
+  "se",
+  "nl",
+  "pt",
+  "id",
+  "sa",
+  "sg",
+  "th",
+  "ph",
+  "vn",
+  "nz",
+  "ie",
+  "no",
+  "fi",
+  "dk",
+  "be",
+  "at",
+  "pl",
+  "ua",
+  "cl",
+  "co",
+  "pe",
+  "pk",
+  "bd",
+  "ae",
+  "qa",
+  "jm",
+  "np",
+  "is",
+  "ma",
+  "ng",
+  "cu",
+  "uy",
 ]);
 
 const MEDIUM_CODES = new Set([
-  "ro", "hu", "cz", "hr", "ke", "kw", "bh", "om", "dz", "tn", "lk", "kh", "la",
-  "mm", "iq", "ir", "sy", "jo", "lb", "ge", "am", "az", "uz", "kz", "cy", "mt",
-  "lu", "ee", "lv", "lt", "sk", "si", "bg", "by", "rs", "ba", "me", "mk", "al"
+  "ro",
+  "hu",
+  "cz",
+  "hr",
+  "ke",
+  "kw",
+  "bh",
+  "om",
+  "dz",
+  "tn",
+  "lk",
+  "kh",
+  "la",
+  "mm",
+  "iq",
+  "ir",
+  "sy",
+  "jo",
+  "lb",
+  "ge",
+  "am",
+  "az",
+  "uz",
+  "kz",
+  "cy",
+  "mt",
+  "lu",
+  "ee",
+  "lv",
+  "lt",
+  "sk",
+  "si",
+  "bg",
+  "by",
+  "rs",
+  "ba",
+  "me",
+  "mk",
+  "al",
 ]);
 
 function getDifficulty(code) {
@@ -51,7 +136,10 @@ function codeToEmoji(code) {
   if (!code || code.length !== 2) return "🚩";
   const base = 127397;
   return String.fromCodePoint(
-    ...code.toUpperCase().split("").map((c) => base + c.charCodeAt(0))
+    ...code
+      .toUpperCase()
+      .split("")
+      .map((c) => base + c.charCodeAt(0)),
   );
 }
 
@@ -71,7 +159,7 @@ function levenshteinDistance(a, b) {
         matrix[i][j] = Math.min(
           matrix[i - 1][j - 1] + 1,
           matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
+          matrix[i - 1][j] + 1,
         );
       }
     }
@@ -84,7 +172,8 @@ function isCloseMatch(input, targetAliases) {
   return targetAliases.some((alias) => {
     const cleanAlias = alias.toLowerCase();
     const distance = levenshteinDistance(input, cleanAlias);
-    const maxAllowedDist = cleanAlias.length > 7 ? 2 : cleanAlias.length > 4 ? 1 : 0;
+    const maxAllowedDist =
+      cleanAlias.length > 7 ? 2 : cleanAlias.length > 4 ? 1 : 0;
     return distance > 0 && distance <= maxAllowedDist;
   });
 }
@@ -92,7 +181,10 @@ function isCloseMatch(input, targetAliases) {
 function generateHint(name, level = 0) {
   const chars = name.split("");
   const totalLetters = chars.filter((c) => /[a-zA-Z]/.test(c)).length;
-  const revealCount = level === 0 ? 1 : Math.min(totalLetters - 1, Math.floor(totalLetters * 0.4) + level);
+  const revealCount =
+    level === 0
+      ? 1
+      : Math.min(totalLetters - 1, Math.floor(totalLetters * 0.4) + level);
 
   let revealed = 0;
   return chars
@@ -111,7 +203,10 @@ function getAliases(name, code) {
   const lowerName = name.toLowerCase();
   const aliases = new Set([lowerName, code.toLowerCase()]);
 
-  if (lowerName === "united states" || lowerName === "united states of america") {
+  if (
+    lowerName === "united states" ||
+    lowerName === "united states of america"
+  ) {
     aliases.add("usa");
     aliases.add("us");
     aliases.add("america");
@@ -151,7 +246,11 @@ async function fetchCountriesFromApi() {
       const countries = [];
 
       for (const [code, name] of Object.entries(data)) {
-        if (code.length === 2 && !code.startsWith("us-") && !code.startsWith("gb-")) {
+        if (
+          code.length === 2 &&
+          !code.startsWith("us-") &&
+          !code.startsWith("gb-")
+        ) {
           const emoji = codeToEmoji(code);
           const aliases = getAliases(name, code);
           const difficulty = getDifficulty(code);
@@ -175,17 +274,58 @@ async function fetchCountriesFromApi() {
   }
 
   return [
-    { name: "Malaysia", code: "my", emoji: "🇲🇾", difficulty: "Easy", aliases: ["malaysia"] },
-    { name: "Japan", code: "jp", emoji: "🇯🇵", difficulty: "Easy", aliases: ["japan"] },
-    { name: "United States", code: "us", emoji: "🇺🇸", difficulty: "Easy", aliases: ["united states", "usa", "us", "america"] },
-    { name: "France", code: "fr", emoji: "🇫🇷", difficulty: "Easy", aliases: ["france"] },
-    { name: "Germany", code: "de", emoji: "🇩🇪", difficulty: "Easy", aliases: ["germany"] },
-    { name: "India", code: "in", emoji: "🇮🇳", difficulty: "Easy", aliases: ["india"] },
-    { name: "Brazil", code: "br", emoji: "🇧🇷", difficulty: "Easy", aliases: ["brazil"] },
+    {
+      name: "Malaysia",
+      code: "my",
+      emoji: "🇲🇾",
+      difficulty: "Easy",
+      aliases: ["malaysia"],
+    },
+    {
+      name: "Japan",
+      code: "jp",
+      emoji: "🇯🇵",
+      difficulty: "Easy",
+      aliases: ["japan"],
+    },
+    {
+      name: "United States",
+      code: "us",
+      emoji: "🇺🇸",
+      difficulty: "Easy",
+      aliases: ["united states", "usa", "us", "america"],
+    },
+    {
+      name: "France",
+      code: "fr",
+      emoji: "🇫🇷",
+      difficulty: "Easy",
+      aliases: ["france"],
+    },
+    {
+      name: "Germany",
+      code: "de",
+      emoji: "🇩🇪",
+      difficulty: "Easy",
+      aliases: ["germany"],
+    },
+    {
+      name: "India",
+      code: "in",
+      emoji: "🇮🇳",
+      difficulty: "Easy",
+      aliases: ["india"],
+    },
+    {
+      name: "Brazil",
+      code: "br",
+      emoji: "🇧🇷",
+      difficulty: "Easy",
+      aliases: ["brazil"],
+    },
   ];
 }
 
-// --- POKEMON GAME HELPERS ---
 async function fetchRandomPokemon(gen = "gen1", channelId = "default") {
   const minId = 1;
   const maxId = gen === "gen1" ? 151 : 898;
@@ -211,7 +351,9 @@ async function fetchRandomPokemon(gen = "gen1", channelId = "default") {
       const data = await res.json();
       const rawName = data.name;
       const formattedName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
-      const types = data.types.map((t) => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1)).join(" / ");
+      const types = data.types
+        .map((t) => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1))
+        .join(" / ");
       const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
 
       return {
@@ -231,13 +373,14 @@ async function fetchRandomPokemon(gen = "gen1", channelId = "default") {
     id: 25,
     name: "Pikachu",
     types: "Electric",
-    imageUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png",
+    imageUrl:
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png",
     aliases: ["pikachu"],
     points: 15,
   };
 }
 
-export const aliases = ["flag", "pokemon", "flb", "plb", "guesslb"];
+export const aliases = ["flag", "pokemon"];
 
 export const data = {
   name: "guess",
@@ -245,48 +388,13 @@ export const data = {
   dm_permission: false,
   options: [
     {
-      type: 1,
-      name: "play",
-      description: "Start a guessing mini-game.",
-      options: [
-        {
-          name: "category",
-          description: "Select game category: Flag or Pokemon",
-          type: 3,
-          required: true,
-          choices: [
-            { name: "Flag", value: "flag" },
-            { name: "Pokemon", value: "pokemon" },
-          ],
-        },
-        {
-          name: "difficulty",
-          description: "Difficulty",
-          type: 3,
-          required: false,
-          choices: [
-            { name: "Easy", value: "easy" },
-            { name: "Medium", value: "medium" },
-            { name: "Hard", value: "hard" },
-          ],
-        },
-      ],
-    },
-    {
-      type: 1,
-      name: "leaderboard",
-      description: "View top guessers in this server.",
-      options: [
-        {
-          name: "category",
-          description: "Select a category",
-          type: 3,
-          required: true,
-          choices: [
-            { name: "Flag", value: "flag" },
-            { name: "Pokemon", value: "pokemon" },
-          ],
-        },
+      name: "category",
+      description: "Select game category.",
+      type: 3,
+      required: true,
+      choices: [
+        { name: "Flag", value: "flag" },
+        { name: "Pokemon", value: "pokemon" },
       ],
     },
   ],
@@ -299,10 +407,12 @@ function buildButtons(gameType = "flag") {
       .setLabel(gameType === "pokemon" ? "Next Pokémon" : "Next Flag")
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
-      .setCustomId(gameType === "pokemon" ? "guess_lb_pokemon" : "guess_lb_flag")
+      .setCustomId(
+        gameType === "pokemon" ? "guess_lb_pokemon" : "guess_lb_flag",
+      )
       .setLabel("Leaderboard")
       .setEmoji("🏆")
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Secondary),
   );
 }
 
@@ -312,33 +422,35 @@ function buildLbToggleRow(currentCategory = "flag") {
       .setCustomId("show_lb_flag")
       .setLabel("Flag LB")
       .setEmoji("🏁")
-      .setStyle(currentCategory === "flag" ? ButtonStyle.Primary : ButtonStyle.Secondary),
+      .setStyle(
+        currentCategory === "flag"
+          ? ButtonStyle.Primary
+          : ButtonStyle.Secondary,
+      ),
     new ButtonBuilder()
       .setCustomId("show_lb_pokemon")
       .setLabel("Pokémon LB")
       .setEmoji("⚡")
-      .setStyle(currentCategory === "pokemon" ? ButtonStyle.Primary : ButtonStyle.Secondary)
+      .setStyle(
+        currentCategory === "pokemon"
+          ? ButtonStyle.Primary
+          : ButtonStyle.Secondary,
+      ),
   );
 }
 
 export async function execute(interaction, client, { buildAiReply } = {}) {
-  let subcommand = null;
-  try {
-    subcommand = interaction.options?.getSubcommand(false);
-  } catch {}
-
   const cmdName = (interaction.commandName || "").toLowerCase();
-  const selectedCategory = interaction.options?.getString("category")?.toLowerCase() || "";
+  const selectedCategory =
+    interaction.options?.getString("category")?.toLowerCase() || "";
   const rawArgs = (
-    interaction.options?.getString("difficulty") ||
     interaction.options?.getString("category") ||
     interaction.options?.getString("getString") ||
     ""
   ).toLowerCase();
 
-  // Detect Leaderboard
   if (
-    subcommand === "leaderboard" ||
+    cmdName === "guessboard" ||
     cmdName === "guesslb" ||
     cmdName === "pklb" ||
     cmdName === "plb" ||
@@ -355,13 +467,16 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       rawArgs.includes("plb")
     ) {
       lbCategory = "pokemon";
-    } else if (cmdName === "flb" || cmdName === "flaglb" || rawArgs.includes("flb")) {
+    } else if (
+      cmdName === "flb" ||
+      cmdName === "flaglb" ||
+      rawArgs.includes("flb")
+    ) {
       lbCategory = "flag";
     }
     return showLeaderboard(interaction, client, lbCategory);
   }
 
-  // Detect Game Category
   const isPokemon =
     selectedCategory === "pokemon" ||
     cmdName === "pokemon" ||
@@ -371,29 +486,40 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
     return startPokemonGame(interaction, client, false, "gen1", buildAiReply);
   }
 
-  // Default: Flag Game
-  let difficultyInput = interaction.options?.getString("difficulty")?.toLowerCase();
-  if (!difficultyInput) {
-    if (rawArgs.includes("hard")) difficultyInput = "hard";
-    else if (rawArgs.includes("medium") || rawArgs.includes("med")) difficultyInput = "medium";
-    else if (rawArgs.includes("easy")) difficultyInput = "easy";
-  }
+  let difficultyInput = null;
+  if (rawArgs.includes("hard")) difficultyInput = "hard";
+  else if (rawArgs.includes("medium") || rawArgs.includes("med"))
+    difficultyInput = "medium";
+  else if (rawArgs.includes("easy")) difficultyInput = "easy";
 
-  return startFlagGame(interaction, client, false, difficultyInput, buildAiReply);
+  return startFlagGame(
+    interaction,
+    client,
+    false,
+    difficultyInput,
+    buildAiReply,
+  );
 }
 
 async function showLeaderboard(interaction, client, category = "flag") {
   const serverId = interaction.guild?.id;
   if (!serverId) {
-    const errorPayload = { content: "Leaderboard is only available inside a server!", ephemeral: true };
+    const errorPayload = {
+      content: "Leaderboard is only available inside a server!",
+      ephemeral: true,
+    };
     return interaction.isButton && interaction.isButton()
       ? interaction.reply(errorPayload)
       : interaction.replied || interaction.deferred
-      ? interaction.followUp(errorPayload)
-      : interaction.reply(errorPayload);
+        ? interaction.followUp(errorPayload)
+        : interaction.reply(errorPayload);
   }
 
-  const payload = await buildLbPayload(serverId, category, interaction.guild.name);
+  const payload = await buildLbPayload(
+    serverId,
+    category,
+    interaction.guild.name,
+  );
 
   let response;
   if (interaction.isButton && interaction.isButton()) {
@@ -419,19 +545,24 @@ async function buildLbPayload(serverId, category, guildName) {
   if (!topPlayers || topPlayers.length === 0) {
     embed = new EmbedBuilder()
       .setTitle(`🏆 **${categoryName} Leaderboard**`)
-      .setDescription(`No scores recorded yet! Play \`/guess\` play category: ${isPokemon ? "Pokemon" : "Flag"}!`)
+      .setDescription(
+        `No scores recorded yet! Play \`/guess category:${isPokemon ? "Pokemon" : "Flag"}\` to score points!`,
+      )
       .setColor(EMBED_COLORS.WHITE);
   } else {
     const leaderboardLines = topPlayers.map((player, index) => {
-      const medal = index === 0 ? "🥇 " : index === 1 ? "🥈 " : index === 2 ? "🥉 " : "";
+      const medal =
+        index === 0 ? "🥇 " : index === 1 ? "🥈 " : index === 2 ? "🥉 " : "";
       return `${medal}<@${player.userId}> — **${player.points}** Pts *(${player.wins} guessed)*`;
     });
 
     embed = new EmbedBuilder()
       .setTitle(`🏆 **${categoryName} Leaderboard**`)
       .setDescription(leaderboardLines.join("\n"))
-      .setFooter({ text: `Earn points by playing `/guess` play category: ${isPokemon ? "Pokemon" : "Flag"}!` })
-      .setColor(EMBED_COLORS.WHITE);
+      .setFooter({
+        text: `Earn points by playing \`/guess category:${isPokemon ? "Pokemon" : "Flag"}\`!`,
+      })
+      .setColor(EMBED_COLORS.SUCCESS);
   }
 
   const toggleRow = buildLbToggleRow(category);
@@ -439,7 +570,8 @@ async function buildLbPayload(serverId, category, guildName) {
 }
 
 function attachLbToggleCollector(message, originalInteraction, client) {
-  if (!message || typeof message.createMessageComponentCollector !== "function") return;
+  if (!message || typeof message.createMessageComponentCollector !== "function")
+    return;
 
   const collector = message.createMessageComponentCollector({
     componentType: ComponentType.Button,
@@ -465,7 +597,9 @@ function getUnusedCountry(filteredCountries, channelId) {
   }
 
   const recentList = recentFlagsMap.get(channelId);
-  const available = filteredCountries.filter((c) => !recentList.includes(c.code));
+  const available = filteredCountries.filter(
+    (c) => !recentList.includes(c.code),
+  );
 
   const pool = available.length > 0 ? available : filteredCountries;
   const selected = pool[Math.floor(Math.random() * pool.length)];
@@ -478,30 +612,44 @@ function getUnusedCountry(filteredCountries, channelId) {
   return selected;
 }
 
-// --- FLAG GAME LOGIC ---
-async function startFlagGame(interaction, client, isFollowUp = false, selectedDifficulty, buildAiReply) {
+async function startFlagGame(
+  interaction,
+  client,
+  isFollowUp = false,
+  selectedDifficulty,
+  buildAiReply,
+) {
   try {
     const allCountries = await fetchCountriesFromApi();
-    const channelId = interaction.channelId || interaction.channel?.id || "default";
+    const channelId =
+      interaction.channelId || interaction.channel?.id || "default";
 
     let filteredCountries = allCountries;
     if (selectedDifficulty) {
       const targetDiff = selectedDifficulty.toLowerCase();
       filteredCountries = allCountries.filter(
-        (c) => c.difficulty.toLowerCase() === targetDiff
+        (c) => c.difficulty.toLowerCase() === targetDiff,
       );
       if (filteredCountries.length === 0) filteredCountries = allCountries;
     } else {
       const rand = Math.random();
       const targetDiff = rand < 0.7 ? "easy" : rand < 0.95 ? "medium" : "hard";
-      const matches = allCountries.filter((c) => c.difficulty.toLowerCase() === targetDiff);
+      const matches = allCountries.filter(
+        (c) => c.difficulty.toLowerCase() === targetDiff,
+      );
       if (matches.length > 0) filteredCountries = matches;
     }
 
     const targetCountry = getUnusedCountry(filteredCountries, channelId);
 
-    const userDisplayName = interaction.member?.displayName || interaction.user.displayName || interaction.user.username;
-    const userAvatar = interaction.user.displayAvatarURL({ extension: "png", size: 256 });
+    const userDisplayName =
+      interaction.member?.displayName ||
+      interaction.user.displayName ||
+      interaction.user.username;
+    const userAvatar = interaction.user.displayAvatarURL({
+      extension: "png",
+      size: 256,
+    });
     const flagUrl = `https://flagcdn.com/w320/${targetCountry.code}.png`;
     const initialHint = generateHint(targetCountry.name, 0);
 
@@ -515,14 +663,15 @@ async function startFlagGame(interaction, client, isFollowUp = false, selectedDi
         `**Difficulty:** ${diffBadge}\n` +
           `**Hint:** ${initialHint}\n\n` +
           `You have 30 seconds to guess the country.\n` +
-          `*Type your answer in the chat or \`.skip\` to skip.*`
+          `*Type your answer in the chat or \`.skip\` to skip.*`,
       )
       .setColor(EMBED_COLORS.GREY);
 
     const payload = { embeds: [embed], components: [] };
 
     const channel = interaction.channel;
-    if (!channel || typeof channel.createMessageCollector !== "function") return;
+    if (!channel || typeof channel.createMessageCollector !== "function")
+      return;
 
     let response;
     if (isFollowUp) {
@@ -547,7 +696,7 @@ async function startFlagGame(interaction, client, isFollowUp = false, selectedDi
             `**Difficulty:** ${diffBadge}\n` +
               `**Hint:** ${secondHint}\n\n` +
               `You have 30 seconds to guess the country.\n` +
-              `*Type your answer in the chat or \`.skip\` to skip.*`
+              `*Type your answer in the chat or \`.skip\` to skip.*`,
           );
           if (response && typeof response.edit === "function") {
             await response.edit({ embeds: [updatedEmbed] }).catch(() => null);
@@ -562,9 +711,12 @@ async function startFlagGame(interaction, client, isFollowUp = false, selectedDi
       if (input === ".skip" || input === ".s") {
         const skipsUsed = channelSkipsMap.get(channelId) || 0;
         if (skipsUsed >= 5) {
-          await m.reply({
-            content: "⚠️ **Maximum skips reached (5/5)!** You must guess this flag or wait for the timer.",
-          }).catch(() => null);
+          await m
+            .reply({
+              content:
+                "⚠️ **Maximum skips reached (5/5)!** You must guess this flag or wait for the timer.",
+            })
+            .catch(() => null);
           return;
         }
 
@@ -576,20 +728,28 @@ async function startFlagGame(interaction, client, isFollowUp = false, selectedDi
       }
 
       const isCorrect = targetCountry.aliases.some(
-        (alias) => alias.toLowerCase() === input
+        (alias) => alias.toLowerCase() === input,
       );
 
       if (isCorrect) {
         winnerMessage = m;
         clearTimeout(hintTimer);
         collector.stop("correct");
-        await m.react("1526228339910643793").catch(() => m.react("<:Success:1526228339910643793>").catch(() => m.react("✅").catch(() => null)));
+        await m
+          .react("1526228339910643793")
+          .catch(() =>
+            m
+              .react("<:Success:1526228339910643793>")
+              .catch(() => m.react("✅").catch(() => null)),
+          );
       } else if (isCloseMatch(input, targetCountry.aliases)) {
         if (!closeMatchUsers.has(m.author.id)) {
           closeMatchUsers.add(m.author.id);
-          await m.reply({
-            content: `*<@${m.author.id}>, you're so close! Check for typos!*`,
-          }).catch(() => null);
+          await m
+            .reply({
+              content: `*<@${m.author.id}>, you're so close! Check for typos!*`,
+            })
+            .catch(() => null);
         }
       }
     });
@@ -605,14 +765,20 @@ async function startFlagGame(interaction, client, isFollowUp = false, selectedDi
             .setTitle("**Flag Skipped!**")
             .setDescription(
               `The country was **${targetCountry.name}** ${targetCountry.emoji}.\n\n` +
-                `*Skips remaining for this game:* **${remainingSkips}/5**`
+                `*Skips remaining for this game:* **${remainingSkips}/5**`,
             )
             .setColor(EMBED_COLORS.WARNING);
 
           await channel.send({ embeds: [skipEmbed] });
 
           setTimeout(async () => {
-            await startFlagGame(interaction, client, true, selectedDifficulty, buildAiReply);
+            await startFlagGame(
+              interaction,
+              client,
+              true,
+              selectedDifficulty,
+              buildAiReply,
+            );
           }, 1500);
         } else if (reason === "correct" && winnerMessage) {
           const winnerId = winnerMessage.author.id;
@@ -631,14 +797,20 @@ async function startFlagGame(interaction, client, isFollowUp = false, selectedDi
             .setDescription(
               `${winnerMention} guessed it right!\n` +
                 `The country was **${targetCountry.name}** ${targetCountry.emoji}!\n\n` +
-                `🏆 **+${pointsGained} Points** *(Total: **${scoreData.totalPoints}** Pts)*`
+                `🏆 **+${pointsGained} Points** *(Total: **${scoreData.totalPoints}** Pts)*`,
             )
             .setColor(EMBED_COLORS.SUCCESS);
 
           await channel.send({ embeds: [winEmbed] });
 
           setTimeout(async () => {
-            await startFlagGame(interaction, client, true, selectedDifficulty, buildAiReply);
+            await startFlagGame(
+              interaction,
+              client,
+              true,
+              selectedDifficulty,
+              buildAiReply,
+            );
           }, 1500);
         } else {
           channelSkipsMap.set(channelId, 0);
@@ -646,7 +818,7 @@ async function startFlagGame(interaction, client, isFollowUp = false, selectedDi
             .setTitle("⌛ **Time's Up!**")
             .setDescription(
               `Nobody guessed the country in time!\n\n` +
-                `The correct answer was **${targetCountry.name}** ${targetCountry.emoji}.`
+                `The correct answer was **${targetCountry.name}** ${targetCountry.emoji}.`,
             )
             .setColor(EMBED_COLORS.TIMEOUT);
 
@@ -655,7 +827,14 @@ async function startFlagGame(interaction, client, isFollowUp = false, selectedDi
             components: [buildButtons("flag")],
           });
 
-          attachGuessNextCollector(resultMsg, interaction, client, "flag", selectedDifficulty, buildAiReply);
+          attachGuessNextCollector(
+            resultMsg,
+            interaction,
+            client,
+            "flag",
+            selectedDifficulty,
+            buildAiReply,
+          );
         }
       } catch (err) {
         logger.error("Error ending flag game collector:", err);
@@ -667,14 +846,26 @@ async function startFlagGame(interaction, client, isFollowUp = false, selectedDi
   }
 }
 
-// --- POKEMON GAME LOGIC ---
-async function startPokemonGame(interaction, client, isFollowUp = false, genSelection = "gen1", buildAiReply) {
+async function startPokemonGame(
+  interaction,
+  client,
+  isFollowUp = false,
+  genSelection = "gen1",
+  buildAiReply,
+) {
   try {
-    const channelId = interaction.channelId || interaction.channel?.id || "default";
+    const channelId =
+      interaction.channelId || interaction.channel?.id || "default";
     const targetPokemon = await fetchRandomPokemon(genSelection, channelId);
 
-    const userDisplayName = interaction.member?.displayName || interaction.user.displayName || interaction.user.username;
-    const userAvatar = interaction.user.displayAvatarURL({ extension: "png", size: 256 });
+    const userDisplayName =
+      interaction.member?.displayName ||
+      interaction.user.displayName ||
+      interaction.user.username;
+    const userAvatar = interaction.user.displayAvatarURL({
+      extension: "png",
+      size: 256,
+    });
     const initialHint = generateHint(targetPokemon.name, 0);
 
     const embed = new EmbedBuilder()
@@ -685,14 +876,15 @@ async function startPokemonGame(interaction, client, isFollowUp = false, genSele
         `**Type:** ${targetPokemon.types}\n` +
           `**Hint:** ${initialHint}\n\n` +
           `You have 30 seconds to guess the Pokémon.\n` +
-          `*Type your answer in the chat or \`.skip\` to skip.*`
+          `*Type your answer in the chat or \`.skip\` to skip.*`,
       )
       .setColor(EMBED_COLORS.GREY);
 
     const payload = { embeds: [embed], components: [] };
 
     const channel = interaction.channel;
-    if (!channel || typeof channel.createMessageCollector !== "function") return;
+    if (!channel || typeof channel.createMessageCollector !== "function")
+      return;
 
     let response;
     if (isFollowUp) {
@@ -717,7 +909,7 @@ async function startPokemonGame(interaction, client, isFollowUp = false, genSele
             `**Type:** ${targetPokemon.types}\n` +
               `**Hint:** ${secondHint}\n\n` +
               `You have 30 seconds to guess the Pokémon.\n` +
-              `*Type your answer in the chat or \`.skip\` to skip.*`
+              `*Type your answer in the chat or \`.skip\` to skip.*`,
           );
           if (response && typeof response.edit === "function") {
             await response.edit({ embeds: [updatedEmbed] }).catch(() => null);
@@ -732,9 +924,12 @@ async function startPokemonGame(interaction, client, isFollowUp = false, genSele
       if (input === ".skip" || input === ".s") {
         const skipsUsed = channelSkipsMap.get(channelId) || 0;
         if (skipsUsed >= 5) {
-          await m.reply({
-            content: "⚠️ **Maximum skips reached (5/5)!** You must guess this Pokémon or wait for the timer.",
-          }).catch(() => null);
+          await m
+            .reply({
+              content:
+                "⚠️ **Maximum skips reached (5/5)!** You must guess this Pokémon or wait for the timer.",
+            })
+            .catch(() => null);
           return;
         }
 
@@ -746,20 +941,28 @@ async function startPokemonGame(interaction, client, isFollowUp = false, genSele
       }
 
       const isCorrect = targetPokemon.aliases.some(
-        (alias) => alias.toLowerCase() === input
+        (alias) => alias.toLowerCase() === input,
       );
 
       if (isCorrect) {
         winnerMessage = m;
         clearTimeout(hintTimer);
         collector.stop("correct");
-        await m.react("1526228339910643793").catch(() => m.react("<:Success:1526228339910643793>").catch(() => m.react("✅").catch(() => null)));
+        await m
+          .react("1526228339910643793")
+          .catch(() =>
+            m
+              .react("<:Success:1526228339910643793>")
+              .catch(() => m.react("✅").catch(() => null)),
+          );
       } else if (isCloseMatch(input, targetPokemon.aliases)) {
         if (!closeMatchUsers.has(m.author.id)) {
           closeMatchUsers.add(m.author.id);
-          await m.reply({
-            content: `*<@${m.author.id}>, you're so close! Check for typos!*`,
-          }).catch(() => null);
+          await m
+            .reply({
+              content: `*<@${m.author.id}>, you're so close! Check for typos!*`,
+            })
+            .catch(() => null);
         }
       }
     });
@@ -775,7 +978,7 @@ async function startPokemonGame(interaction, client, isFollowUp = false, genSele
             .setTitle("**Pokémon Skipped!**")
             .setDescription(
               `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                `*Skips remaining for this game:* **${remainingSkips}/5**`
+                `*Skips remaining for this game:* **${remainingSkips}/5**`,
             )
             .setThumbnail(targetPokemon.imageUrl)
             .setColor(EMBED_COLORS.WARNING);
@@ -783,7 +986,13 @@ async function startPokemonGame(interaction, client, isFollowUp = false, genSele
           await channel.send({ embeds: [skipEmbed] });
 
           setTimeout(async () => {
-            await startPokemonGame(interaction, client, true, genSelection, buildAiReply);
+            await startPokemonGame(
+              interaction,
+              client,
+              true,
+              genSelection,
+              buildAiReply,
+            );
           }, 1500);
         } else if (reason === "correct" && winnerMessage) {
           const winnerId = winnerMessage.author.id;
@@ -802,7 +1011,7 @@ async function startPokemonGame(interaction, client, isFollowUp = false, genSele
             .setDescription(
               `${winnerMention} guessed it right!\n` +
                 `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                `🏆 **+${pointsGained} Points** *(Total: **${scoreData.totalPoints}** Pts)*`
+                `🏆 **+${pointsGained} Points** *(Total: **${scoreData.totalPoints}** Pts)*`,
             )
             .setThumbnail(targetPokemon.imageUrl)
             .setColor(EMBED_COLORS.SUCCESS);
@@ -810,7 +1019,13 @@ async function startPokemonGame(interaction, client, isFollowUp = false, genSele
           await channel.send({ embeds: [winEmbed] });
 
           setTimeout(async () => {
-            await startPokemonGame(interaction, client, true, genSelection, buildAiReply);
+            await startPokemonGame(
+              interaction,
+              client,
+              true,
+              genSelection,
+              buildAiReply,
+            );
           }, 1500);
         } else {
           channelSkipsMap.set(channelId, 0);
@@ -818,7 +1033,7 @@ async function startPokemonGame(interaction, client, isFollowUp = false, genSele
             .setTitle("⌛ **Time's Up!**")
             .setDescription(
               `Nobody guessed the Pokémon in time!\n\n` +
-                `The correct answer was **${targetPokemon.name}**.`
+                `The correct answer was **${targetPokemon.name}**.`,
             )
             .setThumbnail(targetPokemon.imageUrl)
             .setColor(EMBED_COLORS.TIMEOUT);
@@ -828,7 +1043,14 @@ async function startPokemonGame(interaction, client, isFollowUp = false, genSele
             components: [buildButtons("pokemon")],
           });
 
-          attachGuessNextCollector(resultMsg, interaction, client, "pokemon", genSelection, buildAiReply);
+          attachGuessNextCollector(
+            resultMsg,
+            interaction,
+            client,
+            "pokemon",
+            genSelection,
+            buildAiReply,
+          );
         }
       } catch (err) {
         logger.error("Error ending pokemon game collector:", err);
@@ -840,8 +1062,16 @@ async function startPokemonGame(interaction, client, isFollowUp = false, genSele
   }
 }
 
-function attachGuessNextCollector(message, originalInteraction, client, gameType = "flag", extraSetting, buildAiReply) {
-  if (!message || typeof message.createMessageComponentCollector !== "function") return;
+function attachGuessNextCollector(
+  message,
+  originalInteraction,
+  client,
+  gameType = "flag",
+  extraSetting,
+  buildAiReply,
+) {
+  if (!message || typeof message.createMessageComponentCollector !== "function")
+    return;
 
   const buttonCollector = message.createMessageComponentCollector({
     componentType: ComponentType.Button,
@@ -850,18 +1080,37 @@ function attachGuessNextCollector(message, originalInteraction, client, gameType
 
   buttonCollector.on("collect", async (btnInteraction) => {
     try {
-      const channelId = btnInteraction.channelId || btnInteraction.channel?.id || "default";
+      const channelId =
+        btnInteraction.channelId || btnInteraction.channel?.id || "default";
       channelSkipsMap.set(channelId, 0);
 
       if (btnInteraction.customId === "flag_next") {
         await btnInteraction.deferUpdate();
-        await startFlagGame(btnInteraction, client, true, extraSetting, buildAiReply);
+        await startFlagGame(
+          btnInteraction,
+          client,
+          true,
+          extraSetting,
+          buildAiReply,
+        );
       } else if (btnInteraction.customId === "pokemon_next") {
         await btnInteraction.deferUpdate();
-        await startPokemonGame(btnInteraction, client, true, extraSetting, buildAiReply);
-      } else if (btnInteraction.customId === "guess_lb_flag" || btnInteraction.customId === "show_lb_flag") {
+        await startPokemonGame(
+          btnInteraction,
+          client,
+          true,
+          extraSetting,
+          buildAiReply,
+        );
+      } else if (
+        btnInteraction.customId === "guess_lb_flag" ||
+        btnInteraction.customId === "show_lb_flag"
+      ) {
         await showLeaderboard(btnInteraction, client, "flag");
-      } else if (btnInteraction.customId === "guess_lb_pokemon" || btnInteraction.customId === "show_lb_pokemon") {
+      } else if (
+        btnInteraction.customId === "guess_lb_pokemon" ||
+        btnInteraction.customId === "show_lb_pokemon"
+      ) {
         await showLeaderboard(btnInteraction, client, "pokemon");
       }
     } catch (err) {

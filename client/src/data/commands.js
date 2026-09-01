@@ -72,6 +72,14 @@ export const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
+    trigger: "/guessboard",
+    category: "games",
+    title: "Guess Leaderboard",
+    description: "View top guessers in the server.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
     trigger: "/ship",
     category: "fun",
     title: "Love Calculator",
