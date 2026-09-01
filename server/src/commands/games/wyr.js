@@ -120,7 +120,7 @@ async function sendWyrMessage(interaction, ratingInput, isFollowUp = false, buil
 
   const collector = response.createMessageComponentCollector({
     componentType: ComponentType.Button,
-    time: 60000,
+    time: 86400000,
   });
 
   collector.on("collect", async (btnInteraction) => {
@@ -132,15 +132,6 @@ async function sendWyrMessage(interaction, ratingInput, isFollowUp = false, buil
     } catch (err) {
       logger.error("Error in wyr button handler:", err);
     }
-  });
-
-  collector.on("end", async () => {
-    try {
-      const disabledButtons = new ActionRowBuilder().addComponents(
-        buildWyrButtons().components.map((btn) => ButtonBuilder.from(btn).setDisabled(true))
-      );
-      await response.edit({ components: [disabledButtons] }).catch(() => null);
-    } catch {}
   });
 }
 
