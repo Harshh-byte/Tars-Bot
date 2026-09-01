@@ -64,6 +64,14 @@ export const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
+    trigger: "/flag",
+    category: "games",
+    title: "Guess the Flag",
+    description: "Guess the country by its flag.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
     trigger: "/ship",
     category: "fun",
     title: "Love Calculator",

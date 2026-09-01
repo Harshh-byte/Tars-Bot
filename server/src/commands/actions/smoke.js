@@ -2,7 +2,7 @@ import { EmbedBuilder } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import { incrementGlobalUserStat } from "../../services/database.js";
+import { incrementUserStat, incrementGlobalUserStat } from "../../services/database.js";
 
 export const aliases = ["cigar"];
 
@@ -15,8 +15,16 @@ export const data = {
 export async function execute(interaction, client) {
   try {
     const userId = interaction.user.id;
+    const serverId = interaction.guild?.id || "DM";
 
-    const count = await incrementGlobalUserStat(userId, "smokeCount");
+    let count;
+    if (serverId !== "DM") {
+      count = await incrementUserStat(serverId, userId, "smokeCount");
+      incrementGlobalUserStat(userId, "smokeCount").catch(() => null);
+    } else {
+      count = await incrementGlobalUserStat(userId, "smokeCount");
+    }
+
     const authorMention = `<@${userId}>`;
 
     const embed = new EmbedBuilder()

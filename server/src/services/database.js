@@ -167,6 +167,59 @@ export async function deleteServerData(serverId) {
   await db.recursiveDelete(serverDoc(serverId));
 }
 
+export async function addFlagScore(serverId, userId, pointsGained) {
+  validateIds(serverId, userId);
+  const ref = memberDoc(serverId, userId);
+  try {
+    await ref.set(
+      {
+        userId,
+        stats: {
+          flag_points: FieldValue.increment(pointsGained),
+          flag_wins: FieldValue.increment(1),
+        },
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+    const snapshot = await ref.get();
+    const data = snapshot.data()?.stats || {};
+    return {
+      totalPoints: data.flag_points || pointsGained,
+      totalWins: data.flag_wins || 1,
+    };
+  } catch (err) {
+    if (!global.memoryFlagScores) global.memoryFlagScores = new Map();
+    const key = `${serverId}_${userId}`;
+    const current = global.memoryFlagScores.get(key) || { points: 0, wins: 0 };
+    current.points += pointsGained;
+    current.wins += 1;
+    global.memoryFlagScores.set(key, current);
+    return { totalPoints: current.points, totalWins: current.wins };
+  }
+}
+
+export async function getTopFlagPlayers(serverId, limitCount = 10) {
+  if (!serverId) return [];
+  try {
+    const snapshot = await serverDoc(serverId)
+      .collection("members")
+      .orderBy("stats.flag_points", "desc")
+      .limit(limitCount)
+      .get();
+
+    if (snapshot.empty) return [];
+    return snapshot.docs.map((doc) => ({
+      userId: doc.id,
+      points: doc.data()?.stats?.flag_points || 0,
+      wins: doc.data()?.stats?.flag_wins || 0,
+    }));
+  } catch (err) {
+    logger.warn(`Failed to fetch flag leaderboard: ${err.message}`);
+    return [];
+  }
+}
+
 cron.schedule("0 0 * * *", async () => {
   try {
     const cutoff = Timestamp.fromDate(new Date(Date.now() - DATA_RETENTION_MS));
