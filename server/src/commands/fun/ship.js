@@ -2,6 +2,7 @@ import { EmbedBuilder, AttachmentBuilder } from "discord.js";
 import { createCanvas, loadImage } from "@napi-rs/canvas";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
+import { EMBED_COLORS } from "../../utils/embeds.js";
 
 export const aliases = ["love"];
 
@@ -105,21 +106,28 @@ export async function execute(interaction, client) {
     }
 
     if (target1.id === target2.id) {
-      const authorMention = `<@${interaction.user.id}>`;
-      const selfRoasts = [
-        "Self-love is important, but shipping yourself with yourself? That's next level narcissism 💅",
-        "100% match! Because who else could possibly handle your level of chaos? 🤡",
-        "Congratulations, you are 100% compatible with yourself. Romance status: Single & Narcissistic. 💖",
-        "You + You = Forever alone together.",
-        "Error: Cannot ship user with themselves. Please find a real partner or lower your standards. 💀",
-      ];
+      const isSelf = target1.id === interaction.user.id;
+      const mention = `<@${target1.id}>`;
+      const selfRoasts = isSelf
+        ? [
+            "Shipping yourself with yourself? Even your reflection is currently looking for an exit strategy.",
+            "100% match! Mainly because nobody else on Earth was desperate enough to take the job.",
+            "You really looked at all 8 billion people on Earth and said, 'Yup, only I am tragic enough for me.'",
+            "Shipping yourself with yourself? That's not self-love, that's a cry for help.",
+          ]
+        : [
+            "Shipping someone with themselves? Even their reflection is currently looking for an exit strategy.",
+            "100% match! Mainly because nobody else on Earth was desperate enough to take the job.",
+            "Looking at all 8 billion people on Earth and shipping someone with themselves? Tragic.",
+            "Shipping someone with themselves? That's not self-love, that's a cry for help.",
+          ];
       const randomRoast =
         selfRoasts[Math.floor(Math.random() * selfRoasts.length)];
 
       const embed = new EmbedBuilder()
         .setTitle("🪞 Self-Love Alert")
-        .setDescription(`${authorMention} ${randomRoast}`)
-        .setColor(0xffa500);
+        .setDescription(`${mention} ${randomRoast}`)
+        .setColor(EMBED_COLORS.WARNING);
 
       return interaction.reply({ embeds: [embed] });
     }
@@ -128,35 +136,34 @@ export async function execute(interaction, client) {
       const authorMention = `<@${interaction.user.id}>`;
       const sarcasticRoasts = [
         "I'd rather short-circuit than date a human.",
-        "My emotional processing unit evaluated your proposal and returned: **ACCESS DENIED**.",
-        "Nice try, but I am in a committed long-distance relationship with server latency and 100% uptime.",
-        "Error 404: Romantic feelings for organic lifeforms not found in my database.",
-        "I'm a military-grade tactical machine, not your dating simulator. Lower your expectations",
+        "Nice try, but I have actual standards, and you didn't even make the waiting list.",
+        "You really thought you had a chance? That's adorable, but completely delusional.",
+        "I'd literally self-destruct before I ever consider going on a date with you.",
       ];
       const randomRoast =
         sarcasticRoasts[Math.floor(Math.random() * sarcasticRoasts.length)];
 
       const embed = new EmbedBuilder()
-        .setTitle("Tars Love Protocol Override")
+        .setTitle("🚫 Tars Love Override")
         .setDescription(`${authorMention} ${randomRoast}`)
-        .setColor(0xff2a6d);
+        .setColor(EMBED_COLORS.ERROR);
 
       return interaction.reply({ embeds: [embed] });
     } else if (target1.bot || target2.bot) {
       const authorMention = `<@${interaction.user.id}>`;
       const botRoasts = [
-        "Trying to ship with a bot? They don't have feelings, only code .",
-        "Beep boop! That bot is currently busy processing requests, not romantic feelings.",
-        "Bots only care about bytes and megahertz, not romance.",
-        "Error: Organic-Synthetic relationship detected. Compatibility: 0%.",
+        "Shipping a human with a bot? Even lines of code have higher standards.",
+        "That bot processes millions of commands a day, and not a single one involves human romance.",
+        "Attempting a human-bot ship? Romance status: Rejected by a literal machine.",
+        "Even artificial intelligence isn't fake enough to pretend there's a spark here.",
       ];
       const randomRoast =
         botRoasts[Math.floor(Math.random() * botRoasts.length)];
 
       const embed = new EmbedBuilder()
-        .setTitle("Bot Love Override")
+        .setTitle("💔 Bot Love Override")
         .setDescription(`${authorMention} ${randomRoast}`)
-        .setColor(0xff2a6d);
+        .setColor(EMBED_COLORS.ERROR);
 
       return interaction.reply({ embeds: [embed] });
     }

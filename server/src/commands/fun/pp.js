@@ -40,7 +40,7 @@ export async function execute(interaction, client) {
     const authorMention = `<@${interaction.user.id}>`;
     const targetMention = `<@${targetUser.id}>`;
 
-    const textPrefix = isSelf ? "Your" : targetMention;
+    const textPrefix = isSelf ? "Your" : `${targetMention}'s`;
 
     const embed = new EmbedBuilder()
       .setDescription(
