@@ -64,7 +64,15 @@ export const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
-    trigger: "/guess",
+    trigger: "/flag",
+    category: "games",
+    title: "Guess the Flag",
+    description: "Guess the country by its flag.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
+    trigger: "/pokemon",
     category: "games",
     title: "Who's That Pokémon?",
     description: "Guess the Pokémon by its artwork!",
@@ -74,8 +82,8 @@ export const commands = [
   {
     trigger: "/guessboard",
     category: "games",
-    title: "Pokémon Leaderboard",
-    description: "View top Pokémon guessers in the server.",
+    title: "Guess Leaderboard",
+    description: "View top guessers in the server.",
     badge: "Games",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
