@@ -81,7 +81,7 @@ async function startGame(interaction, client, opponent) {
 
       const collector = response.createMessageComponentCollector({
         componentType: ComponentType.Button,
-        time: 30000,
+        time: 86400000,
       });
 
       collector.on("collect", async (i) => {
@@ -127,7 +127,7 @@ async function startGame(interaction, client, opponent) {
 
         const playAgainCollector = response.createMessageComponentCollector({
           componentType: ComponentType.Button,
-          time: 30000,
+          time: 86400000,
         });
 
         playAgainCollector.on("collect", async (paInteraction) => {
@@ -140,19 +140,6 @@ async function startGame(interaction, client, opponent) {
             }
             playAgainCollector.stop("restarted");
             return startGame(paInteraction, client, null);
-          }
-        });
-
-        playAgainCollector.on("end", async (_, paReason) => {
-          if (paReason !== "restarted") {
-            const disabledPlayAgainRow = new ActionRowBuilder().addComponents(
-              new ButtonBuilder()
-                .setCustomId("rps_play_again_disabled")
-                .setLabel("Play Again")
-                .setStyle(ButtonStyle.Secondary)
-                .setDisabled(true)
-            );
-            await response.edit({ components: [disabledPlayAgainRow] }).catch(() => null);
           }
         });
       });
@@ -238,7 +225,7 @@ async function startGame(interaction, client, opponent) {
 
     const collector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
-      time: 45000,
+      time: 86400000,
     });
 
     collector.on("collect", async (i) => {
@@ -310,7 +297,7 @@ async function startGame(interaction, client, opponent) {
 
         const pvpPlayAgainCollector = response.createMessageComponentCollector({
           componentType: ComponentType.Button,
-          time: 30000,
+          time: 86400000,
         });
 
         pvpPlayAgainCollector.on("collect", async (paInteraction) => {
@@ -326,19 +313,6 @@ async function startGame(interaction, client, opponent) {
             const newOpponent = paInteraction.user.id === interaction.user.id ? opponent : interaction.user;
 
             return startGame(paInteraction, client, newOpponent);
-          }
-        });
-
-        pvpPlayAgainCollector.on("end", async (_, paReason) => {
-          if (paReason !== "restarted") {
-            const disabledPlayAgainRow = new ActionRowBuilder().addComponents(
-              new ButtonBuilder()
-                .setCustomId("rps_play_again_disabled")
-                .setLabel("Play Again")
-                .setStyle(ButtonStyle.Secondary)
-                .setDisabled(true)
-            );
-            await response.edit({ components: [disabledPlayAgainRow] }).catch(() => null);
           }
         });
       } else {

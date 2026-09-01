@@ -189,7 +189,7 @@ function attachTodCollector(message, ratingInput, buildAiReply) {
 
   const collector = message.createMessageComponentCollector({
     componentType: ComponentType.Button,
-    time: 60000,
+    time: 86400000,
   });
 
   collector.on("collect", async (btnInteraction) => {
@@ -234,14 +234,5 @@ function attachTodCollector(message, ratingInput, buildAiReply) {
     } catch (err) {
       logger.error("Error in tod button handler:", err);
     }
-  });
-
-  collector.on("end", async () => {
-    try {
-      const disabledButtons = new ActionRowBuilder().addComponents(
-        buildButtons().components.map((btn) => ButtonBuilder.from(btn).setDisabled(true))
-      );
-      await message.edit({ components: [disabledButtons] }).catch(() => null);
-    } catch {}
   });
 }

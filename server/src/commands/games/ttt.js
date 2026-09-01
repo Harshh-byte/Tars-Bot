@@ -192,7 +192,7 @@ async function startGame(interaction, client, opponent) {
 
     const collector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
-      time: 60000,
+      time: 86400000,
     });
 
     const handleGameEnd = async (winner, lastInteraction) => {
@@ -212,7 +212,7 @@ async function startGame(interaction, client, opponent) {
 
       const playAgainCollector = response.createMessageComponentCollector({
         componentType: ComponentType.Button,
-        time: 30000,
+        time: 86400000,
       });
 
       playAgainCollector.on("collect", async (paInteraction) => {
@@ -233,19 +233,6 @@ async function startGame(interaction, client, opponent) {
             : interaction.user;
 
           return startGame(paInteraction, client, newOpponent);
-        }
-      });
-
-      playAgainCollector.on("end", async (_, paReason) => {
-        if (paReason !== "restarted") {
-          const disabledPlayAgainRow = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-              .setCustomId("ttt_play_again_disabled")
-              .setLabel("Play Again")
-              .setStyle(ButtonStyle.Secondary)
-              .setDisabled(true)
-          );
-          await response.edit({ components: [disabledPlayAgainRow] }).catch(() => null);
         }
       });
     };

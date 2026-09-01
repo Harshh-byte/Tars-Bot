@@ -12,23 +12,57 @@ export const data = {
   dm_permission: false,
   options: [
     {
-      name: "new_prefix",
-      description: "New prefix.",
-      type: 3,
-      required: false,
+      type: 1,
+      name: "set",
+      description: "Set a new command prefix.",
+      options: [
+        {
+          name: "new_prefix",
+          description: "New prefix to set.",
+          type: 3,
+          required: true,
+        },
+      ],
+    },
+    {
+      type: 1,
+      name: "view",
+      description: "View current server prefix.",
     },
   ],
 };
 
 export async function execute(interaction, client) {
   try {
-    const newPrefix = interaction.options?.getString("new_prefix");
     const serverId = interaction.guild?.id || "DM";
+    let subcommand = null;
+    try {
+      subcommand = interaction.options?.getSubcommand(false);
+    } catch {}
 
-    if (!newPrefix || newPrefix.trim() === "") {
+    const rawInput =
+      interaction.options?.getString("new_prefix") ||
+      interaction.options?.getString("getString") ||
+      "";
+
+    let newPrefix = "";
+    if (subcommand === "set") {
+      newPrefix = rawInput.trim();
+    } else if (rawInput.trim().toLowerCase().startsWith("set ")) {
+      newPrefix = rawInput.trim().slice(4).trim();
+    } else if (rawInput.trim().toLowerCase() === "set") {
+      newPrefix = "";
+    } else {
+      newPrefix = rawInput.trim();
+    }
+
+    if (!newPrefix) {
       const currentPrefix = client.prefixCache?.get(serverId) || ".";
       const embed = new EmbedBuilder()
-        .setDescription(`<:Prefix:1542236764465274910> Server prefix is \`${currentPrefix}\``)
+        .setDescription(
+          `<:Prefix:1542236764465274910> Server prefix is \`${currentPrefix}\`\n\n` +
+            `*Use \`.prefix set [prefix]\` or \`/prefix set [prefix]\` to change it.*`,
+        )
         .setColor(EMBED_COLORS.WHITE);
       return interaction.reply({ embeds: [embed] });
     }
@@ -43,7 +77,7 @@ export async function execute(interaction, client) {
         title: "Permission Denied",
         description: "You need the `Manage Server` permission to change the bot prefix.",
       });
-      return interaction.reply({ embeds: [errEmbed], ephemeral: true });
+      return interaction.reply({ embeds: [errEmbed], flags: 64 });
     }
 
     const cleanedPrefix = newPrefix.trim();
@@ -52,7 +86,7 @@ export async function execute(interaction, client) {
         title: "Invalid Prefix",
         description: "Prefix cannot be longer than 5 characters.",
       });
-      return interaction.reply({ embeds: [errEmbed], ephemeral: true });
+      return interaction.reply({ embeds: [errEmbed], flags: 64 });
     }
 
     if (!client.prefixCache) client.prefixCache = new Map();
@@ -64,10 +98,9 @@ export async function execute(interaction, client) {
       });
     }
 
-    const sEmbed = successEmbed({
-      title: "Prefix Updated",
-      description: `<:Prefix:1542236764465274910> Server prefix changed to \`${cleanedPrefix}\``,
-    });
+    const sEmbed = new EmbedBuilder()
+      .setDescription(`<:Prefix:1542236764465274910> Server prefix changed to \`${cleanedPrefix}\``)
+      .setColor(EMBED_COLORS.WHITE);
 
     await interaction.reply({ embeds: [sEmbed] });
   } catch (err) {
