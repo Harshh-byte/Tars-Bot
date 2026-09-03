@@ -189,10 +189,10 @@ export async function execute(interaction, client) {
     const initialPayload = {
       embeds: [buildEmbed(currentPage)],
       components: buildButtons(currentPage),
-      fetchReply: true,
     };
 
-    const response = await interaction.reply(initialPayload);
+    await interaction.reply(initialPayload);
+    const response = await interaction.fetchReply();
 
     if (totalPages > 1 && response) {
       const collector = response.createMessageComponentCollector({

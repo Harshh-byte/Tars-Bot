@@ -1,10 +1,4 @@
-import {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType,
-} from "discord.js";
+import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 
@@ -39,6 +33,16 @@ export const data = {
   ],
 };
 
+const getRandomColor = () => Math.floor(Math.random() * 16777215);
+
+async function sendAndFetchReply(interaction, payload) {
+  if (interaction.replied || interaction.deferred) {
+    return await interaction.followUp(payload);
+  }
+  const res = await interaction.reply({ ...payload, withResponse: true });
+  return res?.resource?.message || res;
+}
+
 async function fetchWyrQuestion(rating = "pg") {
   const targetRating = rating || "pg";
   const endpoint = `https://api.truthordarebot.xyz/v1/wyr?rating=${encodeURIComponent(targetRating)}`;
@@ -66,17 +70,7 @@ async function fetchWyrQuestion(rating = "pg") {
   return { question, rating: targetRating.toUpperCase() };
 }
 
-function buildWyrButtons() {
-  return new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("wyr_next")
-      .setLabel("Next Question")
-      .setStyle(ButtonStyle.Primary)
-  );
-}
-
 async function sendWyrMessage(interaction, ratingInput, isFollowUp = false, buildAiReply) {
-  const requestorName = interaction.member?.displayName || interaction.user.username;
   const { question, rating } = await fetchWyrQuestion(ratingInput);
 
   let aiCommentary = "";
@@ -94,25 +88,56 @@ async function sendWyrMessage(interaction, ratingInput, isFollowUp = false, buil
     }
   }
 
-  const embed = new EmbedBuilder()
-    .setTitle("🤔 **WOULD YOU RATHER**")
-    .setDescription(
-      `${question}` +
-      (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "")
-    )
-    .setFooter({ text: `Rating: ${rating} • Requestor: ${requestorName}` })
-    .setColor(Math.floor(Math.random() * 16777215));
+  const requestorName =
+    interaction.member?.displayName ||
+    interaction.user.displayName ||
+    interaction.user.username;
 
-  const payload = { embeds: [embed], components: [buildWyrButtons()] };
+  const v2WyrPayload = {
+    flags: 32768,
+    components: [
+      {
+        type: 17,
+        accent_color: getRandomColor(),
+        components: [
+          {
+            type: 10,
+            content: "### 🤔 WOULD YOU RATHER",
+          },
+          {
+            type: 14,
+            divider: true,
+            spacing: 1,
+          },
+          {
+            type: 10,
+            content:
+              `${question}` +
+              (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "") +
+              `\n\n-# Rating: ${rating} • Requestor: ${requestorName}`,
+          },
+          {
+            type: 14,
+            divider: true,
+            spacing: 1,
+          },
+          {
+            type: 1,
+            components: [
+              {
+                type: 2,
+                custom_id: "wyr_next",
+                style: 1,
+                label: "Next Question",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
 
-  let response;
-  if (isFollowUp) {
-    response = await interaction.followUp({ ...payload, fetchReply: true });
-  } else if (interaction.deferred || interaction.replied) {
-    response = await interaction.editReply(payload);
-  } else {
-    response = await interaction.reply({ ...payload, fetchReply: true });
-  }
+  const response = await sendAndFetchReply(interaction, v2WyrPayload);
 
   if (!response || typeof response.createMessageComponentCollector !== "function") {
     return;
@@ -137,10 +162,6 @@ async function sendWyrMessage(interaction, ratingInput, isFollowUp = false, buil
 
 export async function execute(interaction, client, { buildAiReply } = {}) {
   try {
-    if (interaction.deferReply) {
-      await interaction.deferReply();
-    }
-
     let ratingInput = interaction.options?.getString("rating")?.toLowerCase() || "pg";
 
     if (interaction.commandName) {

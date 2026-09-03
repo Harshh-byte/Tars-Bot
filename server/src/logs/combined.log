@@ -988,3 +988,164 @@
 {"level":"info","message":"Successfully synced 30 slash commands.","timestamp":"2026-09-01 16:39:45"}
 {"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-01 16:41:12"}
 {"level":"info","message":"Successfully synced 30 slash commands.","timestamp":"2026-09-01 16:41:13"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 18:17:50"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 18:17:51"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 18:19:23"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 18:19:24"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 18:19:40"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 18:19:40"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 18:19:52"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 18:20:08"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 18:20:09"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 18:26:10"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 18:26:10"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:06:29"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:06:29"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:08:06"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:08:07"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:09:24"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:09:24"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:09:36"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:09:37"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:09:57"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:09:58"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:10:49"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:10:50"}
+{"code":50035,"level":"warn","message":"V2 Components payload failed, falling back to V1 embed: Invalid Form Body\ncomponents[0].components[1].file[BASE_TYPE_REQUIRED]: This field is required","method":"POST","rawError":{"code":50035,"errors":{"components":{"0":{"components":{"1":{"file":{"_errors":[{"code":"BASE_TYPE_REQUIRED","message":"This field is required"}]}}}}}},"message":"Invalid Form Body"},"requestBody":{"files":[],"json":{"components":[{"accent_color":16777215,"components":[{"content":"## Tars Help","type":10},{"divider":true,"spacing":1,"type":13},{"content":"-# Experience the ultimate Discord bot designed for seamless management and community engagement.\n\n<:Prefix:1542236764465274910> **Prefix** `.`\n<:Commands:1542236622521901088> **Commands** `33`\n<:Modules:1542236707599163422> **Modules** `4`\n\n<:Book:1542647324570816532> Use `.help (command)` for details on a specific command","type":10},{"components":[{"custom_id":"help_category_select","options":[{"default":true,"description":"Bot system overview and general statistics.","emoji":{"id":"1542647191691071548","name":"Home"},"label":"Home","value":"module_home"},{"default":false,"description":"Interactive Discord games and decision tools.","emoji":{"id":"1542645834808565821","name":"Games"},"label":"Games","value":"module_games"},{"default":false,"description":"Entertaining Discord calculators, roasts, and memes.","emoji":{"id":"1542240014388170772","name":"Fun"},"label":"Fun","value":"module_fun"},{"default":false,"description":"Interactive server smoke and vape counters.","emoji":{"id":"1542647256782737559","name":"Actions"},"label":"Actions","value":"module_actions"},{"default":false,"description":"Essential server diagnostics and configuration tools.","emoji":{"id":"1542239958612320306","name":"Utility"},"label":"Utility","value":"module_utility"}],"placeholder":"Select a module...","type":3}],"type":1}],"type":17}],"enforce_nonce":false,"flags":32768,"tts":false}},"stack":"DiscordAPIError[50035]: Invalid Form Body\ncomponents[0].components[1].file[BASE_TYPE_REQUIRED]: This field is required\n    at handleErrors (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:762:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async SequentialHandler.runRequest (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1163:23)\n    at async SequentialHandler.queueRequest (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:994:14)\n    at async _REST.request (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1307:22)\n    at async TextChannel.send (D:\\Tars-Bot\\server\\node_modules\\discord.js\\src\\structures\\interfaces\\TextBasedChannel.js:195:15)\n    at async Object.reply (file:///D:/Tars-Bot/server/src/events/messageCreate.js:136:25)\n    at async Module.execute (file:///D:/Tars-Bot/server/src/commands/utility/help.js:531:20)\n    at async Module.execute (file:///D:/Tars-Bot/server/src/events/messageCreate.js:160:9)","status":400,"timestamp":"2026-09-03 19:11:12","url":"https://discord.com/api/v10/channels/1524326291250085990/messages"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:11:40"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:11:41"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:13:27"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:13:28"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:14:28"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:14:28"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:15:34"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:15:35"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:16:58"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:17:06"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:17:07"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:17:17"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:17:59"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:18:53"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:18:54"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:19:55"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:19:55"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:20:08"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:20:09"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:21:39"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:21:40"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:21:51"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:21:51"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:22:54"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:22:54"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:23:03"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:23:03"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:23:20"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:27:04"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:27:05"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:27:38"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:27:39"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:27:53"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:27:54"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:28:27"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:28:27"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:29:29"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:29:29"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:30:21"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:30:21"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:31:25"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:31:25"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:31:39"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:31:40"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:32:31"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:32:32"}
+{"level":"error","message":"Failed to login to Discord client: Unexpected server response: 503","stack":"Error: Unexpected server response: 503\n    at ClientRequest.<anonymous> (D:\\Tars-Bot\\server\\node_modules\\ws\\lib\\websocket.js:930:7)\n    at ClientRequest.emit (node:events:509:28)\n    at HTTPParser.parserOnIncomingClient (node:_http_client:798:27)\n    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)\n    at TLSSocket.socketOnData (node:_http_client:633:22)\n    at TLSSocket.emit (node:events:509:28)\n    at addChunk (node:internal/streams/readable:563:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)\n    at Readable.push (node:internal/streams/readable:394:5)\n    at TLSWrap.onStreamRead (node:internal/stream_base_commons:189:23)","timestamp":"2026-09-03 19:32:41"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:32:44"}
+{"level":"error","message":"Sync Failure Expected token to be set for this request, but none was present","stack":"Error: Expected token to be set for this request, but none was present\n    at _REST.resolveRequest (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1381:15)\n    at _REST.queueRequest (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1341:46)\n    at _REST.request (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1307:33)\n    at _REST.put (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1290:17)\n    at ApplicationCommandManager.set (D:\\Tars-Bot\\server\\node_modules\\discord.js\\src\\managers\\ApplicationCommandManager.js:171:41)\n    at Client.<anonymous> (file:///D:/Tars-Bot/server/tars.js:404:6)\n    at Object.onceWrapper (node:events:631:26)\n    at Client.emit (node:events:509:28)\n    at WebSocketManager.triggerClientReady (D:\\Tars-Bot\\server\\node_modules\\discord.js\\src\\client\\websocket\\WebSocketManager.js:401:17)\n    at WebSocketManager.checkShardsReady (D:\\Tars-Bot\\server\\node_modules\\discord.js\\src\\client\\websocket\\WebSocketManager.js:368:10)","timestamp":"2026-09-03 19:32:44"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:33:01"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:33:01"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:34:33"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:34:34"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:34:49"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:34:49"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:35:03"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:35:04"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:35:33"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:35:34"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:36:19"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:36:19"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:38:33"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:38:34"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:40:23"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:40:24"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:42:04"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:42:05"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:43:23"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:43:24"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:43:37"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:43:38"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:46:02"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:46:02"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:46:26"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:46:27"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:46:47"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:46:48"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:47:48"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:47:48"}
+{"level":"error","message":"Error in RPS command handler: interaction.fetchReply is not a function","stack":"TypeError: interaction.fetchReply is not a function\n    at startGame (file:///D:/Tars-Bot/server/src/commands/games/rps.js:100:42)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async Module.execute (file:///D:/Tars-Bot/server/src/events/messageCreate.js:160:9)","timestamp":"2026-09-03 19:48:58"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:49:32"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:49:33"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:49:55"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:49:56"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:51:40"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:51:40"}
+{"code":10062,"level":"error","message":"Error in wyr button handler: Unknown interaction","method":"POST","rawError":{"code":10062,"message":"Unknown interaction"},"requestBody":{"json":{"type":6}},"stack":"DiscordAPIError[10062]: Unknown interaction\n    at handleErrors (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:762:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async BurstHandler.runRequest (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:866:23)\n    at async _REST.request (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1307:22)\n    at async ButtonInteraction.deferUpdate (D:\\Tars-Bot\\server\\node_modules\\discord.js\\src\\structures\\interfaces\\InteractionResponses.js:305:22)\n    at async InteractionCollector.<anonymous> (file:///D:/Tars-Bot/server/src/commands/games/wyr.js:149:9)","status":404,"timestamp":"2026-09-03 19:52:56","url":"https://discord.com/api/v10/interactions/1545076622808457377/aW50ZXJhY3Rpb246MTU0NTA3NjYyMjgwODQ1NzM3Nzp2aEp2REVyUUtxTEFqZjJiM3lJeDVnbjBydUdnd2ZDem52SDF5THZhckhwa1ROYjVmSWlKWGpJQm5wZmFzaVA0RVJoeUUwa3BSb3ZsV1I3SzM3NHphdkU1YTAwVnNES3g4RDl2Nkg5ejNyUjNqMGIxbVlhdTZmRjZLb2ZER3pKSw/callback?with_response=false"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:53:15"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:53:15"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:55:01"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:55:02"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:56:32"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:56:33"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:57:30"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:57:31"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:57:55"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:57:55"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:58:21"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:58:22"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:58:35"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:58:36"}
+{"code":50035,"level":"error","message":"Error in Smoke command handler: Invalid Form Body\ncomponents[0].components[4].components[0].emoji.name[COMPONENT_INVALID_EMOJI]: Invalid emoji","method":"POST","rawError":{"code":50035,"errors":{"components":{"0":{"components":{"4":{"components":{"0":{"emoji":{"name":{"_errors":[{"code":"COMPONENT_INVALID_EMOJI","message":"Invalid emoji"}]}}}}}}}}},"message":"Invalid Form Body"},"requestBody":{"files":[],"json":{"components":[{"accent_color":16247703,"components":[{"content":"### <a:smok:1542640291654144082> SMOKE SESSION","type":10},{"divider":true,"spacing":1,"type":14},{"content":"<@569766329960103941> took a hit of smoke!\n\n-# Total Smokes: `6`","type":10},{"divider":true,"spacing":1,"type":14},{"components":[{"custom_id":"smoke_again","emoji":{"name":"<a:smok:1542640291654144082>"},"label":"Take Another Hit","style":2,"type":2}],"type":1}],"type":17}],"enforce_nonce":false,"flags":32768,"tts":false}},"stack":"DiscordAPIError[50035]: Invalid Form Body\ncomponents[0].components[4].components[0].emoji.name[COMPONENT_INVALID_EMOJI]: Invalid emoji\n    at handleErrors (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:762:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async SequentialHandler.runRequest (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1163:23)\n    at async SequentialHandler.queueRequest (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:994:14)\n    at async _REST.request (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1307:22)\n    at async TextChannel.send (D:\\Tars-Bot\\server\\node_modules\\discord.js\\src\\structures\\interfaces\\TextBasedChannel.js:195:15)\n    at async Object.reply (file:///D:/Tars-Bot/server/src/events/messageCreate.js:136:25)\n    at async sendAndFetchReply (file:///D:/Tars-Bot/server/src/commands/actions/smoke.js:20:15)\n    at async Module.execute (file:///D:/Tars-Bot/server/src/commands/actions/smoke.js:79:22)\n    at async Module.execute (file:///D:/Tars-Bot/server/src/events/messageCreate.js:160:9)","status":400,"timestamp":"2026-09-03 19:59:00","url":"https://discord.com/api/v10/channels/1524326291250085990/messages"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 19:59:45"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 19:59:46"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:01:11"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:01:12"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:02:07"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:02:08"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:02:48"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:02:48"}
+{"code":40060,"level":"error","message":"Error executing /maintenance Interaction has already been acknowledged.","method":"POST","rawError":{"code":40060,"message":"Interaction has already been acknowledged."},"requestBody":{"files":[],"json":{"data":{"content":"<a:Maintenance:1526290002974343308> **Tars is now under maintenance mode.**","enforce_nonce":false,"flags":64,"tts":false},"type":4}},"stack":"DiscordAPIError[40060]: Interaction has already been acknowledged.\n    at handleErrors (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:762:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async BurstHandler.runRequest (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:866:23)\n    at async _REST.request (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1307:22)\n    at async ChatInputCommandInteraction.reply (D:\\Tars-Bot\\server\\node_modules\\discord.js\\src\\structures\\interfaces\\InteractionResponses.js:193:22)\n    at async Module.execute (file:///D:/Tars-Bot/server/src/events/interactionCreate.js:76:5)","status":400,"timestamp":"2026-09-03 20:04:41","url":"https://discord.com/api/v10/interactions/1545079593789034507/aW50ZXJhY3Rpb246MTU0NTA3OTU5Mzc4OTAzNDUwNzpXR2Nrd1h2R3V0d2FsR1JVNVBNTzQzUzRKZEdvNkVScmtkbnV5THJYNUR3dGw4RVBtOENwT253QVNaUDN5R3pVMmNEaUdOdmtJT3VEU2VaakNKN2VuNWV2Zkw4WG9TcTFKbWhIUWZhMFJpbWJzUk02ZE1xQkNRdzc3aDcwdXU5Rg/callback?with_response=false"}
+{"code":40060,"level":"error","message":"Error executing /maintenance Interaction has already been acknowledged.","method":"POST","rawError":{"code":40060,"message":"Interaction has already been acknowledged."},"requestBody":{"files":[],"json":{"data":{"content":"<a:Complete:1526291398863880293> **Tars maintenance mode completed!**","enforce_nonce":false,"flags":64,"tts":false},"type":4}},"stack":"DiscordAPIError[40060]: Interaction has already been acknowledged.\n    at handleErrors (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:762:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async BurstHandler.runRequest (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:866:23)\n    at async _REST.request (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1307:22)\n    at async ChatInputCommandInteraction.reply (D:\\Tars-Bot\\server\\node_modules\\discord.js\\src\\structures\\interfaces\\InteractionResponses.js:193:22)\n    at async Module.execute (file:///D:/Tars-Bot/server/src/events/interactionCreate.js:76:5)","status":400,"timestamp":"2026-09-03 20:04:59","url":"https://discord.com/api/v10/interactions/1545079669454413864/aW50ZXJhY3Rpb246MTU0NTA3OTY2OTQ1NDQxMzg2NDo0YW55bkQ5dVhndU9mV2Jrdmg0REhGdHhDMG5aWlVJS1VNV2FZbXJZSW11ZDVUdzM5NWZBbVpHZzRqeVNzbGZHTXM2T1J0cnREMFEyQmpNaTRDejljR3JhYnAxZTM2ZmN1TGYzVWY3cWZaQlJEV0hITnB1NW5WT0R3VkhXRmpPZw/callback?with_response=false"}
+{"level":"warn","message":"Flag API fetch failed: cachedCountries is not defined","timestamp":"2026-09-03 20:06:01"}
+{"level":"error","message":"Error in flag command execution: interaction.fetchReply is not a function","stack":"TypeError: interaction.fetchReply is not a function\n    at startFlagGame (file:///D:/Tars-Bot/server/src/commands/games/flag.js:329:36)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async Module.execute (file:///D:/Tars-Bot/server/src/events/messageCreate.js:160:9)","timestamp":"2026-09-03 20:06:01"}
+{"level":"error","message":"Error executing prefix command .guessboard: interaction.fetchReply is not a function","stack":"TypeError: interaction.fetchReply is not a function\n    at showLeaderboard (file:///D:/Tars-Bot/server/src/commands/games/guessboard.js:116:34)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async Module.execute (file:///D:/Tars-Bot/server/src/events/messageCreate.js:160:9)","timestamp":"2026-09-03 20:06:12"}
+{"level":"error","message":"Error in pokemon command execution: interaction.fetchReply is not a function","stack":"TypeError: interaction.fetchReply is not a function\n    at startPokemonGame (file:///D:/Tars-Bot/server/src/commands/games/pokemon.js:249:36)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async Module.execute (file:///D:/Tars-Bot/server/src/events/messageCreate.js:160:9)","timestamp":"2026-09-03 20:06:22"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:08:01"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:08:02"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:09:36"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:09:37"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:09:52"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:09:53"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:10:48"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:10:48"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:11:12"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:11:13"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:12:07"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:12:08"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:14:29"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:14:30"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:15:51"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:15:51"}
+{"code":10062,"level":"error","message":"Error in LB toggle collector: Unknown interaction","method":"POST","rawError":{"code":10062,"message":"Unknown interaction"},"requestBody":{"files":[],"json":{"data":{"components":[{"accent_color":16777215,"components":[{"content":"### 🏆 Pokémon Leaderboard","type":10},{"divider":true,"spacing":1,"type":14},{"content":"No scores recorded yet! Play `/pokemon` to score points!\n\n-# Earn points by playing /pokemon!","type":10},{"divider":true,"spacing":1,"type":14},{"components":[{"custom_id":"show_lb_flag","emoji":{"name":"🏁"},"label":"Flag LB","style":2,"type":2},{"custom_id":"show_lb_pokemon","emoji":{"name":"⚡"},"label":"Pokémon LB","style":1,"type":2}],"type":1}],"type":17}],"enforce_nonce":false,"flags":32768,"tts":false},"type":7}},"stack":"DiscordAPIError[10062]: Unknown interaction\n    at handleErrors (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:762:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async BurstHandler.runRequest (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:866:23)\n    at async _REST.request (D:\\Tars-Bot\\server\\node_modules\\@discordjs\\rest\\dist\\index.js:1307:22)\n    at async ButtonInteraction.update (D:\\Tars-Bot\\server\\node_modules\\discord.js\\src\\structures\\interfaces\\InteractionResponses.js:354:22)\n    at async sendAndFetchReply (file:///D:/Tars-Bot/server/src/commands/games/guessboard.js:31:5)\n    at async showLeaderboard (file:///D:/Tars-Bot/server/src/commands/games/guessboard.js:85:20)\n    at async InteractionCollector.<anonymous> (file:///D:/Tars-Bot/server/src/commands/games/guessboard.js:177:9)","status":404,"timestamp":"2026-09-03 20:16:16","url":"https://discord.com/api/v10/interactions/1545082511619792936/aW50ZXJhY3Rpb246MTU0NTA4MjUxMTYxOTc5MjkzNjpSQkhKeUp5SmdUQ3JFa3Judm85TkhLdTVLTlhmRnpBWUpuT0lhSlkxWVhFSUt0V3g2TDZFZlR0RXpCVk96VGRtY2RlYlZGanlIMUY0TjRMUDdLS3FhT1Rzeng4RUk2blNQNENtVEZuUXI4cmo0VDVkQTI1Y3N5azljejZJcW9mSg/callback?with_response=false"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:18:55"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:18:56"}
+{"level":"info","message":"Tars#2717 is online.","timestamp":"2026-09-03 20:19:34"}
+{"level":"info","message":"Successfully synced 33 slash commands.","timestamp":"2026-09-03 20:19:34"}

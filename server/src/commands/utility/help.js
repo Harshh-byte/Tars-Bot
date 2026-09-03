@@ -32,15 +32,35 @@ const modulesCatalog = {
     title: "<:Games:1542645834808565821> Games Module",
     description: "Interactive Discord games and decision tools.",
     commands: [
-      { name: "Rock, Paper, Scissors", cmd: "rps", desc: "Play Rock, Paper, Scissors." },
+      {
+        name: "Rock, Paper, Scissors",
+        cmd: "rps",
+        desc: "Play Rock, Paper, Scissors.",
+      },
       { name: "Tic-Tac-Toe", cmd: "ttt", desc: "Play Tic-Tac-Toe." },
       { name: "Truth or Dare", cmd: "tod", desc: "Play Truth or Dare." },
       { name: "Would You Rather", cmd: "wyr", desc: "Play Would You Rather." },
-      { name: "Never Have I Ever", cmd: "nhie", desc: "Play Never Have I Ever." },
+      {
+        name: "Never Have I Ever",
+        cmd: "nhie",
+        desc: "Play Never Have I Ever.",
+      },
       { name: "Paranoia", cmd: "para", desc: "Play Paranoia." },
-      { name: "Guess the Flag", cmd: "flag", desc: "Guess the country by its flag." },
-      { name: "Who's That Pokémon?", cmd: "pokemon", desc: "Guess the Pokémon by its artwork!" },
-      { name: "Guess Leaderboard", cmd: "guessboard", desc: "View top guessers in the server." },
+      {
+        name: "Guess the Flag",
+        cmd: "flag",
+        desc: "Guess the country by its flag.",
+      },
+      {
+        name: "Who's That Pokémon?",
+        cmd: "pokemon",
+        desc: "Guess the Pokémon by its artwork!",
+      },
+      {
+        name: "Guess Leaderboard",
+        cmd: "guessboard",
+        desc: "View top guessers in the server.",
+      },
       { name: "Coin Flip", cmd: "flip", desc: "Flip a coin." },
       { name: "Dice Roll", cmd: "roll", desc: "Roll a dice." },
     ],
@@ -49,17 +69,49 @@ const modulesCatalog = {
     title: "<:Fun:1542240014388170772> Fun Module",
     description: "Entertaining Discord calculators, roasts, and memes.",
     commands: [
-      { name: "Love Calculator", cmd: "ship", desc: "Calculate love percentage between two users!" },
-      { name: "Gay Calculator", cmd: "gay", desc: "Calculate how gay a user is." },
-      { name: "Lesbian Calculator", cmd: "lesbian", desc: "Calculate how lesbian a user is." },
-      { name: "Bitches Calculator", cmd: "bitches", desc: "Calculate how many bitches a user has." },
-      { name: "Simp Calculator", cmd: "simp", desc: "Calculate how simp a user is." },
-      { name: "Autism Calculator", cmd: "autism", desc: "Calculate how autism a user is." },
+      {
+        name: "Love Calculator",
+        cmd: "ship",
+        desc: "Calculate love percentage between two users!",
+      },
+      {
+        name: "Gay Calculator",
+        cmd: "gay",
+        desc: "Calculate how gay a user is.",
+      },
+      {
+        name: "Lesbian Calculator",
+        cmd: "lesbian",
+        desc: "Calculate how lesbian a user is.",
+      },
+      {
+        name: "Bitches Calculator",
+        cmd: "bitches",
+        desc: "Calculate how many bitches a user has.",
+      },
+      {
+        name: "Simp Calculator",
+        cmd: "simp",
+        desc: "Calculate how simp a user is.",
+      },
+      {
+        name: "Autism Calculator",
+        cmd: "autism",
+        desc: "Calculate how autism a user is.",
+      },
       { name: "PP Calculator", cmd: "pp", desc: "Check a user's pp size." },
-      { name: "IQ Calculator", cmd: "iq", desc: "Calculate a user's IQ score." },
+      {
+        name: "IQ Calculator",
+        cmd: "iq",
+        desc: "Calculate a user's IQ score.",
+      },
       { name: "Sarcastic Roast", cmd: "roast", desc: "Roast a user." },
       { name: "Charismatic Wish", cmd: "wish", desc: "Send a wish message." },
-      { name: "Reddit Memes", cmd: "meme", desc: "Display a trending meme from Reddit!" },
+      {
+        name: "Reddit Memes",
+        cmd: "meme",
+        desc: "Display a trending meme from Reddit!",
+      },
     ],
   },
   module_actions: {
@@ -74,8 +126,16 @@ const modulesCatalog = {
     title: "<:Utility:1542239958612320306> Utility Module",
     description: "Essential server diagnostics and configuration tools.",
     commands: [
-      { name: "ServerInfo", cmd: "serverinfo", desc: "Gets information about the server." },
-      { name: "UserInfo", cmd: "userinfo", desc: "Gets information about a user." },
+      {
+        name: "ServerInfo",
+        cmd: "serverinfo",
+        desc: "Gets information about the server.",
+      },
+      {
+        name: "UserInfo",
+        cmd: "userinfo",
+        desc: "Gets information about a user.",
+      },
       { name: "Avatar", cmd: "avatar", desc: "View a user's avatar." },
       { name: "Prefix", cmd: "prefix", desc: "View or change command prefix." },
       { name: "Ping", cmd: "ping", desc: "Check bot latency." },
@@ -119,14 +179,18 @@ export async function execute(interaction, client) {
 
       let usageText = `\`${prefix}${cmdName}\``;
       if (targetCmd.data.options && targetCmd.data.options.length > 0) {
-        const hasSubcommands = targetCmd.data.options.some((opt) => opt.type === 1);
+        const hasSubcommands = targetCmd.data.options.some(
+          (opt) => opt.type === 1,
+        );
         if (!hasSubcommands) {
           const optStr = targetCmd.data.options
             .map((opt) => (opt.required ? `[${opt.name}]` : `(${opt.name})`))
             .join(" ");
           usageText = `\`${prefix}${cmdName} ${optStr}\``;
         } else {
-          const subNames = targetCmd.data.options.map((opt) => opt.name).join("|");
+          const subNames = targetCmd.data.options
+            .map((opt) => opt.name)
+            .join("|");
           usageText = `\`${prefix}${cmdName} [${subNames}]\``;
         }
       }
@@ -205,7 +269,8 @@ export async function execute(interaction, client) {
           },
           {
             label: "Utility",
-            description: "Essential server diagnostics and configuration tools.",
+            description:
+              "Essential server diagnostics and configuration tools.",
             value: "module_utility",
             emoji: "<:Utility:1542239958612320306>",
             default: defaultValue === "module_utility",
@@ -235,10 +300,172 @@ export async function execute(interaction, client) {
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === totalPages - 1);
 
-      return new ActionRowBuilder().addComponents(prevBtn, pageIndicator, nextBtn);
+      return new ActionRowBuilder().addComponents(
+        prevBtn,
+        pageIndicator,
+        nextBtn,
+      );
     };
 
     const buildPayload = (selectedModule, page = 0) => {
+      const menuOptions = [
+        {
+          label: "Home",
+          description: "Bot system overview and general statistics.",
+          value: "module_home",
+          emoji: { id: "1542647191691071548", name: "Home" },
+          default: selectedModule === "module_home",
+        },
+        {
+          label: "Games",
+          description: "Interactive Discord games and decision tools.",
+          value: "module_games",
+          emoji: { id: "1542645834808565821", name: "Games" },
+          default: selectedModule === "module_games",
+        },
+        {
+          label: "Fun",
+          description: "Entertaining Discord calculators, roasts, and memes.",
+          value: "module_fun",
+          emoji: { id: "1542240014388170772", name: "Fun" },
+          default: selectedModule === "module_fun",
+        },
+        {
+          label: "Actions",
+          description: "Interactive server smoke and vape counters.",
+          value: "module_actions",
+          emoji: { id: "1542647256782737559", name: "Actions" },
+          default: selectedModule === "module_actions",
+        },
+        {
+          label: "Utility",
+          description: "Essential server diagnostics and configuration tools.",
+          value: "module_utility",
+          emoji: { id: "1542239958612320306", name: "Utility" },
+          default: selectedModule === "module_utility",
+        },
+      ];
+
+      const selectRow = {
+        type: 1,
+        components: [
+          {
+            type: 3,
+            custom_id: "help_category_select",
+            placeholder: "Select a module...",
+            options: menuOptions,
+          },
+        ],
+      };
+
+      let titleText = "";
+      let bodyText = "";
+      let buttonRow = null;
+
+      if (selectedModule === "module_home") {
+        titleText = `## Tars Help`;
+        bodyText =
+          `-# Experience the ultimate Discord bot designed for seamless management and community engagement.\n\n` +
+          `<:Prefix:1542236764465274910> **Prefix** \`${prefix}\`\n` +
+          `<:Commands:1542236622521901088> **Commands** \`${totalCommands}\`\n` +
+          `<:Modules:1542236707599163422> **Modules** \`${totalModules}\`\n\n` +
+          `<:Book:1542647324570816532> Use \`${prefix}help (command)\` for details on a specific command`;
+      } else {
+        const mod = modulesCatalog[selectedModule];
+        if (!mod) {
+          return buildPayload("module_home", 0);
+        }
+
+        const totalPages = Math.ceil(mod.commands.length / ITEMS_PER_PAGE) || 1;
+        const validPage = Math.max(0, Math.min(page, totalPages - 1));
+        const startIndex = validPage * ITEMS_PER_PAGE;
+        const pageCommands = mod.commands.slice(
+          startIndex,
+          startIndex + ITEMS_PER_PAGE,
+        );
+
+        const listLines = pageCommands
+          .map(
+            (c, idx) =>
+              `**${startIndex + idx + 1}. ${c.name}** — \`${prefix}${c.cmd}\` — *${c.desc}*`,
+          )
+          .join("\n");
+
+        titleText = `### ${mod.title}`;
+        bodyText =
+          `*${mod.description}*\n\n` +
+          listLines +
+          `\n\n-# ${mod.commands.length} total commands`;
+
+        if (totalPages > 1) {
+          buttonRow = {
+            type: 1,
+            components: [
+              {
+                type: 2,
+                custom_id: "help_prev_page",
+                style: 2,
+                emoji: { id: "1542658287894528100", name: "Left" },
+                disabled: validPage === 0,
+              },
+              {
+                type: 2,
+                custom_id: "help_page_indicator",
+                style: 2,
+                label: `Page ${validPage + 1} of ${totalPages}`,
+                disabled: true,
+              },
+              {
+                type: 2,
+                custom_id: "help_next_page",
+                style: 2,
+                emoji: { id: "1542658241400414298", name: "Right" },
+                disabled: validPage === totalPages - 1,
+              },
+            ],
+          };
+        }
+      }
+
+      const containerComponents = [
+        {
+          type: 10,
+          content: titleText,
+        },
+        {
+          type: 14,
+          divider: true,
+          spacing: 1,
+        },
+        {
+          type: 10,
+          content: bodyText,
+        },
+        {
+          type: 14,
+          divider: true,
+          spacing: 1,
+        },
+        selectRow,
+      ];
+
+      if (buttonRow) {
+        containerComponents.push(buttonRow);
+      }
+
+      const container = {
+        type: 17,
+        accent_color: 0xffffff,
+        components: containerComponents,
+      };
+
+      return {
+        flags: 32768,
+        components: [container],
+      };
+    };
+
+    const buildFallbackPayload = (selectedModule, page = 0) => {
       if (selectedModule === "module_home") {
         return {
           embeds: [mainEmbed],
@@ -258,10 +485,13 @@ export async function execute(interaction, client) {
       const validPage = Math.max(0, Math.min(page, totalPages - 1));
 
       const startIndex = validPage * ITEMS_PER_PAGE;
-      const pageCommands = mod.commands.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+      const pageCommands = mod.commands.slice(
+        startIndex,
+        startIndex + ITEMS_PER_PAGE,
+      );
 
-      const fields = pageCommands.map((c) => ({
-        name: c.name,
+      const fields = pageCommands.map((c, idx) => ({
+        name: `${startIndex + idx + 1}. ${c.name}`,
         value: `\`${prefix}${c.cmd}\` - ${c.desc}`,
       }));
 
@@ -285,19 +515,45 @@ export async function execute(interaction, client) {
       };
     };
 
-    const initialPayload = buildPayload("module_home", 0);
+    let initialPayload;
+    try {
+      initialPayload = buildPayload("module_home", 0);
+    } catch {
+      initialPayload = buildFallbackPayload("module_home", 0);
+    }
 
     let response;
-    if (
-      typeof interaction.isStringSelectMenu === "function" &&
-      interaction.isStringSelectMenu()
-    ) {
-      await interaction.update(initialPayload);
-      response = await interaction.fetchReply();
-    } else if (interaction.deferred || interaction.replied) {
-      response = await interaction.editReply(initialPayload);
-    } else {
-      response = await interaction.reply({ ...initialPayload, fetchReply: true });
+    try {
+      if (
+        typeof interaction.isStringSelectMenu === "function" &&
+        interaction.isStringSelectMenu()
+      ) {
+        await interaction.update(initialPayload);
+        response = await interaction.fetchReply();
+      } else if (interaction.deferred || interaction.replied) {
+        response = await interaction.editReply(initialPayload);
+      } else {
+        await interaction.reply(initialPayload);
+        response = await interaction.fetchReply();
+      }
+    } catch (v2Error) {
+      logger.warn(
+        "V2 Components payload failed, falling back to V1 embed:",
+        v2Error,
+      );
+      const fallbackPayload = buildFallbackPayload("module_home", 0);
+      if (
+        typeof interaction.isStringSelectMenu === "function" &&
+        interaction.isStringSelectMenu()
+      ) {
+        await interaction.update(fallbackPayload);
+        response = await interaction.fetchReply();
+      } else if (interaction.deferred || interaction.replied) {
+        response = await interaction.editReply(fallbackPayload);
+      } else {
+        await interaction.reply(fallbackPayload);
+        response = await interaction.fetchReply();
+      }
     }
 
     const collector = response.createMessageComponentCollector();
@@ -321,8 +577,16 @@ export async function execute(interaction, client) {
         }
       }
 
-      const newPayload = buildPayload(currentSelectedModule, currentPage);
-      await i.update(newPayload);
+      try {
+        const newPayload = buildPayload(currentSelectedModule, currentPage);
+        await i.update(newPayload);
+      } catch {
+        const fallbackPayload = buildFallbackPayload(
+          currentSelectedModule,
+          currentPage,
+        );
+        await i.update(fallbackPayload);
+      }
     });
   } catch (err) {
     logger.error("Error in Help command handler:", err);

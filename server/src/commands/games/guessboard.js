@@ -1,10 +1,4 @@
-import {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType,
-} from "discord.js";
+import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import { EMBED_COLORS } from "../../utils/embeds.js";
 import {
@@ -32,27 +26,16 @@ export const data = {
   ],
 };
 
-function buildLbToggleRow(currentCategory = "flag") {
-  return new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("show_lb_flag")
-      .setLabel("Flag LB")
-      .setEmoji("🏁")
-      .setStyle(
-        currentCategory === "flag"
-          ? ButtonStyle.Primary
-          : ButtonStyle.Secondary
-      ),
-    new ButtonBuilder()
-      .setCustomId("show_lb_pokemon")
-      .setLabel("Pokémon LB")
-      .setEmoji("⚡")
-      .setStyle(
-        currentCategory === "pokemon"
-          ? ButtonStyle.Primary
-          : ButtonStyle.Secondary
-      )
-  );
+async function sendAndFetchReply(interaction, payload) {
+  if (interaction.isButton && interaction.isButton()) {
+    await interaction.update(payload);
+    return await interaction.fetchReply();
+  }
+  if (interaction.replied || interaction.deferred) {
+    return await interaction.followUp(payload);
+  }
+  const res = await interaction.reply({ ...payload, withResponse: true });
+  return res?.resource?.message || res;
 }
 
 export async function execute(interaction, client) {
@@ -98,25 +81,13 @@ export async function showLeaderboard(interaction, client, category = "flag") {
         : interaction.reply(errorPayload);
   }
 
-  const payload = await buildLbPayload(
-    serverId,
-    category,
-    interaction.guild.name
-  );
-
-  let response;
-  if (interaction.isButton && interaction.isButton()) {
-    response = await interaction.update({ ...payload, fetchReply: true });
-  } else if (interaction.replied || interaction.deferred) {
-    response = await interaction.followUp({ ...payload, fetchReply: true });
-  } else {
-    response = await interaction.reply({ ...payload, fetchReply: true });
-  }
+  const payload = await buildLbPayload(serverId, category);
+  const response = await sendAndFetchReply(interaction, payload);
 
   attachLbToggleCollector(response, interaction, client);
 }
 
-async function buildLbPayload(serverId, category, guildName) {
+async function buildLbPayload(serverId, category) {
   const isPokemon = category === "pokemon";
   const topPlayers = isPokemon
     ? await getTopPokemonPlayers(serverId, 10)
@@ -124,32 +95,69 @@ async function buildLbPayload(serverId, category, guildName) {
 
   const categoryName = isPokemon ? "Pokémon" : "Flag";
 
-  let embed;
+  let bodyContent = "";
   if (!topPlayers || topPlayers.length === 0) {
-    embed = new EmbedBuilder()
-      .setTitle(`🏆 **${categoryName} Leaderboard**`)
-      .setDescription(
-        `No scores recorded yet! Play \`/${isPokemon ? "pokemon" : "flag"}\` to score points!`
-      )
-      .setColor(EMBED_COLORS.WHITE);
+    bodyContent = `No scores recorded yet!`;
   } else {
-    const leaderboardLines = topPlayers.map((player, index) => {
-      const medal =
-        index === 0 ? "🥇 " : index === 1 ? "🥈 " : index === 2 ? "🥉 " : "";
-      return `${medal}<@${player.userId}> — **${player.points}** Pts *(${player.wins} guessed)*`;
-    });
-
-    embed = new EmbedBuilder()
-      .setTitle(`🏆 **${categoryName} Leaderboard**`)
-      .setDescription(leaderboardLines.join("\n"))
-      .setFooter({
-        text: `Earn points by playing /${isPokemon ? "pokemon" : "flag"}!`,
+    bodyContent = topPlayers
+      .map((player, index) => {
+        const medal =
+          index === 0 ? "🥇 " : index === 1 ? "🥈 " : index === 2 ? "🥉 " : "";
+        return `${medal}<@${player.userId}> — **${player.points}** Pts *(${player.wins} guessed)*`;
       })
-      .setColor(EMBED_COLORS.WHITE);
+      .join("\n");
   }
 
-  const toggleRow = buildLbToggleRow(category);
-  return { embeds: [embed], components: [toggleRow] };
+  bodyContent += `\n\n-# Earn points by playing /${isPokemon ? "pokemon" : "flag"}!`;
+
+  return {
+    flags: 32768,
+    components: [
+      {
+        type: 17,
+        accent_color: EMBED_COLORS.WHITE,
+        components: [
+          {
+            type: 10,
+            content: `### 🏆 ${categoryName} Leaderboard`,
+          },
+          {
+            type: 14,
+            divider: true,
+            spacing: 1,
+          },
+          {
+            type: 10,
+            content: bodyContent,
+          },
+          {
+            type: 14,
+            divider: true,
+            spacing: 1,
+          },
+          {
+            type: 1,
+            components: [
+              {
+                type: 2,
+                custom_id: "show_lb_flag",
+                style: !isPokemon ? 1 : 2,
+                label: "Flag LB",
+                emoji: { name: "🏁" },
+              },
+              {
+                type: 2,
+                custom_id: "show_lb_pokemon",
+                style: isPokemon ? 1 : 2,
+                label: "Pokémon LB",
+                emoji: { name: "⚡" },
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
 }
 
 function attachLbToggleCollector(message, originalInteraction, client) {

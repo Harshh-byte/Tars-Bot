@@ -1,4 +1,4 @@
-import { EmbedBuilder, MessageFlags, PermissionFlagsBits } from "discord.js";
+import { MessageFlags, PermissionFlagsBits } from "discord.js";
 import { errorEmbed } from "../../utils/embeds.js";
 import fs from "fs";
 
@@ -38,24 +38,33 @@ export async function execute(interaction, client) {
 
   if (subcommand === "start") {
     try {
-      const botAvatar = client.user.displayAvatarURL({
-        extension: "png",
-        size: 256,
-      });
+      const v2StartContainerPayload = {
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: 0x34495e,
+            components: [
+              {
+                type: 10,
+                content: "### <a:Maintenance:1526290002974343308> Maintenance Started",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content:
+                  "The bot is temporarily offline for a scheduled system update and maintenance. Thank you for your patience!\n\n-# Status: Offline • Maintenance Active",
+              },
+            ],
+          },
+        ],
+      };
 
-      const startEmbed = new EmbedBuilder()
-        .setColor(0x34495e)
-        .setAuthor({
-          name: "Tars Update",
-          iconURL: botAvatar,
-        })
-        .setTitle("<a:Maintenance:1526290002974343308> **Maintenance Started**")
-        .setDescription(
-          "The bot is temporarily offline for a system update. Thank you for your patience.",
-        )
-        .setTimestamp();
-
-      const startMsg = await interaction.channel.send({ embeds: [startEmbed] });
+      const startMsg = await interaction.channel.send(v2StartContainerPayload);
 
       const startTime = Date.now();
       client.maintenanceMode = true;
@@ -78,7 +87,7 @@ export async function execute(interaction, client) {
       );
 
       return interaction.reply({
-        content: "<a:Maintenance:1526290002974343308> Tars is going under maintenance.",
+        content: "<a:Maintenance:1526290002974343308> **Tars is now under maintenance mode.**",
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {
@@ -94,7 +103,7 @@ export async function execute(interaction, client) {
       if (typeof client.updateBotPresence === "function") {
         client.updateBotPresence();
       }
-  
+
       let messageId = null;
       let channelId = null;
       try {
@@ -103,30 +112,38 @@ export async function execute(interaction, client) {
         );
         messageId = savedData.messageId;
         channelId = savedData.channelId;
-      } catch (e) {
-      }
-  
+      } catch (e) {}
+
       fs.writeFileSync(
         new URL("../../../../maintenance.json", import.meta.url),
         JSON.stringify({ active: false }, null, 2)
       );
 
-      const botAvatar = client.user.displayAvatarURL({
-        extension: "png",
-        size: 256,
-      });
-
-      const completeEmbed = new EmbedBuilder()
-        .setColor(0x2ecc71)
-        .setAuthor({
-          name: "Tars Update",
-          iconURL: botAvatar,
-        })
-        .setTitle("<a:Complete:1526291398863880293> **Maintenance Completed**")
-        .setDescription(
-          "Tars update completed successfully. All features are now fully functional.",
-        )
-        .setTimestamp();
+      const v2CompleteContainerPayload = {
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: 0x2ecc71,
+            components: [
+              {
+                type: 10,
+                content: "### <a:Complete:1526291398863880293> Maintenance Completed",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content:
+                  "Tars update completed successfully. All features, commands, and systems are now fully operational!\n\n-# Status: Online • Systems Operational",
+              },
+            ],
+          },
+        ],
+      };
 
       let repliedToStart = false;
       if (messageId && channelId) {
@@ -135,20 +152,19 @@ export async function execute(interaction, client) {
           if (targetChannel) {
             const startMsg = await targetChannel.messages.fetch(messageId);
             if (startMsg) {
-              await startMsg.reply({ embeds: [completeEmbed] });
+              await startMsg.reply(v2CompleteContainerPayload);
               repliedToStart = true;
             }
           }
-        } catch (err) {
-        }
+        } catch (err) {}
       }
 
       if (!repliedToStart) {
-        await interaction.channel.send({ embeds: [completeEmbed] });
+        await interaction.channel.send(v2CompleteContainerPayload);
       }
 
       return interaction.reply({
-        content: "<a:Complete:1526291398863880293> Tars is back online.",
+        content: "<a:Complete:1526291398863880293> **Tars maintenance mode completed!**",
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {
