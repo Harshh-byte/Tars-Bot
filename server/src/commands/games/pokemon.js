@@ -30,7 +30,7 @@ function levenshteinDistance(a, b) {
         matrix[i][j] = Math.min(
           matrix[i - 1][j - 1] + 1,
           matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
+          matrix[i - 1][j] + 1,
         );
       }
     }
@@ -175,7 +175,7 @@ function buildButtons() {
       .setCustomId("show_lb_pokemon")
       .setLabel("Leaderboard")
       .setEmoji("🏆")
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Secondary),
   );
 }
 
@@ -188,10 +188,14 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
 
   let genInput = interaction.options?.getString("generation")?.toLowerCase();
   if (!genInput) {
-    if (rawArgs.includes("gen2") || rawArgs.includes("johto")) genInput = "gen2";
-    else if (rawArgs.includes("gen3") || rawArgs.includes("hoenn")) genInput = "gen3";
-    else if (rawArgs.includes("gen4") || rawArgs.includes("sinnoh")) genInput = "gen4";
-    else if (rawArgs.includes("gen5") || rawArgs.includes("unova")) genInput = "gen5";
+    if (rawArgs.includes("gen2") || rawArgs.includes("johto"))
+      genInput = "gen2";
+    else if (rawArgs.includes("gen3") || rawArgs.includes("hoenn"))
+      genInput = "gen3";
+    else if (rawArgs.includes("gen4") || rawArgs.includes("sinnoh"))
+      genInput = "gen4";
+    else if (rawArgs.includes("gen5") || rawArgs.includes("unova"))
+      genInput = "gen5";
     else if (rawArgs.includes("all")) genInput = "all";
     else genInput = "gen1";
   }
@@ -204,7 +208,7 @@ async function startPokemonGame(
   client,
   isFollowUp = false,
   genSelection = "gen1",
-  buildAiReply
+  buildAiReply,
 ) {
   try {
     const channelId =
@@ -229,7 +233,7 @@ async function startPokemonGame(
         `**Type:** ${targetPokemon.types}\n` +
           `**Hint:** ${initialHint}\n\n` +
           `You have 30 seconds to guess the Pokémon.\n` +
-          `*Type your answer in the chat or \`.skip\` to skip.*`
+          `*Type your answer in the chat or \`.skip\` to skip.*`,
       )
       .setColor(EMBED_COLORS.GREY);
 
@@ -245,7 +249,8 @@ async function startPokemonGame(
     } else if (interaction.deferred || interaction.replied) {
       response = await channel.send(payload);
     } else {
-      response = await interaction.reply({ ...payload, fetchReply: true });
+      await interaction.reply(payload);
+      response = await interaction.fetchReply();
     }
 
     const filter = (m) => !m.author.bot;
@@ -262,7 +267,7 @@ async function startPokemonGame(
             `**Type:** ${targetPokemon.types}\n` +
               `**Hint:** ${secondHint}\n\n` +
               `You have 30 seconds to guess the Pokémon.\n` +
-              `*Type your answer in the chat or \`.skip\` to skip.*`
+              `*Type your answer in the chat or \`.skip\` to skip.*`,
           );
           if (response && typeof response.edit === "function") {
             await response.edit({ embeds: [updatedEmbed] }).catch(() => null);
@@ -294,7 +299,7 @@ async function startPokemonGame(
       }
 
       const isCorrect = targetPokemon.aliases.some(
-        (alias) => alias.toLowerCase() === input
+        (alias) => alias.toLowerCase() === input,
       );
 
       if (isCorrect) {
@@ -306,7 +311,7 @@ async function startPokemonGame(
           .catch(() =>
             m
               .react("<:Success:1526228339910643793>")
-              .catch(() => m.react("✅").catch(() => null))
+              .catch(() => m.react("✅").catch(() => null)),
           );
       } else if (isCloseMatch(input, targetPokemon.aliases)) {
         if (!closeMatchUsers.has(m.author.id)) {
@@ -331,7 +336,7 @@ async function startPokemonGame(
             .setTitle("**Pokémon Skipped!**")
             .setDescription(
               `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                `*Skips remaining for this game:* **${remainingSkips}/5**`
+                `*Skips remaining for this game:* **${remainingSkips}/5**`,
             )
             .setThumbnail(targetPokemon.imageUrl)
             .setColor(EMBED_COLORS.WARNING);
@@ -344,7 +349,7 @@ async function startPokemonGame(
               client,
               true,
               genSelection,
-              buildAiReply
+              buildAiReply,
             );
           }, 1500);
         } else if (reason === "correct" && winnerMessage) {
@@ -364,7 +369,7 @@ async function startPokemonGame(
             .setDescription(
               `${winnerMention} guessed it right!\n` +
                 `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                `🏆 **+${pointsGained} Points** *(Total: **${scoreData.totalPoints}** Pts)*`
+                `🏆 **+${pointsGained} Points** *(Total: **${scoreData.totalPoints}** Pts)*`,
             )
             .setThumbnail(targetPokemon.imageUrl)
             .setColor(EMBED_COLORS.SUCCESS);
@@ -377,7 +382,7 @@ async function startPokemonGame(
               client,
               true,
               genSelection,
-              buildAiReply
+              buildAiReply,
             );
           }, 1500);
         } else {
@@ -386,7 +391,7 @@ async function startPokemonGame(
             .setTitle("⌛ **Time's Up!**")
             .setDescription(
               `Nobody guessed the Pokémon in time!\n\n` +
-                `The correct answer was **${targetPokemon.name}**.`
+                `The correct answer was **${targetPokemon.name}**.`,
             )
             .setThumbnail(targetPokemon.imageUrl)
             .setColor(EMBED_COLORS.TIMEOUT);
@@ -401,7 +406,7 @@ async function startPokemonGame(
             interaction,
             client,
             genSelection,
-            buildAiReply
+            buildAiReply,
           );
         }
       } catch (err) {
@@ -419,7 +424,7 @@ function attachPokemonNextCollector(
   originalInteraction,
   client,
   extraSetting,
-  buildAiReply
+  buildAiReply,
 ) {
   if (!message || typeof message.createMessageComponentCollector !== "function")
     return;
@@ -442,7 +447,7 @@ function attachPokemonNextCollector(
           client,
           true,
           extraSetting,
-          buildAiReply
+          buildAiReply,
         );
       } else if (btnInteraction.customId === "show_lb_pokemon") {
         await showLeaderboard(btnInteraction, client, "pokemon");

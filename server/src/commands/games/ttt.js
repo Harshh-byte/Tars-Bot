@@ -1,5 +1,4 @@
 import {
-  EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
@@ -7,7 +6,6 @@ import {
 } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { EMBED_COLORS } from "../../utils/embeds.js";
 
 export const data = {
   name: "ttt",
@@ -35,6 +33,16 @@ const WINNING_COMBOS = [
   [0, 4, 8], [2, 4, 6],
 ];
 
+const getRandomColor = () => Math.floor(Math.random() * 16777215);
+
+async function sendAndFetchReply(interaction, payload) {
+  if (interaction.replied || interaction.deferred) {
+    return await interaction.followUp(payload);
+  }
+  const res = await interaction.reply({ ...payload, withResponse: true });
+  return res?.resource?.message || res;
+}
+
 function checkWinner(board) {
   for (const combo of WINNING_COMBOS) {
     const [a, b, c] = combo;
@@ -51,22 +59,31 @@ function checkWinner(board) {
 function buildGridComponents(board, disabled = false) {
   const rows = [];
   for (let r = 0; r < 3; r++) {
-    const row = new ActionRowBuilder();
+    const row = {
+      type: 1,
+      components: [],
+    };
     for (let c = 0; c < 3; c++) {
       const idx = r * 3 + c;
       const cellVal = board[idx];
-      const btn = new ButtonBuilder()
-        .setCustomId(`ttt_${idx}`)
-        .setDisabled(disabled || cellVal !== null);
+
+      const btn = {
+        type: 2,
+        custom_id: `ttt_${idx}`,
+        disabled: disabled || cellVal !== null,
+      };
 
       if (cellVal === "X") {
-        btn.setEmoji(SYMBOLS.X).setStyle(ButtonStyle.Danger);
+        btn.emoji = { id: "1542154950065524757", name: "x_" };
+        btn.style = 4; // Danger (Red)
       } else if (cellVal === "O") {
-        btn.setEmoji(SYMBOLS.O).setStyle(ButtonStyle.Success);
+        btn.emoji = { id: "1542154996013863023", name: "o_" };
+        btn.style = 3; // Success (Green)
       } else {
-        btn.setLabel("​").setStyle(ButtonStyle.Secondary);
+        btn.label = "​";
+        btn.style = 2; // Secondary (Grey)
       }
-      row.addComponents(btn);
+      row.components.push(btn);
     }
     rows.push(row);
   }
@@ -103,6 +120,45 @@ function getBestTarsMove(board) {
   return openSpots[Math.floor(Math.random() * openSpots.length)];
 }
 
+function buildV2GridPayload(board, turnUserId, playerXName, playerOName, playerXId, isVsTars, disabled = false) {
+  const symbol = turnUserId === playerXId ? SYMBOLS.X : SYMBOLS.O;
+  const gridRows = buildGridComponents(board, disabled);
+
+  const containerComponents = [
+    {
+      type: 10,
+      content: "### ⚔️ TIC-TAC-TOE",
+    },
+    {
+      type: 14,
+      divider: true,
+      spacing: 1,
+    },
+    {
+      type: 10,
+      content: `**${playerXName}** vs **${playerOName}**\n\nTurn: ${symbol} <@${turnUserId}>\n\n-# Requestor: <@${playerXId}>`,
+    },
+    {
+      type: 14,
+      divider: true,
+      spacing: 1,
+    },
+    ...gridRows,
+  ];
+
+  return {
+    content: (!disabled && !isVsTars) ? `<@${turnUserId}>` : null,
+    flags: 32768,
+    components: [
+      {
+        type: 17,
+        accent_color: getRandomColor(),
+        components: containerComponents,
+      },
+    ],
+  };
+}
+
 export async function execute(interaction, client) {
   const opponent = interaction.options?.getUser("opponent") || null;
   return startGame(interaction, client, opponent);
@@ -137,58 +193,8 @@ async function startGame(interaction, client, opponent) {
       ? "Tars"
       : (interaction.guild?.members.cache.get(opponent.id)?.displayName || opponent.displayName || opponent.username);
 
-    const getEmbed = (winner = null) => {
-      const embed = new EmbedBuilder().setTitle("⚔️ **TIC-TAC-TOE**");
-
-      if (winner === "X") {
-        embed
-          .setDescription(`<a:Tada:1544329561955770488> **<@${playerX.id}> won the match!**`)
-          .setColor(EMBED_COLORS.SUCCESS);
-      } else if (winner === "O") {
-        const oColor = isVsTars ? EMBED_COLORS.ERROR : EMBED_COLORS.SUCCESS;
-        const winnerMention = isVsTars ? "**Tars**" : `<@${playerO.id}>`;
-        embed
-          .setDescription(
-            `<a:Tada:1544329561955770488> **${winnerMention} won the match!**` +
-            (isVsTars ? `\n\n*Tars: "Predictable outcome."*` : "")
-          )
-          .setColor(oColor);
-      } else if (winner === "TIE") {
-        embed
-          .setDescription(`🤝 **It's a Tie Game!**`)
-          .setColor(EMBED_COLORS.WARNING);
-      } else {
-        const symbol = turnUserId === playerX.id ? SYMBOLS.X : SYMBOLS.O;
-        embed
-          .setDescription(
-            `**${playerXName}** vs **${playerOName}**\n\n` +
-            `Turn: ${symbol} **<@${turnUserId}>**`
-          )
-          .setColor(Math.floor(Math.random() * 16777215));
-      }
-
-      embed.setFooter({ text: `Requestor: ${playerXName}` });
-      return embed;
-    };
-
-    const getContent = (winner = null) => {
-      if (winner) return null;
-      if (isVsTars) return undefined;
-      return `<@${turnUserId}>`;
-    };
-
-    const replyPayload = {
-      content: getContent(),
-      embeds: [getEmbed()],
-      components: buildGridComponents(board),
-      fetchReply: true,
-    };
-
-    const response = interaction.replied || interaction.deferred
-      ? await interaction.followUp(replyPayload)
-      : interaction.isButton()
-      ? await interaction.update(replyPayload) || await interaction.fetchReply()
-      : await interaction.reply(replyPayload);
+    const initialPayload = buildV2GridPayload(board, turnUserId, playerXName, playerOName, playerX.id, isVsTars);
+    const response = await sendAndFetchReply(interaction, initialPayload);
 
     const collector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
@@ -197,18 +203,60 @@ async function startGame(interaction, client, opponent) {
 
     const handleGameEnd = async (winner, lastInteraction) => {
       collector.stop(winner);
-      const playAgainRow = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId("ttt_play_again")
-          .setLabel("Play Again")
-          .setStyle(ButtonStyle.Primary)
-      );
 
-      await lastInteraction.update({
-        content: getContent(winner),
-        embeds: [getEmbed(winner)],
-        components: [playAgainRow],
-      });
+      let winnerText = "";
+      if (winner === "X") {
+        winnerText = `<a:Tada:1544329561955770488> **<@${playerX.id}> won the match!**`;
+      } else if (winner === "O") {
+        const winnerMention = isVsTars ? "**Tars**" : `<@${playerO.id}>`;
+        winnerText = `<a:Tada:1544329561955770488> **${winnerMention} won the match!**` + (isVsTars ? `\n\n*Tars: "Predictable outcome."*` : "");
+      } else if (winner === "TIE") {
+        winnerText = `🤝 **It's a Tie Game!**`;
+      }
+
+      const v2EndPayload = {
+        content: null,
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: getRandomColor(),
+            components: [
+              {
+                type: 10,
+                content: "### ⚔️ TIC-TAC-TOE MATCH RESULTS",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content: `${winnerText}\n\n-# Requestor: <@${playerX.id}>`,
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 2,
+                    custom_id: "ttt_play_again",
+                    style: 1,
+                    label: "Play Again",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      await lastInteraction.update(v2EndPayload);
 
       const playAgainCollector = response.createMessageComponentCollector({
         componentType: ComponentType.Button,
@@ -272,26 +320,46 @@ async function startGame(interaction, client, opponent) {
         }
       }
 
-      await i.update({
-        content: getContent(),
-        embeds: [getEmbed()],
-        components: buildGridComponents(board),
-      });
+      await i.update(buildV2GridPayload(board, turnUserId, playerXName, playerOName, playerX.id, isVsTars));
       collector.resetTimer();
     });
 
     collector.on("end", async (_, reason) => {
       if (["X", "O", "TIE"].includes(reason)) return;
 
-      const timeoutEmbed = new EmbedBuilder()
-        .setTitle("<:Timer:1542147643021725796> Match Timed Out")
-        .setDescription("The game was cancelled due to inactivity.")
-        .setColor(EMBED_COLORS.TIMEOUT);
+      const timeoutContainer = {
+        content: null,
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: getRandomColor(),
+            components: [
+              {
+                type: 10,
+                content: "### <:Timer:1542147643021725796> Match Timed Out",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content: `The game was cancelled due to inactivity.\n\n-# Requestor: <@${playerX.id}>`,
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              ...buildGridComponents(board, true),
+            ],
+          },
+        ],
+      };
 
-      await response.edit({
-        embeds: [timeoutEmbed],
-        components: buildGridComponents(board, true),
-      }).catch(() => null);
+      await response.edit(timeoutContainer).catch(() => null);
     });
   } catch (err) {
     logger.error("Error in Tic-Tac-Toe command handler:", err);

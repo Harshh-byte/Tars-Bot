@@ -1,10 +1,4 @@
-import {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType,
-} from "discord.js";
+import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 
@@ -60,6 +54,16 @@ export const data = {
   ],
 };
 
+const getRandomColor = () => Math.floor(Math.random() * 16777215);
+
+async function sendAndFetchReply(interaction, payload) {
+  if (interaction.replied || interaction.deferred) {
+    return await interaction.followUp(payload);
+  }
+  const res = await interaction.reply({ ...payload, withResponse: true });
+  return res?.resource?.message || res;
+}
+
 async function fetchQuestion(type, rating = "pg") {
   const chosenType = type === "random" ? (Math.random() > 0.5 ? "truth" : "dare") : type;
   const targetRating = rating || "pg";
@@ -91,32 +95,70 @@ async function fetchQuestion(type, rating = "pg") {
   return { type: chosenType, question, rating: targetRating.toUpperCase() };
 }
 
-function buildButtons() {
-  return new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("tod_truth")
-      .setLabel("Truth")
-      .setEmoji("❓")
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId("tod_dare")
-      .setLabel("Dare")
-      .setEmoji("🎯")
-      .setStyle(ButtonStyle.Danger),
-    new ButtonBuilder()
-      .setCustomId("tod_random")
-      .setLabel("Random")
-      .setEmoji("🎲")
-      .setStyle(ButtonStyle.Secondary)
-  );
+function buildV2Payload(promptType, question, rating, aiCommentary, requestorName) {
+  const titleIcon = promptType === "truth" ? "❓" : "🎯";
+  return {
+    flags: 32768,
+    components: [
+      {
+        type: 17,
+        accent_color: getRandomColor(),
+        components: [
+          {
+            type: 10,
+            content: `### ${titleIcon} ${promptType.toUpperCase()}`,
+          },
+          {
+            type: 14,
+            divider: true,
+            spacing: 1,
+          },
+          {
+            type: 10,
+            content:
+              `${question}` +
+              (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "") +
+              `\n\n-# Rating: ${rating} • Requestor: ${requestorName}`,
+          },
+          {
+            type: 14,
+            divider: true,
+            spacing: 1,
+          },
+          {
+            type: 1,
+            components: [
+              {
+                type: 2,
+                custom_id: "tod_truth",
+                style: 1,
+                label: "Truth",
+                emoji: { name: "❓" },
+              },
+              {
+                type: 2,
+                custom_id: "tod_dare",
+                style: 4,
+                label: "Dare",
+                emoji: { name: "🎯" },
+              },
+              {
+                type: 2,
+                custom_id: "tod_random",
+                style: 2,
+                label: "Random",
+                emoji: { name: "🎲" },
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
 }
 
 export async function execute(interaction, client, { buildAiReply } = {}) {
   try {
-    if (interaction.deferReply) {
-      await interaction.deferReply();
-    }
-
     let rawInput = interaction.options?.getString("type")?.toLowerCase();
     let ratingInput = interaction.options?.getString("rating")?.toLowerCase() || "pg";
 
@@ -134,7 +176,6 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
     }
 
     const type = rawInput && ["truth", "dare"].includes(rawInput) ? rawInput : "random";
-
     const { type: promptType, question, rating } = await fetchQuestion(type, ratingInput);
 
     let aiCommentary = "";
@@ -154,26 +195,13 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       }
     }
 
-    const requestorName = interaction.member?.displayName || interaction.user.username;
+    const requestorName =
+      interaction.member?.displayName ||
+      interaction.user.displayName ||
+      interaction.user.username;
 
-    const titleIcon = promptType === "truth" ? "❓" : "🎯";
-    const embed = new EmbedBuilder()
-      .setTitle(`${titleIcon} **${promptType.toUpperCase()}**`)
-      .setDescription(
-        `${question}` +
-        (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "")
-      )
-      .setFooter({ text: `Rating: ${rating} • Requestor: ${requestorName}` })
-      .setColor(Math.floor(Math.random() * 16777215));
-
-    const payload = { embeds: [embed], components: [buildButtons()] };
-
-    let response;
-    if (interaction.deferred || interaction.replied) {
-      response = await interaction.editReply(payload);
-    } else {
-      response = await interaction.reply({ ...payload, fetchReply: true });
-    }
+    const payload = buildV2Payload(promptType, question, rating, aiCommentary, requestorName);
+    const response = await sendAndFetchReply(interaction, payload);
 
     attachTodCollector(response, ratingInput, buildAiReply);
   } catch (err) {
@@ -212,23 +240,13 @@ function attachTodCollector(message, ratingInput, buildAiReply) {
         } catch {}
       }
 
-      const requestorName = btnInteraction.member?.displayName || btnInteraction.user.username;
+      const requestorName =
+        btnInteraction.member?.displayName ||
+        btnInteraction.user.displayName ||
+        btnInteraction.user.username;
 
-      const nextIcon = nextPrompt.type === "truth" ? "❓" : "🎯";
-      const newEmbed = new EmbedBuilder()
-        .setTitle(`${nextIcon} **${nextPrompt.type.toUpperCase()}**`)
-        .setDescription(
-          `${nextPrompt.question}` +
-          (nextAiComment ? `\n\n*Tars: ${nextAiComment}*` : "")
-        )
-        .setFooter({ text: `Rating: ${nextPrompt.rating} • Requestor: ${requestorName}` })
-        .setColor(Math.floor(Math.random() * 16777215));
-
-      const newMsg = await btnInteraction.followUp({
-        embeds: [newEmbed],
-        components: [buildButtons()],
-        fetchReply: true,
-      });
+      const payload = buildV2Payload(nextPrompt.type, nextPrompt.question, nextPrompt.rating, nextAiComment, requestorName);
+      const newMsg = await sendAndFetchReply(btnInteraction, payload);
 
       attachTodCollector(newMsg, ratingInput, buildAiReply);
     } catch (err) {

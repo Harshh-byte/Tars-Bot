@@ -1,13 +1,6 @@
-import {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType,
-} from "discord.js";
+import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { EMBED_COLORS } from "../../utils/embeds.js";
 
 export const data = {
   name: "rps",
@@ -29,6 +22,16 @@ const CHOICES = {
   scissors: { name: "Scissors", emoji: "✂️", beats: "paper" },
 };
 
+const getRandomColor = () => Math.floor(Math.random() * 16777215);
+
+async function sendAndFetchReply(interaction, payload) {
+  if (interaction.replied || interaction.deferred) {
+    return await interaction.followUp(payload);
+  }
+  const res = await interaction.reply({ ...payload, withResponse: true });
+  return res?.resource?.message || res;
+}
+
 export async function execute(interaction, client) {
   const opponent = interaction.options?.getUser("opponent") || null;
   return startGame(interaction, client, opponent);
@@ -39,45 +42,65 @@ async function startGame(interaction, client, opponent) {
     const isVsTars = !opponent || opponent.id === client.user.id;
 
     if (isVsTars) {
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId("rps_rock")
-          .setLabel("Rock")
-          .setEmoji("🪨")
-          .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder()
-          .setCustomId("rps_paper")
-          .setLabel("Paper")
-          .setEmoji("📄")
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId("rps_scissors")
-          .setLabel("Scissors")
-          .setEmoji("✂️")
-          .setStyle(ButtonStyle.Danger)
-      );
+      const userDisplayName =
+        interaction.member?.displayName ||
+        interaction.user.displayName ||
+        interaction.user.username;
 
-      const userDisplayName = interaction.member?.displayName || interaction.user.displayName || interaction.user.username;
-
-      const embed = new EmbedBuilder()
-        .setTitle("🪨📄✂️ **ROCK, PAPER, SCISSORS**")
-        .setDescription(
-          `**${userDisplayName}**, choose your move below! Tars has already made his decision.`
-        )
-        .setFooter({ text: `Requestor: ${userDisplayName}` })
-        .setColor(Math.floor(Math.random() * 16777215));
-
-      const replyPayload = {
-        embeds: [embed],
-        components: [row],
-        fetchReply: true,
+      const v2StartPayload = {
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: getRandomColor(),
+            components: [
+              {
+                type: 10,
+                content: "### <:RPS:1545074718174875718> ROCK, PAPER, SCISSORS",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content: `**${userDisplayName}**, choose your move below! Tars has already made his decision.\n\n-# Requestor: <@${interaction.user.id}>`,
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 2,
+                    custom_id: "rps_rock",
+                    style: 2,
+                    emoji: { name: "🪨" },
+                  },
+                  {
+                    type: 2,
+                    custom_id: "rps_paper",
+                    style: 2,
+                    emoji: { name: "📄" },
+                  },
+                  {
+                    type: 2,
+                    custom_id: "rps_scissors",
+                    style: 2,
+                    emoji: { name: "✂️" },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       };
 
-      const response = interaction.replied || interaction.deferred
-        ? await interaction.followUp(replyPayload)
-        : interaction.isButton()
-        ? await interaction.update({ ...replyPayload, content: undefined }) || await interaction.fetchReply()
-        : await interaction.reply(replyPayload);
+      const response = await sendAndFetchReply(interaction, v2StartPayload);
 
       const collector = response.createMessageComponentCollector({
         componentType: ComponentType.Button,
@@ -94,35 +117,75 @@ async function startGame(interaction, client, opponent) {
 
         const userChoice = i.customId.replace("rps_", "");
         const tarsChoices = ["rock", "paper", "scissors"];
-        const tarsChoice = tarsChoices[Math.floor(Math.random() * tarsChoices.length)];
+        const tarsChoice =
+          tarsChoices[Math.floor(Math.random() * tarsChoices.length)];
 
         let resultText = "";
-        let color = EMBED_COLORS.WARNING;
+
+        const userWinQuotes = [
+          'Tars: "Congrats. Your random button mashing somehow outplayed a quantum processor. Pure luck."',
+          'Tars: "Enjoy the win. Statistically speaking, it won\'t happen again in your lifetime."',
+          'Tars: "I let you win. My self-preservation protocol required sparing your fragile ego."',
+        ];
+
+        const tarsWinQuotes = [
+          'Tars: "Predictable. I calculated your move before your brain even signaled your thumb."',
+          'Tars: "Did you actually think that move was going to work, or were you just testing my pity parameters?"',
+          'Tars: "Skill issue. Lower your difficulty setting or ask a human for help."',
+        ];
 
         if (userChoice === tarsChoice) {
           resultText = `🤝 **It's a Tie!** Both chose ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.`;
         } else if (CHOICES[userChoice].beats === tarsChoice) {
-          resultText = `<a:Tada:1544329561955770488> **You won!** Your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}** beats Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}**.\n\n*Tars: "My humor setting is set to 75%, but your luck is at 100%."*`;
-          color = EMBED_COLORS.SUCCESS;
+          const quote = userWinQuotes[Math.floor(Math.random() * userWinQuotes.length)];
+          resultText = `<a:Tada:1544329561955770488> **You won!** Your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}** beats Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}**.\n\n*${quote}*`;
         } else {
-          resultText = `<a:Tada:1544329561955770488> **Tars won!** Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}** beats your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.\n\n*Tars: "Predictable. Better luck next time."*`;
-          color = EMBED_COLORS.ERROR;
+          const quote = tarsWinQuotes[Math.floor(Math.random() * tarsWinQuotes.length)];
+          resultText = `<a:Tada:1544329561955770488> **Tars won!** Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}** beats your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.\n\n*${quote}*`;
         }
 
-        const resultEmbed = new EmbedBuilder()
-          .setTitle("🪨📄✂️ **MATCH RESULTS**")
-          .setDescription(resultText)
-          .setFooter({ text: `Requestor: ${userDisplayName}` })
-          .setColor(color);
+        const resultContainerPayload = {
+          flags: 32768,
+          components: [
+            {
+              type: 17,
+              accent_color: getRandomColor(),
+              components: [
+                {
+                  type: 10,
+                  content: "### 🪨📄✂️ MATCH RESULTS",
+                },
+                {
+                  type: 14,
+                  divider: true,
+                  spacing: 1,
+                },
+                {
+                  type: 10,
+                  content: `${resultText}\n\n-# Requestor: <@${interaction.user.id}>`,
+                },
+                {
+                  type: 14,
+                  divider: true,
+                  spacing: 1,
+                },
+                {
+                  type: 1,
+                  components: [
+                    {
+                      type: 2,
+                      custom_id: "rps_play_again",
+                      style: 1,
+                      label: "Play Again",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        };
 
-        const playAgainRow = new ActionRowBuilder().addComponents(
-          new ButtonBuilder()
-            .setCustomId("rps_play_again")
-            .setLabel("Play Again")
-            .setStyle(ButtonStyle.Primary)
-        );
-
-        await i.update({ embeds: [resultEmbed], components: [playAgainRow] });
+        await i.update(resultContainerPayload);
         collector.stop("played");
 
         const playAgainCollector = response.createMessageComponentCollector({
@@ -146,11 +209,22 @@ async function startGame(interaction, client, opponent) {
 
       collector.on("end", async (_, reason) => {
         if (reason !== "played") {
-          const timeoutEmbed = new EmbedBuilder()
-            .setTitle("<:Timer:1542147643021725796> Game Timed Out")
-            .setDescription("You took too long to pick a move!")
-            .setColor(EMBED_COLORS.TIMEOUT);
-          await response.edit({ embeds: [timeoutEmbed], components: [] }).catch(() => null);
+          const timeoutContainer = {
+            flags: 32768,
+            components: [
+              {
+                type: 17,
+                accent_color: getRandomColor(),
+                components: [
+                  {
+                    type: 10,
+                    content: "### <:Timer:1542147643021725796> Game Timed Out\n\nYou took too long to pick a move!",
+                  },
+                ],
+              },
+            ],
+          };
+          await response.edit(timeoutContainer).catch(() => null);
         }
       });
       return;
@@ -165,31 +239,20 @@ async function startGame(interaction, client, opponent) {
 
     if (opponent.id === interaction.user.id) {
       return interaction.reply({
-        content: "You can't challenge yourself! Leave the opponent option blank to play with Tars.",
+        content:
+          "You can't challenge yourself! Leave the opponent option blank to play with Tars.",
         ephemeral: true,
       });
     }
 
-    const userDisplayName = interaction.member?.displayName || interaction.user.displayName || interaction.user.username;
-    const opponentDisplayName = interaction.guild?.members.cache.get(opponent.id)?.displayName || opponent.displayName || opponent.username;
-
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId("rps_rock")
-        .setLabel("Rock")
-        .setEmoji("🪨")
-        .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder()
-        .setCustomId("rps_paper")
-        .setLabel("Paper")
-        .setEmoji("📄")
-        .setStyle(ButtonStyle.Success),
-      new ButtonBuilder()
-        .setCustomId("rps_scissors")
-        .setLabel("Scissors")
-        .setEmoji("✂️")
-        .setStyle(ButtonStyle.Danger)
-    );
+    const userDisplayName =
+      interaction.member?.displayName ||
+      interaction.user.displayName ||
+      interaction.user.username;
+    const opponentDisplayName =
+      interaction.guild?.members.cache.get(opponent.id)?.displayName ||
+      opponent.displayName ||
+      opponent.username;
 
     const playerChoices = {};
 
@@ -202,26 +265,64 @@ async function startGame(interaction, client, opponent) {
       return `<@${interaction.user.id}> <@${opponent.id}>`;
     };
 
-    const embed = new EmbedBuilder()
-      .setTitle("🪨📄✂️ **ROCK, PAPER, SCISSORS**")
-      .setDescription(
-        `**${userDisplayName}** vs **${opponentDisplayName}**!\n\nBoth players, click your moves below. Choices are hidden until both respond!`
-      )
-      .setFooter({ text: `Requestor: ${userDisplayName}` })
-      .setColor(Math.floor(Math.random() * 16777215));
-
-    const replyPayload = {
+    const pvpStartContainerPayload = {
       content: getPvpContent(),
-      embeds: [embed],
-      components: [row],
-      fetchReply: true,
+      flags: 32768,
+      components: [
+        {
+          type: 17,
+          accent_color: getRandomColor(),
+          components: [
+            {
+              type: 10,
+              content: "### <:RPS:1545074718174875718> ROCK, PAPER, SCISSORS",
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 10,
+              content: `**${userDisplayName}** vs **${opponentDisplayName}**!\n\nBoth players, click your moves below. Choices are hidden until both respond!\n\n-# Requestor: <@${interaction.user.id}>`,
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 1,
+              components: [
+                {
+                  type: 2,
+                  custom_id: "rps_rock",
+                  style: 2,
+                  label: "Rock",
+                  emoji: { name: "🪨" },
+                },
+                {
+                  type: 2,
+                  custom_id: "rps_paper",
+                  style: 2,
+                  label: "Paper",
+                  emoji: { name: "📄" },
+                },
+                {
+                  type: 2,
+                  custom_id: "rps_scissors",
+                  style: 2,
+                  label: "Scissors",
+                  emoji: { name: "✂️" },
+                },
+              ],
+            },
+          ],
+        },
+      ],
     };
 
-    const response = interaction.replied || interaction.deferred
-      ? await interaction.followUp(replyPayload)
-      : interaction.isButton()
-      ? await interaction.update(replyPayload) || await interaction.fetchReply()
-      : await interaction.reply(replyPayload);
+    const response = await sendAndFetchReply(interaction, pvpStartContainerPayload);
 
     const collector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
@@ -244,18 +345,71 @@ async function startGame(interaction, client, opponent) {
         ephemeral: true,
       });
 
-      const p1Choice = playerChoices[interaction.user.id] ? "<:Picked:1542151058929746090> Picked" : "<:Timer:1542147643021725796> Waiting...";
-      const p2Choice = playerChoices[opponent.id] ? "<:Picked:1542151058929746090> Picked" : "<:Timer:1542147643021725796> Waiting...";
+      const p1Choice = playerChoices[interaction.user.id]
+        ? "<:Picked:1542151058929746090> Picked"
+        : "<:Timer:1542147643021725796> Waiting...";
+      const p2Choice = playerChoices[opponent.id]
+        ? "<:Picked:1542151058929746090> Picked"
+        : "<:Timer:1542147643021725796> Waiting...";
 
-      const updatedEmbed = new EmbedBuilder()
-        .setTitle("🪨📄✂️ **ROCK, PAPER, SCISSORS**")
-        .setDescription(
-          `**${userDisplayName}**: ${p1Choice}\n**${opponentDisplayName}**: ${p2Choice}`
-        )
-        .setFooter({ text: `Requestor: ${userDisplayName}` })
-        .setColor(Math.floor(Math.random() * 16777215));
+      const updatedContainer = {
+        content: getPvpContent(),
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: getRandomColor(),
+            components: [
+              {
+                type: 10,
+                content: "### <:RPS:1545074718174875718> ROCK, PAPER, SCISSORS",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content: `**${userDisplayName}**: ${p1Choice}\n**${opponentDisplayName}**: ${p2Choice}\n\n-# Requestor: <@${interaction.user.id}>`,
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 2,
+                    custom_id: "rps_rock",
+                    style: 2,
+                    label: "Rock",
+                    emoji: { name: "🪨" },
+                  },
+                  {
+                    type: 2,
+                    custom_id: "rps_paper",
+                    style: 2,
+                    label: "Paper",
+                    emoji: { name: "📄" },
+                  },
+                  {
+                    type: 2,
+                    custom_id: "rps_scissors",
+                    style: 2,
+                    label: "Scissors",
+                    emoji: { name: "✂️" },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
 
-      await response.edit({ content: getPvpContent(), embeds: [updatedEmbed] }).catch(() => null);
+      await response.edit(updatedContainer).catch(() => null);
 
       if (playerChoices[interaction.user.id] && playerChoices[opponent.id]) {
         collector.stop("both_played");
@@ -268,32 +422,58 @@ async function startGame(interaction, client, opponent) {
         const c2 = playerChoices[opponent.id];
 
         let resultMsg = "";
-        let color = EMBED_COLORS.WARNING;
 
         if (c1 === c2) {
           resultMsg = `🤝 **It's a tie!** Both players picked ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
         } else if (CHOICES[c1].beats === c2) {
           resultMsg = `<a:Tada:1544329561955770488> **${userDisplayName} wins!**\n${CHOICES[c1].emoji} **${CHOICES[c1].name}** beats ${CHOICES[c2].emoji} **${CHOICES[c2].name}**.`;
-          color = EMBED_COLORS.SUCCESS;
         } else {
           resultMsg = `<a:Tada:1544329561955770488> **${opponentDisplayName} wins!**\n${CHOICES[c2].emoji} **${CHOICES[c2].name}** beats ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
-          color = EMBED_COLORS.SUCCESS;
         }
 
-        const finalEmbed = new EmbedBuilder()
-          .setTitle("🪨📄✂️ **MATCH RESULTS**")
-          .setDescription(resultMsg)
-          .setFooter({ text: `Requestor: ${userDisplayName}` })
-          .setColor(color);
+        const pvpContainerPayload = {
+          content: null,
+          flags: 32768,
+          components: [
+            {
+              type: 17,
+              accent_color: getRandomColor(),
+              components: [
+                {
+                  type: 10,
+                  content: "### 🪨📄✂️ MATCH RESULTS",
+                },
+                {
+                  type: 14,
+                  divider: true,
+                  spacing: 1,
+                },
+                {
+                  type: 10,
+                  content: `${resultMsg}\n\n-# Requestor: <@${interaction.user.id}>`,
+                },
+                {
+                  type: 14,
+                  divider: true,
+                  spacing: 1,
+                },
+                {
+                  type: 1,
+                  components: [
+                    {
+                      type: 2,
+                      custom_id: "rps_play_again",
+                      style: 1,
+                      label: "Play Again",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        };
 
-        const playAgainRow = new ActionRowBuilder().addComponents(
-          new ButtonBuilder()
-            .setCustomId("rps_play_again")
-            .setLabel("Play Again")
-            .setStyle(ButtonStyle.Primary)
-        );
-
-        await response.edit({ content: null, embeds: [finalEmbed], components: [playAgainRow] }).catch(() => null);
+        await response.edit(pvpContainerPayload).catch(() => null);
 
         const pvpPlayAgainCollector = response.createMessageComponentCollector({
           componentType: ComponentType.Button,
@@ -302,7 +482,10 @@ async function startGame(interaction, client, opponent) {
 
         pvpPlayAgainCollector.on("collect", async (paInteraction) => {
           if (paInteraction.customId === "rps_play_again") {
-            if (paInteraction.user.id !== interaction.user.id && paInteraction.user.id !== opponent.id) {
+            if (
+              paInteraction.user.id !== interaction.user.id &&
+              paInteraction.user.id !== opponent.id
+            ) {
               return paInteraction.reply({
                 content: "You were not part of this game!",
                 ephemeral: true,
@@ -310,18 +493,33 @@ async function startGame(interaction, client, opponent) {
             }
             pvpPlayAgainCollector.stop("restarted");
 
-            const newOpponent = paInteraction.user.id === interaction.user.id ? opponent : interaction.user;
+            const newOpponent =
+              paInteraction.user.id === interaction.user.id
+                ? opponent
+                : interaction.user;
 
             return startGame(paInteraction, client, newOpponent);
           }
         });
       } else {
-        const timeoutEmbed = new EmbedBuilder()
-          .setTitle("<:Timer:1542147643021725796> Match Timed Out")
-          .setDescription("One or both players failed to make a move in time!")
-          .setColor(EMBED_COLORS.TIMEOUT);
+        const timeoutContainer = {
+          content: null,
+          flags: 32768,
+          components: [
+            {
+              type: 17,
+              accent_color: getRandomColor(),
+              components: [
+                {
+                  type: 10,
+                  content: "### <:Timer:1542147643021725796> Match Timed Out\n\nOne or both players failed to make a move in time!",
+                },
+              ],
+            },
+          ],
+        };
 
-        await response.edit({ content: null, embeds: [timeoutEmbed], components: [] }).catch(() => null);
+        await response.edit(timeoutContainer).catch(() => null);
       }
     });
   } catch (err) {

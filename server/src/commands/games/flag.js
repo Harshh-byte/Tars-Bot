@@ -16,16 +16,102 @@ const recentFlagsMap = new Map();
 const channelSkipsMap = new Map();
 
 const EASY_CODES = new Set([
-  "us", "ca", "gb", "fr", "de", "it", "es", "jp", "cn", "in", "br", "ar", "au",
-  "mx", "kr", "ru", "eg", "my", "tr", "ch", "gr", "za", "se", "nl", "pt", "id", "sa",
-  "sg", "th", "ph", "vn", "nz", "ie", "no", "fi", "dk", "be", "at", "pl", "ua", "cl",
-  "co", "pe", "pk", "bd", "ae", "qa", "jm", "np", "is", "ma", "ng", "cu", "uy"
+  "us",
+  "ca",
+  "gb",
+  "fr",
+  "de",
+  "it",
+  "es",
+  "jp",
+  "cn",
+  "in",
+  "br",
+  "ar",
+  "au",
+  "mx",
+  "kr",
+  "ru",
+  "eg",
+  "my",
+  "tr",
+  "ch",
+  "gr",
+  "za",
+  "se",
+  "nl",
+  "pt",
+  "id",
+  "sa",
+  "sg",
+  "th",
+  "ph",
+  "vn",
+  "nz",
+  "ie",
+  "no",
+  "fi",
+  "dk",
+  "be",
+  "at",
+  "pl",
+  "ua",
+  "cl",
+  "co",
+  "pe",
+  "pk",
+  "bd",
+  "ae",
+  "qa",
+  "jm",
+  "np",
+  "is",
+  "ma",
+  "ng",
+  "cu",
+  "uy",
 ]);
 
 const MEDIUM_CODES = new Set([
-  "ro", "hu", "cz", "hr", "ke", "kw", "bh", "om", "dz", "tn", "lk", "kh", "la",
-  "mm", "iq", "ir", "sy", "jo", "lb", "ge", "am", "az", "uz", "kz", "cy", "mt",
-  "lu", "ee", "lv", "lt", "sk", "si", "bg", "by", "rs", "ba", "me", "mk", "al"
+  "ro",
+  "hu",
+  "cz",
+  "hr",
+  "ke",
+  "kw",
+  "bh",
+  "om",
+  "dz",
+  "tn",
+  "lk",
+  "kh",
+  "la",
+  "mm",
+  "iq",
+  "ir",
+  "sy",
+  "jo",
+  "lb",
+  "ge",
+  "am",
+  "az",
+  "uz",
+  "kz",
+  "cy",
+  "mt",
+  "lu",
+  "ee",
+  "lv",
+  "lt",
+  "sk",
+  "si",
+  "bg",
+  "by",
+  "rs",
+  "ba",
+  "me",
+  "mk",
+  "al",
 ]);
 
 function getDifficulty(code) {
@@ -45,7 +131,10 @@ function codeToEmoji(code) {
   if (!code || code.length !== 2) return "🚩";
   const base = 127397;
   return String.fromCodePoint(
-    ...code.toUpperCase().split("").map((c) => base + c.charCodeAt(0))
+    ...code
+      .toUpperCase()
+      .split("")
+      .map((c) => base + c.charCodeAt(0)),
   );
 }
 
@@ -65,7 +154,7 @@ function levenshteinDistance(a, b) {
         matrix[i][j] = Math.min(
           matrix[i - 1][j - 1] + 1,
           matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
+          matrix[i - 1][j] + 1,
         );
       }
     }
@@ -109,7 +198,10 @@ function getAliases(name, code) {
   const lowerName = name.toLowerCase();
   const aliases = new Set([lowerName, code.toLowerCase()]);
 
-  if (lowerName === "united states" || lowerName === "united states of america") {
+  if (
+    lowerName === "united states" ||
+    lowerName === "united states of america"
+  ) {
     aliases.add("usa");
     aliases.add("us");
     aliases.add("america");
@@ -177,13 +269,55 @@ async function fetchCountriesFromApi() {
   }
 
   return [
-    { name: "Malaysia", code: "my", emoji: "🇲🇾", difficulty: "Easy", aliases: ["malaysia"] },
-    { name: "Japan", code: "jp", emoji: "🇯🇵", difficulty: "Easy", aliases: ["japan"] },
-    { name: "United States", code: "us", emoji: "🇺🇸", difficulty: "Easy", aliases: ["united states", "usa", "us", "america"] },
-    { name: "France", code: "fr", emoji: "🇫🇷", difficulty: "Easy", aliases: ["france"] },
-    { name: "Germany", code: "de", emoji: "🇩🇪", difficulty: "Easy", aliases: ["germany"] },
-    { name: "India", code: "in", emoji: "🇮🇳", difficulty: "Easy", aliases: ["india"] },
-    { name: "Brazil", code: "br", emoji: "🇧🇷", difficulty: "Easy", aliases: ["brazil"] },
+    {
+      name: "Malaysia",
+      code: "my",
+      emoji: "🇲🇾",
+      difficulty: "Easy",
+      aliases: ["malaysia"],
+    },
+    {
+      name: "Japan",
+      code: "jp",
+      emoji: "🇯🇵",
+      difficulty: "Easy",
+      aliases: ["japan"],
+    },
+    {
+      name: "United States",
+      code: "us",
+      emoji: "🇺🇸",
+      difficulty: "Easy",
+      aliases: ["united states", "usa", "us", "america"],
+    },
+    {
+      name: "France",
+      code: "fr",
+      emoji: "🇫🇷",
+      difficulty: "Easy",
+      aliases: ["france"],
+    },
+    {
+      name: "Germany",
+      code: "de",
+      emoji: "🇩🇪",
+      difficulty: "Easy",
+      aliases: ["germany"],
+    },
+    {
+      name: "India",
+      code: "in",
+      emoji: "🇮🇳",
+      difficulty: "Easy",
+      aliases: ["india"],
+    },
+    {
+      name: "Brazil",
+      code: "br",
+      emoji: "🇧🇷",
+      difficulty: "Easy",
+      aliases: ["brazil"],
+    },
   ];
 }
 
@@ -194,7 +328,7 @@ function getUnusedCountry(filteredCountries, channelId) {
 
   const recentList = recentFlagsMap.get(channelId);
   const available = filteredCountries.filter(
-    (c) => !recentList.includes(c.code)
+    (c) => !recentList.includes(c.code),
   );
 
   const pool = available.length > 0 ? available : filteredCountries;
@@ -239,7 +373,7 @@ function buildButtons() {
       .setCustomId("show_lb_flag")
       .setLabel("Leaderboard")
       .setEmoji("🏆")
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Secondary),
   );
 }
 
@@ -250,14 +384,23 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
     ""
   ).toLowerCase();
 
-  let difficultyInput = interaction.options?.getString("difficulty")?.toLowerCase();
+  let difficultyInput = interaction.options
+    ?.getString("difficulty")
+    ?.toLowerCase();
   if (!difficultyInput) {
     if (rawArgs.includes("hard")) difficultyInput = "hard";
-    else if (rawArgs.includes("medium") || rawArgs.includes("med")) difficultyInput = "medium";
+    else if (rawArgs.includes("medium") || rawArgs.includes("med"))
+      difficultyInput = "medium";
     else if (rawArgs.includes("easy")) difficultyInput = "easy";
   }
 
-  return startFlagGame(interaction, client, false, difficultyInput, buildAiReply);
+  return startFlagGame(
+    interaction,
+    client,
+    false,
+    difficultyInput,
+    buildAiReply,
+  );
 }
 
 async function startFlagGame(
@@ -265,24 +408,25 @@ async function startFlagGame(
   client,
   isFollowUp = false,
   selectedDifficulty,
-  buildAiReply
+  buildAiReply,
 ) {
   try {
     const allCountries = await fetchCountriesFromApi();
-    const channelId = interaction.channelId || interaction.channel?.id || "default";
+    const channelId =
+      interaction.channelId || interaction.channel?.id || "default";
 
     let filteredCountries = allCountries;
     if (selectedDifficulty) {
       const targetDiff = selectedDifficulty.toLowerCase();
       filteredCountries = allCountries.filter(
-        (c) => c.difficulty.toLowerCase() === targetDiff
+        (c) => c.difficulty.toLowerCase() === targetDiff,
       );
       if (filteredCountries.length === 0) filteredCountries = allCountries;
     } else {
       const rand = Math.random();
       const targetDiff = rand < 0.7 ? "easy" : rand < 0.95 ? "medium" : "hard";
       const matches = allCountries.filter(
-        (c) => c.difficulty.toLowerCase() === targetDiff
+        (c) => c.difficulty.toLowerCase() === targetDiff,
       );
       if (matches.length > 0) filteredCountries = matches;
     }
@@ -310,14 +454,15 @@ async function startFlagGame(
         `**Difficulty:** ${diffBadge}\n` +
           `**Hint:** ${initialHint}\n\n` +
           `You have 30 seconds to guess the country.\n` +
-          `*Type your answer in the chat or \`.skip\` to skip.*`
+          `*Type your answer in the chat or \`.skip\` to skip.*`,
       )
       .setColor(EMBED_COLORS.GREY);
 
     const payload = { embeds: [embed], components: [] };
 
     const channel = interaction.channel;
-    if (!channel || typeof channel.createMessageCollector !== "function") return;
+    if (!channel || typeof channel.createMessageCollector !== "function")
+      return;
 
     let response;
     if (isFollowUp) {
@@ -325,7 +470,8 @@ async function startFlagGame(
     } else if (interaction.deferred || interaction.replied) {
       response = await channel.send(payload);
     } else {
-      response = await interaction.reply({ ...payload, fetchReply: true });
+      await interaction.reply(payload);
+      response = await interaction.fetchReply();
     }
 
     const filter = (m) => !m.author.bot;
@@ -342,7 +488,7 @@ async function startFlagGame(
             `**Difficulty:** ${diffBadge}\n` +
               `**Hint:** ${secondHint}\n\n` +
               `You have 30 seconds to guess the country.\n` +
-              `*Type your answer in the chat or \`.skip\` to skip.*`
+              `*Type your answer in the chat or \`.skip\` to skip.*`,
           );
           if (response && typeof response.edit === "function") {
             await response.edit({ embeds: [updatedEmbed] }).catch(() => null);
@@ -374,7 +520,7 @@ async function startFlagGame(
       }
 
       const isCorrect = targetCountry.aliases.some(
-        (alias) => alias.toLowerCase() === input
+        (alias) => alias.toLowerCase() === input,
       );
 
       if (isCorrect) {
@@ -386,7 +532,7 @@ async function startFlagGame(
           .catch(() =>
             m
               .react("<:Success:1526228339910643793>")
-              .catch(() => m.react("✅").catch(() => null))
+              .catch(() => m.react("✅").catch(() => null)),
           );
       } else if (isCloseMatch(input, targetCountry.aliases)) {
         if (!closeMatchUsers.has(m.author.id)) {
@@ -411,7 +557,7 @@ async function startFlagGame(
             .setTitle("**Flag Skipped!**")
             .setDescription(
               `The country was **${targetCountry.name}** ${targetCountry.emoji}.\n\n` +
-                `*Skips remaining for this game:* **${remainingSkips}/5**`
+                `*Skips remaining for this game:* **${remainingSkips}/5**`,
             )
             .setColor(EMBED_COLORS.WARNING);
 
@@ -423,7 +569,7 @@ async function startFlagGame(
               client,
               true,
               selectedDifficulty,
-              buildAiReply
+              buildAiReply,
             );
           }, 1500);
         } else if (reason === "correct" && winnerMessage) {
@@ -443,7 +589,7 @@ async function startFlagGame(
             .setDescription(
               `${winnerMention} guessed it right!\n` +
                 `The country was **${targetCountry.name}** ${targetCountry.emoji}!\n\n` +
-                `🏆 **+${pointsGained} Points** *(Total: **${scoreData.totalPoints}** Pts)*`
+                `🏆 **+${pointsGained} Points** *(Total: **${scoreData.totalPoints}** Pts)*`,
             )
             .setColor(EMBED_COLORS.SUCCESS);
 
@@ -455,7 +601,7 @@ async function startFlagGame(
               client,
               true,
               selectedDifficulty,
-              buildAiReply
+              buildAiReply,
             );
           }, 1500);
         } else {
@@ -464,7 +610,7 @@ async function startFlagGame(
             .setTitle("⌛ **Time's Up!**")
             .setDescription(
               `Nobody guessed the country in time!\n\n` +
-                `The correct answer was **${targetCountry.name}** ${targetCountry.emoji}.`
+                `The correct answer was **${targetCountry.name}** ${targetCountry.emoji}.`,
             )
             .setColor(EMBED_COLORS.TIMEOUT);
 
@@ -478,7 +624,7 @@ async function startFlagGame(
             interaction,
             client,
             selectedDifficulty,
-            buildAiReply
+            buildAiReply,
           );
         }
       } catch (err) {
@@ -496,7 +642,7 @@ function attachFlagNextCollector(
   originalInteraction,
   client,
   extraSetting,
-  buildAiReply
+  buildAiReply,
 ) {
   if (!message || typeof message.createMessageComponentCollector !== "function")
     return;
@@ -519,7 +665,7 @@ function attachFlagNextCollector(
           client,
           true,
           extraSetting,
-          buildAiReply
+          buildAiReply,
         );
       } else if (btnInteraction.customId === "show_lb_flag") {
         await showLeaderboard(btnInteraction, client, "flag");
