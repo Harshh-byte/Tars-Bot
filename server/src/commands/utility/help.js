@@ -140,6 +140,7 @@ const modulesCatalog = {
       { name: "Prefix", cmd: "prefix", desc: "View or change command prefix." },
       { name: "Ping", cmd: "ping", desc: "Check bot latency." },
       { name: "About", cmd: "about", desc: "View information about the bot." },
+      { name: "Remind", cmd: "remind", desc: "Set a smart reminder." },
       { name: "Help", cmd: "help", desc: "View command list or help." },
     ],
   },
@@ -211,6 +212,10 @@ export async function execute(interaction, client) {
 
     const totalCommands = new Set(client.commands?.values()).size;
     const totalModules = 4;
+    const botAvatar = client.user.displayAvatarURL({
+      extension: "png",
+      size: 512,
+    });
 
     const bookNotice = `<:Book:1542647324570816532> Use \`${prefix}help (command)\` for details on a specific command`;
 
@@ -219,6 +224,7 @@ export async function execute(interaction, client) {
       .setDescription(
         "-# Experience the ultimate Discord bot designed for seamless management and community engagement.",
       )
+      .setThumbnail(botAvatar)
       .addFields(
         {
           name: "\u200b",
@@ -363,13 +369,13 @@ export async function execute(interaction, client) {
       let buttonRow = null;
 
       if (selectedModule === "module_home") {
-        titleText = `## Tars Help`;
+        titleText =
+          `## Tars Help\n` +
+          `-# Experience the ultimate Discord bot designed for seamless management and community engagement.`;
         bodyText =
-          `-# Experience the ultimate Discord bot designed for seamless management and community engagement.\n\n` +
           `<:Prefix:1542236764465274910> **Prefix** \`${prefix}\`\n` +
           `<:Commands:1542236622521901088> **Commands** \`${totalCommands}\`\n` +
-          `<:Modules:1542236707599163422> **Modules** \`${totalModules}\`\n\n` +
-          `<:Book:1542647324570816532> Use \`${prefix}help (command)\` for details on a specific command`;
+          `<:Modules:1542236707599163422> **Modules** \`${totalModules}\``;
       } else {
         const mod = modulesCatalog[selectedModule];
         if (!mod) {
@@ -391,11 +397,8 @@ export async function execute(interaction, client) {
           )
           .join("\n");
 
-        titleText = `### ${mod.title}`;
-        bodyText =
-          `*${mod.description}*\n\n` +
-          listLines +
-          `\n\n-# ${mod.commands.length} total commands`;
+        titleText = `### ${mod.title}\n*${mod.description}*`;
+        bodyText = listLines + `\n\n-# ${mod.commands.length} total commands`;
 
         if (totalPages > 1) {
           buttonRow = {
@@ -427,11 +430,29 @@ export async function execute(interaction, client) {
         }
       }
 
-      const containerComponents = [
-        {
-          type: 10,
-          content: titleText,
+      const avatarUrl = client.user.displayAvatarURL({
+        extension: "png",
+        size: 512,
+      });
+
+      const headerSection = {
+        type: 9,
+        components: [
+          {
+            type: 10,
+            content: titleText,
+          },
+        ],
+        accessory: {
+          type: 11,
+          media: {
+            url: avatarUrl,
+          },
         },
+      };
+
+      const containerComponents = [
+        headerSection,
         {
           type: 14,
           divider: true,
@@ -452,6 +473,11 @@ export async function execute(interaction, client) {
       if (buttonRow) {
         containerComponents.push(buttonRow);
       }
+
+      containerComponents.push({
+        type: 10,
+        content: bookNotice,
+      });
 
       const container = {
         type: 17,
@@ -500,6 +526,7 @@ export async function execute(interaction, client) {
       const categoryEmbed = new EmbedBuilder()
         .setTitle(mod.title)
         .setDescription(`${mod.description}`)
+        .setThumbnail(botAvatar)
         .addFields(fields)
         .setColor(EMBED_COLORS.WHITE);
 
@@ -529,12 +556,20 @@ export async function execute(interaction, client) {
         interaction.isStringSelectMenu()
       ) {
         await interaction.update(initialPayload);
-        response = await interaction.fetchReply();
+        response =
+          typeof interaction.fetchReply === "function"
+            ? await interaction.fetchReply()
+            : interaction.message;
       } else if (interaction.deferred || interaction.replied) {
         response = await interaction.editReply(initialPayload);
       } else {
-        await interaction.reply(initialPayload);
-        response = await interaction.fetchReply();
+        response = await interaction.reply({
+          ...initialPayload,
+          fetchReply: true,
+        });
+        if (!response && typeof interaction.fetchReply === "function") {
+          response = await interaction.fetchReply();
+        }
       }
     } catch (v2Error) {
       logger.warn(
@@ -547,12 +582,20 @@ export async function execute(interaction, client) {
         interaction.isStringSelectMenu()
       ) {
         await interaction.update(fallbackPayload);
-        response = await interaction.fetchReply();
+        response =
+          typeof interaction.fetchReply === "function"
+            ? await interaction.fetchReply()
+            : interaction.message;
       } else if (interaction.deferred || interaction.replied) {
         response = await interaction.editReply(fallbackPayload);
       } else {
-        await interaction.reply(fallbackPayload);
-        response = await interaction.fetchReply();
+        response = await interaction.reply({
+          ...fallbackPayload,
+          fetchReply: true,
+        });
+        if (!response && typeof interaction.fetchReply === "function") {
+          response = await interaction.fetchReply();
+        }
       }
     }
 

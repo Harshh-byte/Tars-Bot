@@ -16,6 +16,7 @@ import { getConversation, saveConversation } from "./src/services/database.js";
 import logger from "./src/utils/logger.js";
 import * as interactionCreateEvent from "./src/events/interactionCreate.js";
 import * as messageCreateEvent from "./src/events/messageCreate.js";
+import { initReminderManager } from "./src/services/reminder.js";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -391,6 +392,7 @@ client.updateBotPresence = function () {
 client.once(Events.ClientReady, async (c) => {
   logger.info(`${c.user.tag} is online.`);
   client.updateBotPresence();
+  initReminderManager(client);
 
   const uniqueCommandsMap = new Map();
   for (const cmd of client.commands.values()) {
@@ -402,11 +404,6 @@ client.once(Events.ClientReady, async (c) => {
 
   await c.application.commands
     .set(slashDataArray)
-    .then(() =>
-      logger.info(
-        `Successfully synced ${slashDataArray.length} slash commands.`,
-      ),
-    )
     .catch((err) => logger.error("Sync Failure", err));
 });
 
@@ -417,7 +414,7 @@ client.on(Events.InteractionCreate, (interaction) =>
   }),
 );
 client.on(Events.MessageCreate, (message) =>
-  messageCreateEvent.execute(message, client, { buildAiReply }),
+  messageCreateEvent.execute(message, client, { buildAiReply, BOT_INFO }),
 );
 
 const app = express();
