@@ -57,7 +57,7 @@ export async function execute(interaction, client) {
               {
                 type: 10,
                 content:
-                  "The bot is temporarily offline for a scheduled system update and maintenance. Thank you for your patience!\n\n-# Status: Offline • Maintenance Active",
+                  "The bot is temporarily offline for a scheduled system update and maintenance. Thank you for your patience!\n\n-# Status: Offline",
               },
             ],
           },
@@ -138,7 +138,7 @@ export async function execute(interaction, client) {
               {
                 type: 10,
                 content:
-                  "Tars update completed successfully. All features, commands, and systems are now fully operational!\n\n-# Status: Online • Systems Operational",
+                  "Tars update completed successfully. All features, commands, and systems are now fully operational!\n\n-# Status: Online",
               },
             ],
           },

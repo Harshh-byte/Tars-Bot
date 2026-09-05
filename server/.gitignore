@@ -6,4 +6,4 @@
 
 serviceAccountKey.json
 
-/logs
+**/logs

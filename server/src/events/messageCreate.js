@@ -17,7 +17,7 @@ function getFormattedMaintenanceTime(startTime) {
   return `Today at ${timeStr}`;
 }
 
-export async function execute(message, client, { buildAiReply }) {
+export async function execute(message, client, { buildAiReply, BOT_INFO }) {
   if (message.author.bot) return;
 
   if (!client.prefixCache) client.prefixCache = new Map();
@@ -110,20 +110,28 @@ export async function execute(message, client, { buildAiReply }) {
         member: message.member,
         guild: message.guild,
         channel: message.channel,
+        mentions: message.mentions,
+        message: message,
         isButton: () => false,
         isStringSelectMenu: () => false,
         replied: false,
         deferred: false,
         options: {
+          getSubcommand: (required = false) => {
+            const firstArg = args[0]?.toLowerCase();
+            if (firstArg === "user" || firstArg === "server") return firstArg;
+            if (message.mentions.users.size > 0 || targetUser) return "user";
+            return required ? null : null;
+          },
           getUser: (name) => {
             const mentions = Array.from(message.mentions.users.values());
             if (name === "user" || name === "user1") {
-              return mentions[0] || null;
+              return mentions[0] || targetUser || null;
             }
             if (name === "target" || name === "user2") {
               return mentions[1] || null;
             }
-            return name === "opponent" ? targetUser : null;
+            return name === "opponent" ? targetUser : (mentions[0] || targetUser || null);
           },
           getString: () => args.join(" ") || null,
         },
@@ -154,10 +162,11 @@ export async function execute(message, client, { buildAiReply }) {
         deleteReply: async () => {
           if (sentMessage) await sentMessage.delete().catch(() => null);
         },
+        fetchReply: async () => sentMessage,
       };
 
       try {
-        await command.execute(mockInteraction, client, { buildAiReply });
+        await command.execute(mockInteraction, client, { buildAiReply, BOT_INFO });
       } catch (err) {
         logger.error(`Error executing prefix command .${commandName}:`, err);
         Sentry.captureException(err);
