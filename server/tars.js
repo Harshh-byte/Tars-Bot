@@ -21,13 +21,7 @@ import {
 import { detectUserGender } from "./src/utils/genderDetector.js";
 import logger from "./src/utils/logger.js";
 import * as interactionCreateEvent from "./src/events/interactionCreate.js";
-import * as messageCreateEvent from "./src/events/messageCreate.js";
-const app = express();
-const port = process.env.PORT || 3000;
-app.get("/", (req, res) => res.send("Tars Bot is active."));
-app.listen(port, () => {
-  console.log(`Web server listening on port ${port}`);
-});
+import { initReminderManager } from "./src/services/reminder.js";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -440,6 +434,10 @@ client.on(Events.InteractionCreate, (interaction) =>
 client.on(Events.MessageCreate, (message) =>
   messageCreateEvent.execute(message, client, { buildAiReply, BOT_INFO }),
 );
+
+const app = express();
+app.get("/", (req, res) => res.send("Tars Bot is active."));
+app.listen(process.env.PORT || 3000);
 
 client.login(process.env.DISCORD_BOT_TOKEN).catch((err) => {
   logger.error("Failed to login to Discord client:", err);
