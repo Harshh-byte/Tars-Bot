@@ -108,16 +108,26 @@ export async function execute(interaction, client) {
       if (member.permissions.has(PermissionFlagsBits.Administrator)) {
         keyPerms.push("Administrator");
       } else {
-        if (member.permissions.has(PermissionFlagsBits.ManageGuild)) keyPerms.push("Manage Server");
-        if (member.permissions.has(PermissionFlagsBits.ManageRoles)) keyPerms.push("Manage Roles");
-        if (member.permissions.has(PermissionFlagsBits.ManageChannels)) keyPerms.push("Manage Channels");
-        if (member.permissions.has(PermissionFlagsBits.KickMembers)) keyPerms.push("Kick Members");
-        if (member.permissions.has(PermissionFlagsBits.BanMembers)) keyPerms.push("Ban Members");
-        if (member.permissions.has(PermissionFlagsBits.ManageMessages)) keyPerms.push("Manage Messages");
-        if (member.permissions.has(PermissionFlagsBits.ManageWebhooks)) keyPerms.push("Manage Webhooks");
-        if (member.permissions.has(PermissionFlagsBits.ManageNicknames)) keyPerms.push("Manage Nicknames");
-        if (member.permissions.has(PermissionFlagsBits.MentionEveryone)) keyPerms.push("Mention Everyone");
-        if (member.permissions.has(PermissionFlagsBits.ModerateMembers)) keyPerms.push("Timeout Members");
+        if (member.permissions.has(PermissionFlagsBits.ManageGuild))
+          keyPerms.push("Manage Server");
+        if (member.permissions.has(PermissionFlagsBits.ManageRoles))
+          keyPerms.push("Manage Roles");
+        if (member.permissions.has(PermissionFlagsBits.ManageChannels))
+          keyPerms.push("Manage Channels");
+        if (member.permissions.has(PermissionFlagsBits.KickMembers))
+          keyPerms.push("Kick Members");
+        if (member.permissions.has(PermissionFlagsBits.BanMembers))
+          keyPerms.push("Ban Members");
+        if (member.permissions.has(PermissionFlagsBits.ManageMessages))
+          keyPerms.push("Manage Messages");
+        if (member.permissions.has(PermissionFlagsBits.ManageWebhooks))
+          keyPerms.push("Manage Webhooks");
+        if (member.permissions.has(PermissionFlagsBits.ManageNicknames))
+          keyPerms.push("Manage Nicknames");
+        if (member.permissions.has(PermissionFlagsBits.MentionEveryone))
+          keyPerms.push("Mention Everyone");
+        if (member.permissions.has(PermissionFlagsBits.ModerateMembers))
+          keyPerms.push("Timeout Members");
       }
 
       if (keyPerms.length > 0) {

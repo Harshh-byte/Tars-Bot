@@ -45,7 +45,7 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} \`${count}\` bitches\n*${category}*`
+        `${authorMention}: ${emoji} ${textPrefix} \`${count}\` bitches\n*${category}*`,
       )
       .setColor(EMBED_COLORS.GREY);
 

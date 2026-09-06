@@ -75,7 +75,8 @@ export async function execute(interaction, client) {
     ) {
       const errEmbed = errorEmbed({
         title: "Permission Denied",
-        description: "You need the `Manage Server` permission to change the bot prefix.",
+        description:
+          "You need the `Manage Server` permission to change the bot prefix.",
       });
       return interaction.reply({ embeds: [errEmbed], flags: 64 });
     }
@@ -93,13 +94,17 @@ export async function execute(interaction, client) {
     client.prefixCache.set(serverId, cleanedPrefix);
 
     if (serverId !== "DM") {
-      await updateServerSettings(serverId, "prefix", cleanedPrefix).catch((err) => {
-        logger.error("Failed to save prefix to database:", err);
-      });
+      await updateServerSettings(serverId, "prefix", cleanedPrefix).catch(
+        (err) => {
+          logger.error("Failed to save prefix to database:", err);
+        },
+      );
     }
 
     const sEmbed = new EmbedBuilder()
-      .setDescription(`<:Prefix:1542236764465274910> Server prefix changed to \`${cleanedPrefix}\``)
+      .setDescription(
+        `<:Prefix:1542236764465274910> Server prefix changed to \`${cleanedPrefix}\``,
+      )
       .setColor(EMBED_COLORS.WHITE);
 
     await interaction.reply({ embeds: [sEmbed] });

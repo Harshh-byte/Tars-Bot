@@ -14,7 +14,7 @@ export const data = {
       required: false,
       choices: [
         { name: "Dank Memes", value: "dankmemes" },
-        // { name: "Dark Memes", value: "darkmemers" },
+        { name: "Dark Memes", value: "darkmemers" },
         { name: "General Memes", value: "memes" },
         { name: "Wholesome", value: "wholesomememes" },
         { name: "Me_IRL", value: "me_irl" },
@@ -27,7 +27,7 @@ export const data = {
 
 const SUBREDDITS = [
   "dankmemes",
-  // "darkmemers",
+  "darkmemers",
   "memes",
   "wholesomememes",
   "me_irl",

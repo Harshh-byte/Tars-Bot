@@ -48,8 +48,8 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
     const embed = new EmbedBuilder()
       .setDescription(
         `${userMention} flipped a coin...\n\n` +
-        `🪙 Result: **${result}**\n\n` +
-        `*Tars: ${aiCommentary}*`
+          `🪙 Result: **${result}**\n\n` +
+          `*Tars: ${aiCommentary}*`,
       )
       .setColor(Math.floor(Math.random() * 16777215));
 

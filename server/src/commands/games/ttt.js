@@ -28,9 +28,14 @@ const SYMBOLS = {
 };
 
 const WINNING_COMBOS = [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8],
-  [0, 3, 6], [1, 4, 7], [2, 5, 8],
-  [0, 4, 8], [2, 4, 6],
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
 ];
 
 const getRandomColor = () => Math.floor(Math.random() * 16777215);
@@ -75,13 +80,13 @@ function buildGridComponents(board, disabled = false) {
 
       if (cellVal === "X") {
         btn.emoji = { id: "1542154950065524757", name: "x_" };
-        btn.style = 4; // Danger (Red)
+        btn.style = 4;
       } else if (cellVal === "O") {
         btn.emoji = { id: "1542154996013863023", name: "o_" };
-        btn.style = 3; // Success (Green)
+        btn.style = 3;
       } else {
         btn.label = "​";
-        btn.style = 2; // Secondary (Grey)
+        btn.style = 2;
       }
       row.components.push(btn);
     }
@@ -116,11 +121,21 @@ function getBestTarsMove(board) {
   if (corners.length > 0) {
     return corners[Math.floor(Math.random() * corners.length)];
   }
-  const openSpots = board.map((val, idx) => (val === null ? idx : null)).filter((val) => val !== null);
+  const openSpots = board
+    .map((val, idx) => (val === null ? idx : null))
+    .filter((val) => val !== null);
   return openSpots[Math.floor(Math.random() * openSpots.length)];
 }
 
-function buildV2GridPayload(board, turnUserId, playerXName, playerOName, playerXId, isVsTars, disabled = false) {
+function buildV2GridPayload(
+  board,
+  turnUserId,
+  playerXName,
+  playerOName,
+  playerXId,
+  isVsTars,
+  disabled = false,
+) {
   const symbol = turnUserId === playerXId ? SYMBOLS.X : SYMBOLS.O;
   const gridRows = buildGridComponents(board, disabled);
 
@@ -147,7 +162,7 @@ function buildV2GridPayload(board, turnUserId, playerXName, playerOName, playerX
   ];
 
   return {
-    content: (!disabled && !isVsTars) ? `<@${turnUserId}>` : null,
+    content: !disabled && !isVsTars ? `<@${turnUserId}>` : null,
     flags: 32768,
     components: [
       {
@@ -177,7 +192,8 @@ async function startGame(interaction, client, opponent) {
       }
       if (opponent.id === interaction.user.id) {
         return interaction.reply({
-          content: "You can't play against yourself! Leave the opponent option blank to play with Tars.",
+          content:
+            "You can't play against yourself! Leave the opponent option blank to play with Tars.",
           ephemeral: true,
         });
       }
@@ -188,12 +204,24 @@ async function startGame(interaction, client, opponent) {
     const playerX = interaction.user;
     const playerO = isVsTars ? client.user : opponent;
 
-    const playerXName = interaction.member?.displayName || interaction.user.displayName || interaction.user.username;
+    const playerXName =
+      interaction.member?.displayName ||
+      interaction.user.displayName ||
+      interaction.user.username;
     const playerOName = isVsTars
       ? "Tars"
-      : (interaction.guild?.members.cache.get(opponent.id)?.displayName || opponent.displayName || opponent.username);
+      : interaction.guild?.members.cache.get(opponent.id)?.displayName ||
+        opponent.displayName ||
+        opponent.username;
 
-    const initialPayload = buildV2GridPayload(board, turnUserId, playerXName, playerOName, playerX.id, isVsTars);
+    const initialPayload = buildV2GridPayload(
+      board,
+      turnUserId,
+      playerXName,
+      playerOName,
+      playerX.id,
+      isVsTars,
+    );
     const response = await sendAndFetchReply(interaction, initialPayload);
 
     const collector = response.createMessageComponentCollector({
@@ -209,7 +237,9 @@ async function startGame(interaction, client, opponent) {
         winnerText = `<a:Tada:1544329561955770488> **<@${playerX.id}> won the match!**`;
       } else if (winner === "O") {
         const winnerMention = isVsTars ? "**Tars**" : `<@${playerO.id}>`;
-        winnerText = `<a:Tada:1544329561955770488> **${winnerMention} won the match!**` + (isVsTars ? `\n\n*Tars: "Predictable outcome."*` : "");
+        winnerText =
+          `<a:Tada:1544329561955770488> **${winnerMention} won the match!**` +
+          (isVsTars ? `\n\n*Tars: "Predictable outcome."*` : "");
       } else if (winner === "TIE") {
         winnerText = `🤝 **It's a Tie Game!**`;
       }
@@ -277,8 +307,8 @@ async function startGame(interaction, client, opponent) {
           const newOpponent = isVsTars
             ? null
             : paInteraction.user.id === interaction.user.id
-            ? opponent
-            : interaction.user;
+              ? opponent
+              : interaction.user;
 
           return startGame(paInteraction, client, newOpponent);
         }
@@ -295,7 +325,10 @@ async function startGame(interaction, client, opponent) {
 
       const moveIdx = parseInt(i.customId.replace("ttt_", ""), 10);
       if (board[moveIdx] !== null) {
-        return i.reply({ content: "That spot is already taken!", ephemeral: true });
+        return i.reply({
+          content: "That spot is already taken!",
+          ephemeral: true,
+        });
       }
 
       board[moveIdx] = turnUserId === playerX.id ? "X" : "O";
@@ -320,7 +353,16 @@ async function startGame(interaction, client, opponent) {
         }
       }
 
-      await i.update(buildV2GridPayload(board, turnUserId, playerXName, playerOName, playerX.id, isVsTars));
+      await i.update(
+        buildV2GridPayload(
+          board,
+          turnUserId,
+          playerXName,
+          playerOName,
+          playerX.id,
+          isVsTars,
+        ),
+      );
       collector.resetTimer();
     });
 

@@ -47,7 +47,8 @@ export async function execute(interaction, client) {
             components: [
               {
                 type: 10,
-                content: "### <a:Maintenance:1526290002974343308> Maintenance Started",
+                content:
+                  "### <a:Maintenance:1526290002974343308> Maintenance Started",
               },
               {
                 type: 14,
@@ -82,12 +83,13 @@ export async function execute(interaction, client) {
             startTime: startTime,
           },
           null,
-          2
-        )
+          2,
+        ),
       );
 
       return interaction.reply({
-        content: "<a:Maintenance:1526290002974343308> **Tars is now under maintenance mode.**",
+        content:
+          "<a:Maintenance:1526290002974343308> **Tars is now under maintenance mode.**",
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {
@@ -108,7 +110,10 @@ export async function execute(interaction, client) {
       let channelId = null;
       try {
         const savedData = JSON.parse(
-          fs.readFileSync(new URL("../../../../maintenance.json", import.meta.url), "utf-8")
+          fs.readFileSync(
+            new URL("../../../../maintenance.json", import.meta.url),
+            "utf-8",
+          ),
         );
         messageId = savedData.messageId;
         channelId = savedData.channelId;
@@ -116,7 +121,7 @@ export async function execute(interaction, client) {
 
       fs.writeFileSync(
         new URL("../../../../maintenance.json", import.meta.url),
-        JSON.stringify({ active: false }, null, 2)
+        JSON.stringify({ active: false }, null, 2),
       );
 
       const v2CompleteContainerPayload = {
@@ -128,7 +133,8 @@ export async function execute(interaction, client) {
             components: [
               {
                 type: 10,
-                content: "### <a:Complete:1526291398863880293> Maintenance Completed",
+                content:
+                  "### <a:Complete:1526291398863880293> Maintenance Completed",
               },
               {
                 type: 14,
@@ -164,7 +170,8 @@ export async function execute(interaction, client) {
       }
 
       return interaction.reply({
-        content: "<a:Complete:1526291398863880293> **Tars maintenance mode completed!**",
+        content:
+          "<a:Complete:1526291398863880293> **Tars maintenance mode completed!**",
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {

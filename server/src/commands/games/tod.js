@@ -65,7 +65,8 @@ async function sendAndFetchReply(interaction, payload) {
 }
 
 async function fetchQuestion(type, rating = "pg") {
-  const chosenType = type === "random" ? (Math.random() > 0.5 ? "truth" : "dare") : type;
+  const chosenType =
+    type === "random" ? (Math.random() > 0.5 ? "truth" : "dare") : type;
   const targetRating = rating || "pg";
   const ratingParam = `?rating=${encodeURIComponent(targetRating)}`;
   const endpoint = `https://api.truthordarebot.xyz/v1/${chosenType}${ratingParam}`;
@@ -95,7 +96,13 @@ async function fetchQuestion(type, rating = "pg") {
   return { type: chosenType, question, rating: targetRating.toUpperCase() };
 }
 
-function buildV2Payload(promptType, question, rating, aiCommentary, requestorName) {
+function buildV2Payload(
+  promptType,
+  question,
+  rating,
+  aiCommentary,
+  requestorName,
+) {
   const titleIcon = promptType === "truth" ? "❓" : "🎯";
   return {
     flags: 32768,
@@ -160,7 +167,8 @@ function buildV2Payload(promptType, question, rating, aiCommentary, requestorNam
 export async function execute(interaction, client, { buildAiReply } = {}) {
   try {
     let rawInput = interaction.options?.getString("type")?.toLowerCase();
-    let ratingInput = interaction.options?.getString("rating")?.toLowerCase() || "pg";
+    let ratingInput =
+      interaction.options?.getString("rating")?.toLowerCase() || "pg";
 
     if (interaction.commandName) {
       if (interaction.commandName === "truth") rawInput = "truth";
@@ -169,14 +177,24 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       const rawArgs = interaction.options?.getString("new_prefix");
       if (typeof rawArgs === "string") {
         const lower = rawArgs.toLowerCase();
-        if (lower.includes("r") || lower.includes("spicy") || lower.includes("bold")) ratingInput = "r";
+        if (
+          lower.includes("r") ||
+          lower.includes("spicy") ||
+          lower.includes("bold")
+        )
+          ratingInput = "r";
         else if (lower.includes("pg13")) ratingInput = "pg13";
         else if (lower.includes("pg")) ratingInput = "pg";
       }
     }
 
-    const type = rawInput && ["truth", "dare"].includes(rawInput) ? rawInput : "random";
-    const { type: promptType, question, rating } = await fetchQuestion(type, ratingInput);
+    const type =
+      rawInput && ["truth", "dare"].includes(rawInput) ? rawInput : "random";
+    const {
+      type: promptType,
+      question,
+      rating,
+    } = await fetchQuestion(type, ratingInput);
 
     let aiCommentary = "";
     if (typeof buildAiReply === "function") {
@@ -200,7 +218,13 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       interaction.user.displayName ||
       interaction.user.username;
 
-    const payload = buildV2Payload(promptType, question, rating, aiCommentary, requestorName);
+    const payload = buildV2Payload(
+      promptType,
+      question,
+      rating,
+      aiCommentary,
+      requestorName,
+    );
     const response = await sendAndFetchReply(interaction, payload);
 
     attachTodCollector(response, ratingInput, buildAiReply);
@@ -211,7 +235,10 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
 }
 
 function attachTodCollector(message, ratingInput, buildAiReply) {
-  if (!message || typeof message.createMessageComponentCollector !== "function") {
+  if (
+    !message ||
+    typeof message.createMessageComponentCollector !== "function"
+  ) {
     return;
   }
 
@@ -245,7 +272,13 @@ function attachTodCollector(message, ratingInput, buildAiReply) {
         btnInteraction.user.displayName ||
         btnInteraction.user.username;
 
-      const payload = buildV2Payload(nextPrompt.type, nextPrompt.question, nextPrompt.rating, nextAiComment, requestorName);
+      const payload = buildV2Payload(
+        nextPrompt.type,
+        nextPrompt.question,
+        nextPrompt.rating,
+        nextAiComment,
+        requestorName,
+      );
       const newMsg = await sendAndFetchReply(btnInteraction, payload);
 
       attachTodCollector(newMsg, ratingInput, buildAiReply);

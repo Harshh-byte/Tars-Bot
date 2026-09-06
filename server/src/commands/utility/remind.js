@@ -1,5 +1,8 @@
 import { MessageFlags } from "discord.js";
-import { parseReminderInput, saveAndScheduleReminder } from "../../services/reminder.js";
+import {
+  parseReminderInput,
+  saveAndScheduleReminder,
+} from "../../services/reminder.js";
 import { EMBED_COLORS } from "../../utils/embeds.js";
 import logger from "../../utils/logger.js";
 
