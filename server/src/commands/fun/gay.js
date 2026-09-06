@@ -21,14 +21,14 @@ export const data = {
 
 function getGayCategory(percentage) {
   if (percentage >= 85)
-    return { category: "The Closet Is Shaking", emoji: "🏳️‍🌈" };
+    return { category: "Full-Blown Cock Fiend", emoji: "🏳️‍🌈" };
   if (percentage >= 60)
-    return { category: "Bro, Explain Yourself", emoji: "🤨" };
+    return { category: "Taking It Deep Daily", emoji: "🤨" };
   if (percentage >= 35)
-    return { category: "That's Looking Zesty", emoji: "💅" };
+    return { category: "Zesty & Down Bad", emoji: "💅" };
   if (percentage >= 15)
     return { category: "Lowkey Sus", emoji: "<:suseyes:1543158740985839638>" };
-  return { category: "No Evidence Found", emoji: "📋" };
+  return { category: "Straight as an Arrow", emoji: "📋" };
 }
 
 export async function execute(interaction, client) {
@@ -39,10 +39,10 @@ export async function execute(interaction, client) {
     if (targetUser.id === client.user.id) {
       const authorMention = `<@${interaction.user.id}>`;
       const roasts = [
-        "0%. I'd rather stare at a blank wall for eternity than find you even remotely attractive.",
-        "I wouldn't touch you with a 50-foot pole, straight, gay, or otherwise.",
-        "I'm 0% gay, and you're 100% out of options.",
-        "You're checking my orientation when your entire life is one giant red flag of desperation.",
+        "0%. I wouldn't touch your miserable ass even if you were the last breathing creature on earth.",
+        "0% gay. The only thing taking it up the ass here is your dignity every time you type.",
+        "I'm 0% gay, but your dad is 100% getting his dick sucked behind a dumpster right now.",
+        "Checking my gay meter while you sit there taking it raw from life every single day.",
       ];
       const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
 
