@@ -437,7 +437,68 @@ client.on(Events.MessageCreate, (message) =>
 );
 
 const app = express();
-app.get("/", (req, res) => res.send("Tars Bot is active."));
+app.get("/", (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TARS Bot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #09090b;
+      color: #fafafa;
+      font-family: 'Geist', sans-serif;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .status {
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.9rem;
+      color: #a1a1aa;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      background: #18181b;
+    }
+    .dot {
+      position: relative;
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+    }
+    .dot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: radar 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    @keyframes radar {
+      0% { transform: scale(1); opacity: 0.75; }
+      100% { transform: scale(3.5); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="status">
+    <span class="dot"></span>
+    <span>Tars Bot is active.</span>
+  </div>
+</body>
+</html>`);
+});
 app.listen(process.env.PORT || 3000);
 
 client.login(process.env.DISCORD_BOT_TOKEN).catch((err) => {
