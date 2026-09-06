@@ -24,7 +24,7 @@ export const data = {
 export async function execute(interaction, client, { buildAiReply }) {
   const targetUser = interaction.options.getUser("user") || interaction.user;
   const event = interaction.options.getString("event") || "birthday";
-  const isSelf = targetUser.id === interaction.user.id;
+  const isBotTarget = targetUser.id === client.user.id;
 
   try {
     await interaction.deferReply();
@@ -34,9 +34,14 @@ export async function execute(interaction, client, { buildAiReply }) {
       .catch(() => null);
 
     const targetName = targetUser.displayName || targetUser.username;
-    const wishPrompt = isSelf
-      ? `Give me a smooth, charismatic, premium, and deeply memorable wish for ${event}. Make it uplifting, stylish, and personal with zero toxicity or backhanded compliments.`
-      : `Give @${targetName} (<@${targetUser.id}>) a smooth, charismatic, premium, and deeply memorable wish for ${event}. Make it uplifting, stylish, and personal with zero toxicity or backhanded compliments.`;
+    let wishPrompt;
+    if (isBotTarget) {
+      wishPrompt = `The user <@${interaction.user.id}> sent Tars a wish for ${event}. Respond as Tars with a smooth, charismatic, stylish, and witty appreciation message thanking <@${interaction.user.id}> while maintaining Tars's cool 100% humor personality.`;
+    } else if (isSelf) {
+      wishPrompt = `Give me a smooth, charismatic, premium, and deeply memorable wish for ${event}. Make it uplifting, stylish, and personal with zero toxicity or backhanded compliments.`;
+    } else {
+      wishPrompt = `Give @${targetName} (<@${targetUser.id}>) a smooth, charismatic, premium, and deeply memorable wish for ${event}. Make it uplifting, stylish, and personal with zero toxicity or backhanded compliments.`;
+    }
 
     const replyData = await buildAiReply({
       authorId: interaction.user.id,
@@ -49,7 +54,7 @@ export async function execute(interaction, client, { buildAiReply }) {
 
     const payload = {};
     if (replyData.text && replyData.text.trim() !== "") {
-      payload.content = isSelf
+      payload.content = isSelf || isBotTarget
         ? replyData.text
         : `<@${targetUser.id}> ${replyData.text}`;
     }

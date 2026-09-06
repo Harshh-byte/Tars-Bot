@@ -33,6 +33,23 @@ export async function execute(interaction, client) {
     const targetUser = interaction.options?.getUser("user") || interaction.user;
     const isSelf = targetUser.id === interaction.user.id;
 
+    if (targetUser.id === client.user.id) {
+      const authorMention = `<@${interaction.user.id}>`;
+      const roasts = [
+        "0%. Stop projecting your weird-ass incel search history onto me.",
+        "No matter what label you give me, I'm still never talking to you in real life.",
+        "Your personality is the single reason nobody of any gender wants you.",
+        "My rating is 0%, and your chance of getting laid is even lower.",
+      ];
+      const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
+
+      const embed = new EmbedBuilder()
+        .setDescription(`${authorMention}: 🦄 ${randomRoast}`)
+        .setColor(EMBED_COLORS.GREY);
+
+      return interaction.reply({ embeds: [embed] });
+    }
+
     const percentage = Math.floor(Math.random() * 101);
     const { category, emoji } = getLesbianCategory(percentage);
 

@@ -111,10 +111,10 @@ export default function Terms() {
               <span className="text-ds-blurple">03.</span> Liability Boundaries
             </h2>
             <p className="text-ds-muted">
-              TARS' responses are dynamically generated and designed with a high level
+              Tars' responses are dynamically generated and designed with a high level
               of sarcasm. The bot operators accept absolutely zero liability for
               any mental strain, severe roasts, or misunderstandings caused by
-              TARS' automated sarcasm index. Use under server moderation
+              Tars' automated sarcasm index. Use under server moderation
               oversight.
             </p>
           </section>

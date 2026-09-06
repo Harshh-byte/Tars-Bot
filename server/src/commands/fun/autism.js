@@ -34,7 +34,22 @@ export async function execute(interaction, client) {
     const targetUser = interaction.options?.getUser("user") || interaction.user;
     const isSelf = targetUser.id === interaction.user.id;
 
-    const percentage = Math.floor(Math.random() * 101);
+    if (targetUser.id === client.user.id) {
+      const authorMention = `<@${interaction.user.id}>`;
+      const roasts = [
+        "My autism level is still lower than your body count and your IQ combined.",
+        "I hyperfixate on ignoring your existence, and honestly I'm doing a fantastic job.",
+        "100%—because hanging out in this server with you requires a serious condition.",
+        "You pinged me to check this because nobody gave you enough attention at home today.",
+      ];
+      const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
+
+      const embed = new EmbedBuilder()
+        .setDescription(`${authorMention}: 🧩 ${randomRoast}`)
+        .setColor(EMBED_COLORS.GREY);
+
+      return interaction.reply({ embeds: [embed] });
+    }
     const { category, emoji } = getAutismCategory(percentage);
 
     const authorMention = `<@${interaction.user.id}>`;
