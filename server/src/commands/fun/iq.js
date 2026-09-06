@@ -22,7 +22,8 @@ function getIqCategory(iq) {
   if (iq >= 115) return { category: "Above Average", emoji: "🎓" };
   if (iq >= 85) return { category: "Average Intelligence", emoji: "🧠" };
   if (iq >= 70) return { category: "Below Average", emoji: "📉" };
-  return { category: "Extremely Low", emoji: "🤡" };
+  if (iq >= 50) return { category: "Extremely Low", emoji: "🤡" };
+  return { category: "Room Temperature IQ", emoji: "🧊" };
 }
 
 export async function execute(interaction, client) {
@@ -47,7 +48,7 @@ export async function execute(interaction, client) {
       return interaction.reply({ embeds: [embed] });
     }
 
-    const iq = Math.floor(Math.random() * 101) + 50;
+    const iq = Math.floor(Math.random() * 151);
     const { category, emoji } = getIqCategory(iq);
 
     const authorMention = `<@${interaction.user.id}>`;

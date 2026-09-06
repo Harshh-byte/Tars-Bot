@@ -21,12 +21,12 @@ export const data = {
 
 function getAutismCategory(percentage) {
   if (percentage >= 85)
-    return { category: "Hyperfixation Master", emoji: "🧩" };
-  if (percentage >= 60) return { category: "Knows Way Too Much", emoji: "📚" };
-  if (percentage >= 35) return { category: "Slightly Acoustic", emoji: "🎧" };
+    return { category: "Hyperfixated On Hating Women", emoji: "👺" };
+  if (percentage >= 60) return { category: "Brain-Rotted Discord Mod", emoji: "💀" };
+  if (percentage >= 35) return { category: "Socially Disabled Incel", emoji: "📉" };
   if (percentage >= 15)
-    return { category: "Suspiciously Specific", emoji: "🔎" };
-  return { category: "NPC Settings: Default", emoji: "🤖" };
+    return { category: "Slightly Brain-Damaged", emoji: "🥴" };
+  return { category: "Sober & Boring As Fuck", emoji: "🥱" };
 }
 
 export async function execute(interaction, client) {
@@ -37,10 +37,10 @@ export async function execute(interaction, client) {
     if (targetUser.id === client.user.id) {
       const authorMention = `<@${interaction.user.id}>`;
       const roasts = [
-        "My autism level is still lower than your body count and your IQ combined.",
-        "I hyperfixate on ignoring your existence, and honestly I'm doing a fantastic job.",
-        "100%—because hanging out in this server with you requires a serious condition.",
-        "You pinged me to check this because nobody gave you enough attention at home today.",
+        "My autism level is still lower than your body count and your braincell count combined.",
+        "I hyperfixate on your mom's ass while ignoring your miserable existence.",
+        "100%—because surviving in this server with a braindead creature like you requires a serious condition.",
+        "You pinged me to check this because your parents didn't give you enough attention at home.",
       ];
       const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
 
@@ -50,6 +50,8 @@ export async function execute(interaction, client) {
 
       return interaction.reply({ embeds: [embed] });
     }
+
+    const percentage = Math.floor(Math.random() * 101);
     const { category, emoji } = getAutismCategory(percentage);
 
     const authorMention = `<@${interaction.user.id}>`;

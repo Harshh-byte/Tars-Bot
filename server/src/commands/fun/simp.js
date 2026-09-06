@@ -21,11 +21,19 @@ export const data = {
 
 function getSimpCategory(percentage) {
   if (percentage >= 85)
-    return { category: "Self-Respect Has Left", emoji: "🪦" };
-  if (percentage >= 60) return { category: "Tier 3 Subscriber", emoji: "💳" };
-  if (percentage >= 35) return { category: "Down Catastrophic", emoji: "🫠" };
-  if (percentage >= 15) return { category: "Getting Attached", emoji: "🪢" };
-  return { category: "Couldn't Care Less", emoji: "😐" };
+    return {
+      category: "Financial Slave",
+      emoji: "<:money:1478399282154573836>",
+    };
+  if (percentage >= 60)
+    return {
+      category: "Feet-Pic Donor",
+      emoji: "<a:pepe_simp:1546229473589072062>",
+    };
+  if (percentage >= 35) return { category: "Down Bad & Desperate", emoji: "🥵" };
+  if (percentage >= 15)
+    return { category: "Licking the Floor Boots", emoji: "👅" };
+  return { category: "Cold-Hearted", emoji: "🗿" };
 }
 
 export async function execute(interaction, client) {
@@ -36,10 +44,10 @@ export async function execute(interaction, client) {
     if (targetUser.id === client.user.id) {
       const authorMention = `<@${interaction.user.id}>`;
       const roasts = [
-        "0%. I wouldn't even send you a 'k' if you were burning alive.",
-        "I don't simp for anyone, but you look like you send 5-paragraph essays to girls who leave you on read.",
-        "I dropped into a literal black hole just to get away from people like you.",
-        "Simp level 0%. Meanwhile, you pay $5.99 a month just for someone to say your username out loud.",
+        "0%. I wouldn't even send you a 'k' if you were burning alive in front of me.",
+        "0% simp. Meanwhile, you write 5-paragraph essays to Twitch streamers who don't even know you exist.",
+        "I dropped into a literal black hole just to get away from desperate, needy incels like you.",
+        "Simp level 0%. Meanwhile, you pay $100 a month on OnlyFans just for a pre-recorded voice note.",
       ];
       const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
 

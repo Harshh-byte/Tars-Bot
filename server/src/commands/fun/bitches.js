@@ -18,16 +18,19 @@ export const data = {
 };
 
 function getBitchesCategory(count) {
-  if (count >= 85) return { category: "Absolute Gigachad", emoji: "🗿" };
-  if (count >= 60) return { category: "Rizz Master", emoji: "🥶" };
+  if (count >= 85) return { category: "Pussy Magnet", emoji: "🗿" };
+  if (count >= 60) return { category: "Certified Rizz God", emoji: "🥶" };
   if (count >= 35)
     return {
-      category: "Pulling Constantly",
+      category: "Getting Your Dick Wet",
       emoji: "<:blushed:1543158784653004810>",
     };
-  if (count >= 15) return { category: "Getting Somewhere", emoji: "😏" };
-  if (count > 0) return { category: "Minimal Rizz", emoji: "🤏" };
-  return { category: "No Bitches?", emoji: "🥺" };
+  if (count >= 15) return { category: "Scraping Bottom of the Barrel", emoji: "😏" };
+  if (count > 0) return { category: "Desperate Crumb-Snatcher", emoji: "🤏" };
+  return {
+    category: "Chronically Maidenless",
+    emoji: "🥺",
+  };
 }
 
 export async function execute(interaction, client) {
@@ -38,10 +41,10 @@ export async function execute(interaction, client) {
     if (targetUser.id === client.user.id) {
       const authorMention = `<@${interaction.user.id}>`;
       const roasts = [
-        "0 bitches. Exactly the same number of people who texted you good morning today.",
-        "My DMs are dry by choice; your DMs are dry by natural selection.",
-        "I get millions of pings a day, and you still can't get a single text back.",
-        "Even if I handed you a bitch on a silver platter, you'd fumble in 5 seconds.",
+        "0 bitches. The only action you've seen in months is when your hand cramped up in the shower.",
+        "0 bitches. You look like you pay for premium Tinder just to get swiped left on faster.",
+        "I get millions of pings a day while you pay $50 a month on OnlyFans just to hear a girl say your name.",
+        "Even if a bitch threw herself at you naked, you'd find a way to fumble and cry about it on Discord.",
       ];
       const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
 

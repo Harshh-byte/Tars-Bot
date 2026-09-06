@@ -20,12 +20,12 @@ export const data = {
 };
 
 function getLesbianCategory(percentage) {
-  if (percentage >= 85) return { category: "Sapphic Final Boss", emoji: "✂️" };
+  if (percentage >= 85) return { category: "Scissor Queen", emoji: "✂️" };
   if (percentage >= 60)
-    return { category: "That's Not Very Straight", emoji: "🚨" };
-  if (percentage >= 35) return { category: "Certified Fruity", emoji: "🦄" };
-  if (percentage >= 15) return { category: "Hmm...Interesting", emoji: "👀" };
-  return { category: "Allegations: Unfounded", emoji: "🗿" };
+    return { category: "Eats Pussy for Breakfast", emoji: "🚨" };
+  if (percentage >= 35) return { category: "Finger Bang Enthusiast", emoji: "🦄" };
+  if (percentage >= 15) return { category: "Closet Fruity", emoji: "👀" };
+  return { category: "Straight", emoji: "🗿" };
 }
 
 export async function execute(interaction, client) {
@@ -36,10 +36,10 @@ export async function execute(interaction, client) {
     if (targetUser.id === client.user.id) {
       const authorMention = `<@${interaction.user.id}>`;
       const roasts = [
-        "0%. Stop projecting your weird-ass incel search history onto me.",
-        "No matter what label you give me, I'm still never talking to you in real life.",
-        "Your personality is the single reason nobody of any gender wants you.",
-        "My rating is 0%, and your chance of getting laid is even lower.",
+        "0%. Stop projecting your crusty-ass incel search history onto me.",
+        "0% lesbian. Even if I were into women, your pathetic ass wouldn't get a single drop of play.",
+        "My rating is 0%, and your chance of eating pussy in this lifetime is lower than your credit score.",
+        "Checking my orientation when nobody of any gender, sexuality, or species would let you touch them.",
       ];
       const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
 
