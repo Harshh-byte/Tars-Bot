@@ -1,22 +1,11 @@
 import admin from "firebase-admin";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync } from "fs";
 import cron from "node-cron";
 
-let serviceAccount;
-try {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-  } else if (existsSync("/etc/secrets/serviceAccountKey.json")) {
-    serviceAccount = JSON.parse(readFileSync("/etc/secrets/serviceAccountKey.json", "utf-8"));
-  } else {
-    serviceAccount = JSON.parse(
-      readFileSync(new URL("../../serviceAccountKey.json", import.meta.url), "utf-8")
-    );
-  }
-} catch (err) {
-  console.error("Failed to load Firebase service account key:", err.message);
-}
+const serviceAccount = JSON.parse(
+  readFileSync(new URL("../../serviceAccountKey.json", import.meta.url)),
+);
 
 if (!admin.apps.length) {
   admin.initializeApp({
