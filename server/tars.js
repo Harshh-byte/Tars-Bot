@@ -21,6 +21,7 @@ import {
 import { detectUserGender } from "./src/utils/genderDetector.js";
 import logger from "./src/utils/logger.js";
 import * as interactionCreateEvent from "./src/events/interactionCreate.js";
+import * as messageCreateEvent from "./src/events/messageCreate.js";
 import { initReminderManager } from "./src/services/reminder.js";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
