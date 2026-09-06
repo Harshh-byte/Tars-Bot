@@ -48,7 +48,7 @@ export async function execute(interaction, client) {
       const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
 
       const embed = new EmbedBuilder()
-        .setDescription(`${authorMention}: 🍆 ${randomRoast}`)
+        .setDescription(`${authorMention}: ${randomRoast}`)
         .setColor(EMBED_COLORS.GREY);
 
       return interaction.reply({ embeds: [embed] });

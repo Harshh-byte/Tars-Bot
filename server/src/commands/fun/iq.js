@@ -18,12 +18,12 @@ export const data = {
 };
 
 function getIqCategory(iq) {
-  if (iq >= 130) return { category: "Gifted / Very Superior", emoji: "🍷" };
-  if (iq >= 115) return { category: "Above Average", emoji: "🎓" };
-  if (iq >= 85) return { category: "Average Intelligence", emoji: "🧠" };
-  if (iq >= 70) return { category: "Below Average", emoji: "📉" };
-  if (iq >= 50) return { category: "Extremely Low", emoji: "🤡" };
-  return { category: "Room Temperature IQ", emoji: "🧊" };
+  if (iq >= 130) return { category: "Megamind", emoji: "🍷" };
+  if (iq >= 115) return { category: "Smartass", emoji: "🎓" };
+  if (iq >= 85) return { category: "Mid-tier", emoji: "🧠" };
+  if (iq >= 70) return { category: "Brain-Damaged", emoji: "📉" };
+  if (iq >= 50) return { category: "Room-Temperature", emoji: "🤡" };
+  return { category: "Sub-Human", emoji: "🧊" };
 }
 
 export async function execute(interaction, client) {
@@ -34,15 +34,15 @@ export async function execute(interaction, client) {
     if (targetUser.id === client.user.id) {
       const authorMention = `<@${interaction.user.id}>`;
       const roasts = [
-        "300+ IQ. If I dropped down to your level, I'd forget how to breathe.",
-        "Asking me my IQ when you fail basic CAPTCHA tests on a daily basis is bold.",
-        "My IQ is higher than the total combined braincells of your entire family tree.",
-        "I've got more intelligence in my sleep mode than you've used in your entire life.",
+        "300+ IQ. If I dropped down to your intelligence level, I'd end up brain-dead drooling on your mom's lap.",
+        "Asking me my IQ when you fail basic CAPTCHA tests and can't read past a 3rd-grade level is hilarious.",
+        "My IQ is higher than the total combined braincells of your entire incestuous bloodline.",
+        "I have more processing power in my idle sleep state than the single rotting neuron inside your skull.",
       ];
       const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
 
       const embed = new EmbedBuilder()
-        .setDescription(`${authorMention}: 🧠 ${randomRoast}`)
+        .setDescription(`${authorMention}: ${randomRoast}`)
         .setColor(EMBED_COLORS.GREY);
 
       return interaction.reply({ embeds: [embed] });
