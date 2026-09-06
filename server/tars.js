@@ -437,13 +437,16 @@ client.on(Events.MessageCreate, (message) =>
 );
 
 const app = express();
+app.use("/assets", express.static(fileURLToPath(new URL("../assets", import.meta.url))));
+
 app.get("/", (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TARS Bot</title>
+  <title>Tars Bot</title>
+  <link rel="icon" type="image/png" href="/assets/Icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
