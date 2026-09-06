@@ -47,7 +47,8 @@ export async function execute(interaction, client) {
       targetUser = interaction.user;
     }
 
-    const displayName = targetUser.displayName || targetUser.globalName || targetUser.username;
+    const displayName =
+      targetUser.displayName || targetUser.globalName || targetUser.username;
 
     const embed = new EmbedBuilder()
       .setTitle(`**${displayName}'s Avatar**`)
@@ -58,7 +59,7 @@ export async function execute(interaction, client) {
       new ButtonBuilder()
         .setLabel("Open Full Image")
         .setStyle(ButtonStyle.Link)
-        .setURL(targetUser.displayAvatarURL({ size: 4096 }))
+        .setURL(targetUser.displayAvatarURL({ size: 4096 })),
     );
 
     return interaction.reply({

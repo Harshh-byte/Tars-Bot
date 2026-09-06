@@ -2,7 +2,11 @@ const cooldowns = new Map();
 
 export function checkCooldown(userId, commandName, cooldownSeconds = 3) {
   if (userId === process.env.OWNER_ID) {
-    return { onCooldown: false, remainingSeconds: "0.0", expirationTimestamp: 0 };
+    return {
+      onCooldown: false,
+      remainingSeconds: "0.0",
+      expirationTimestamp: 0,
+    };
   }
 
   const key = `${userId}_${commandName}`;

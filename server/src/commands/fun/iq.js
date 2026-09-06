@@ -18,14 +18,10 @@ export const data = {
 };
 
 function getIqCategory(iq) {
-  if (iq >= 130) 
-    return { category: "Gifted / Very Superior", emoji: "🍷" };
-  if (iq >= 115) 
-    return { category: "Above Average", emoji: "🎓" };
-  if (iq >= 85) 
-    return { category: "Average Intelligence", emoji: "🧠" };
-  if (iq >= 70) 
-    return { category: "Below Average", emoji: "📉" };
+  if (iq >= 130) return { category: "Gifted / Very Superior", emoji: "🍷" };
+  if (iq >= 115) return { category: "Above Average", emoji: "🎓" };
+  if (iq >= 85) return { category: "Average Intelligence", emoji: "🧠" };
+  if (iq >= 70) return { category: "Below Average", emoji: "📉" };
   return { category: "Extremely Low", emoji: "🤡" };
 }
 

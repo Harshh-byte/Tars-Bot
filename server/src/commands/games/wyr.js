@@ -66,11 +66,17 @@ async function fetchWyrQuestion(rating = "pg") {
     logger.warn(`WYR API failed, using fallback: ${err.message}`);
   }
 
-  const question = FALLBACK_WYR[Math.floor(Math.random() * FALLBACK_WYR.length)];
+  const question =
+    FALLBACK_WYR[Math.floor(Math.random() * FALLBACK_WYR.length)];
   return { question, rating: targetRating.toUpperCase() };
 }
 
-async function sendWyrMessage(interaction, ratingInput, isFollowUp = false, buildAiReply) {
+async function sendWyrMessage(
+  interaction,
+  ratingInput,
+  isFollowUp = false,
+  buildAiReply,
+) {
   const { question, rating } = await fetchWyrQuestion(ratingInput);
 
   let aiCommentary = "";
@@ -139,7 +145,10 @@ async function sendWyrMessage(interaction, ratingInput, isFollowUp = false, buil
 
   const response = await sendAndFetchReply(interaction, v2WyrPayload);
 
-  if (!response || typeof response.createMessageComponentCollector !== "function") {
+  if (
+    !response ||
+    typeof response.createMessageComponentCollector !== "function"
+  ) {
     return;
   }
 
@@ -162,13 +171,21 @@ async function sendWyrMessage(interaction, ratingInput, isFollowUp = false, buil
 
 export async function execute(interaction, client, { buildAiReply } = {}) {
   try {
-    let ratingInput = interaction.options?.getString("rating")?.toLowerCase() || "pg";
+    let ratingInput =
+      interaction.options?.getString("rating")?.toLowerCase() || "pg";
 
     if (interaction.commandName) {
-      const rawArgs = interaction.options?.getString("new_prefix") || interaction.options?.getString("user");
+      const rawArgs =
+        interaction.options?.getString("new_prefix") ||
+        interaction.options?.getString("user");
       if (typeof rawArgs === "string") {
         const lower = rawArgs.toLowerCase();
-        if (lower.includes("r") || lower.includes("spicy") || lower.includes("bold")) ratingInput = "r";
+        if (
+          lower.includes("r") ||
+          lower.includes("spicy") ||
+          lower.includes("bold")
+        )
+          ratingInput = "r";
         else if (lower.includes("pg13")) ratingInput = "pg13";
         else if (lower.includes("pg")) ratingInput = "pg";
       }

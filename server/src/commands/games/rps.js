@@ -137,10 +137,12 @@ async function startGame(interaction, client, opponent) {
         if (userChoice === tarsChoice) {
           resultText = `🤝 **It's a Tie!** Both chose ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.`;
         } else if (CHOICES[userChoice].beats === tarsChoice) {
-          const quote = userWinQuotes[Math.floor(Math.random() * userWinQuotes.length)];
+          const quote =
+            userWinQuotes[Math.floor(Math.random() * userWinQuotes.length)];
           resultText = `<a:Tada:1544329561955770488> **You won!** Your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}** beats Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}**.\n\n*${quote}*`;
         } else {
-          const quote = tarsWinQuotes[Math.floor(Math.random() * tarsWinQuotes.length)];
+          const quote =
+            tarsWinQuotes[Math.floor(Math.random() * tarsWinQuotes.length)];
           resultText = `<a:Tada:1544329561955770488> **Tars won!** Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}** beats your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.\n\n*${quote}*`;
         }
 
@@ -218,7 +220,8 @@ async function startGame(interaction, client, opponent) {
                 components: [
                   {
                     type: 10,
-                    content: "### <:Timer:1542147643021725796> Game Timed Out\n\nYou took too long to pick a move!",
+                    content:
+                      "### <:Timer:1542147643021725796> Game Timed Out\n\nYou took too long to pick a move!",
                   },
                 ],
               },
@@ -322,7 +325,10 @@ async function startGame(interaction, client, opponent) {
       ],
     };
 
-    const response = await sendAndFetchReply(interaction, pvpStartContainerPayload);
+    const response = await sendAndFetchReply(
+      interaction,
+      pvpStartContainerPayload,
+    );
 
     const collector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
@@ -512,7 +518,8 @@ async function startGame(interaction, client, opponent) {
               components: [
                 {
                   type: 10,
-                  content: "### <:Timer:1542147643021725796> Match Timed Out\n\nOne or both players failed to make a move in time!",
+                  content:
+                    "### <:Timer:1542147643021725796> Match Timed Out\n\nOne or both players failed to make a move in time!",
                 },
               ],
             },

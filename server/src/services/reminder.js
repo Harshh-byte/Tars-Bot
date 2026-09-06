@@ -8,7 +8,8 @@ const remindersRef = db.collection("reminders");
 const activeTimers = new Map();
 
 function parseTimeRegex(inputText) {
-  const timeRegex = /(?:in\s+)?(\d+)\s*(seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d)\b/i;
+  const timeRegex =
+    /(?:in\s+)?(\d+)\s*(seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d)\b/i;
   const match = inputText.match(timeRegex);
 
   if (!match) return null;
@@ -56,18 +57,25 @@ Return ONLY a JSON object with this format, no markdown formatting or extra text
       });
 
       let responseText = response.text || "";
-      responseText = responseText.replace(/```json/gi, "").replace(/```/g, "").trim();
+      responseText = responseText
+        .replace(/```json/gi, "")
+        .replace(/```/g, "")
+        .trim();
 
       const parsed = JSON.parse(responseText);
       if (parsed && typeof parsed.delayMs === "number" && parsed.delayMs > 0) {
         return {
           delayMs: Math.max(1000, parsed.delayMs),
           task: parsed.task || cleanText,
-          timeString: parsed.timeString || `${Math.round(parsed.delayMs / 60000)} mins`,
+          timeString:
+            parsed.timeString || `${Math.round(parsed.delayMs / 60000)} mins`,
         };
       }
     } catch (err) {
-      logger.warn("AI parsing failed for reminder, falling back to regex:", err.message);
+      logger.warn(
+        "AI parsing failed for reminder, falling back to regex:",
+        err.message,
+      );
     }
   }
 
@@ -75,9 +83,19 @@ Return ONLY a JSON object with this format, no markdown formatting or extra text
 }
 
 export async function saveAndScheduleReminder(client, reminderData) {
-  const { id, userId, guildId, guildName, channelId, task, triggerAt, createdAt } = reminderData;
+  const {
+    id,
+    userId,
+    guildId,
+    guildName,
+    channelId,
+    task,
+    triggerAt,
+    createdAt,
+  } = reminderData;
 
-  const docId = id || `${userId}_${triggerAt}_${Math.floor(Math.random() * 10000)}`;
+  const docId =
+    id || `${userId}_${triggerAt}_${Math.floor(Math.random() * 10000)}`;
 
   const reminderObj = {
     id: docId,
@@ -93,7 +111,10 @@ export async function saveAndScheduleReminder(client, reminderData) {
   try {
     await remindersRef.doc(docId).set(reminderObj);
   } catch (err) {
-    logger.warn("Failed to persist reminder to Firestore, running in-memory:", err.message);
+    logger.warn(
+      "Failed to persist reminder to Firestore, running in-memory:",
+      err.message,
+    );
   }
 
   scheduleInMemoryTimer(client, reminderObj);
@@ -108,7 +129,9 @@ function scheduleInMemoryTimer(client, reminderObj) {
   const delayMs = Math.max(0, reminderObj.triggerAt - Date.now());
 
   if (delayMs > 2147483647) {
-    logger.warn(`Reminder ${reminderObj.id} is beyond 24 days, skipping in-memory timer.`);
+    logger.warn(
+      `Reminder ${reminderObj.id} is beyond 24 days, skipping in-memory timer.`,
+    );
     return;
   }
 
@@ -135,7 +158,10 @@ export async function initReminderManager(client) {
       }
     }
   } catch (err) {
-    logger.warn("Failed to initialize reminder manager from Firestore:", err.message);
+    logger.warn(
+      "Failed to initialize reminder manager from Firestore:",
+      err.message,
+    );
   }
 }
 
@@ -199,16 +225,23 @@ export async function deliverReminder(client, reminder) {
         await user.send(dmPayloadV1);
         sent = true;
       } catch (dmErr) {
-        logger.warn(`Could not send DM to user ${reminder.userId}:`, dmErr.message);
+        logger.warn(
+          `Could not send DM to user ${reminder.userId}:`,
+          dmErr.message,
+        );
       }
     }
 
     if (!sent && reminder.channelId) {
-      const channel = await client.channels.fetch(reminder.channelId).catch(() => null);
+      const channel = await client.channels
+        .fetch(reminder.channelId)
+        .catch(() => null);
       if (channel && typeof channel.send === "function") {
-        await channel.send({
-          content: `⏰ <@${reminder.userId}> (Could not DM you): **${reminder.task}**`,
-        }).catch(() => null);
+        await channel
+          .send({
+            content: `⏰ <@${reminder.userId}> (Could not DM you): **${reminder.task}**`,
+          })
+          .catch(() => null);
       }
     }
   } catch (err) {

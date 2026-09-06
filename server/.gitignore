@@ -4,6 +4,8 @@
 # Environment Variables
 .env
 
+# Firebase Credentials
 serviceAccountKey.json
 
+# Application Logs
 **/logs

@@ -42,7 +42,7 @@ export async function execute(interaction, client, { buildAiReply }) {
       .catch(() => null);
 
     const targetName = targetUser.displayName || targetUser.username;
-    
+
     let roastPrompt;
     if (isSelf) {
       roastPrompt = reason

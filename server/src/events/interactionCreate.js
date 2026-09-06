@@ -30,18 +30,24 @@ export async function execute(interaction, client, context) {
       .setDescription(
         "Tars is currently undergoing scheduled maintenance and will be back online shortly.",
       )
-      .setFooter({ text: getFormattedMaintenanceTime(client.maintenanceStartTime) });
+      .setFooter({
+        text: getFormattedMaintenanceTime(client.maintenanceStartTime),
+      });
 
     if (interaction.deferred || interaction.replied) {
-      return interaction.followUp({
+      return interaction
+        .followUp({
+          embeds: [maintenanceEmbed],
+          flags: MessageFlags.Ephemeral,
+        })
+        .catch(() => null);
+    }
+    return interaction
+      .reply({
         embeds: [maintenanceEmbed],
         flags: MessageFlags.Ephemeral,
-      }).catch(() => null);
-    }
-    return interaction.reply({
-      embeds: [maintenanceEmbed],
-      flags: MessageFlags.Ephemeral,
-    }).catch(() => null);
+      })
+      .catch(() => null);
   }
 
   if (!interaction.isChatInputCommand()) return;

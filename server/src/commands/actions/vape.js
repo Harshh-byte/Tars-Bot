@@ -2,7 +2,10 @@ import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import { incrementUserStat, incrementGlobalUserStat } from "../../services/database.js";
+import {
+  incrementUserStat,
+  incrementGlobalUserStat,
+} from "../../services/database.js";
 
 export const data = {
   name: "vape",
@@ -78,9 +81,16 @@ export async function execute(interaction, client) {
       ],
     });
 
-    const response = await sendAndFetchReply(interaction, buildPayload(count, getDisplayName(interaction)));
+    const response = await sendAndFetchReply(
+      interaction,
+      buildPayload(count, getDisplayName(interaction)),
+    );
 
-    if (!response || typeof response.createMessageComponentCollector !== "function") return;
+    if (
+      !response ||
+      typeof response.createMessageComponentCollector !== "function"
+    )
+      return;
 
     const collector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
@@ -89,7 +99,10 @@ export async function execute(interaction, client) {
 
     collector.on("collect", async (i) => {
       if (i.user.id !== userId) {
-        return i.reply({ content: "Start your own vape session with `/vape`!", ephemeral: true });
+        return i.reply({
+          content: "Start your own vape session with `/vape`!",
+          ephemeral: true,
+        });
       }
 
       await i.deferUpdate();

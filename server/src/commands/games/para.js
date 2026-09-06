@@ -66,11 +66,17 @@ async function fetchParanoiaQuestion(rating = "pg") {
     logger.warn(`Paranoia API failed, using fallback: ${err.message}`);
   }
 
-  const question = FALLBACK_PARANOIA[Math.floor(Math.random() * FALLBACK_PARANOIA.length)];
+  const question =
+    FALLBACK_PARANOIA[Math.floor(Math.random() * FALLBACK_PARANOIA.length)];
   return { question, rating: targetRating.toUpperCase() };
 }
 
-async function sendParaMessage(interaction, ratingInput, isFollowUp = false, buildAiReply) {
+async function sendParaMessage(
+  interaction,
+  ratingInput,
+  isFollowUp = false,
+  buildAiReply,
+) {
   const { question, rating } = await fetchParanoiaQuestion(ratingInput);
 
   let aiCommentary = "";
@@ -84,7 +90,9 @@ async function sendParaMessage(interaction, ratingInput, isFollowUp = false, bui
       });
       if (res?.text) aiCommentary = res.text.trim();
     } catch (e) {
-      logger.warn(`Failed to generate AI commentary for paranoia: ${e.message}`);
+      logger.warn(
+        `Failed to generate AI commentary for paranoia: ${e.message}`,
+      );
     }
   }
 
@@ -139,7 +147,10 @@ async function sendParaMessage(interaction, ratingInput, isFollowUp = false, bui
 
   const response = await sendAndFetchReply(interaction, v2Payload);
 
-  if (!response || typeof response.createMessageComponentCollector !== "function") {
+  if (
+    !response ||
+    typeof response.createMessageComponentCollector !== "function"
+  ) {
     return;
   }
 
@@ -162,7 +173,8 @@ async function sendParaMessage(interaction, ratingInput, isFollowUp = false, bui
 
 export async function execute(interaction, client, { buildAiReply } = {}) {
   try {
-    let ratingInput = interaction.options?.getString("rating")?.toLowerCase() || "pg";
+    let ratingInput =
+      interaction.options?.getString("rating")?.toLowerCase() || "pg";
 
     if (interaction.commandName) {
       const rawArgs = interaction.options?.getString("new_prefix");

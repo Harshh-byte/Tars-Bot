@@ -115,7 +115,8 @@ export async function incrementGlobalUserStat(userId, statKey) {
     const data = snapshot.data();
     return data?.stats?.[statKey] ?? data?.[`stats.${statKey}`] ?? 1;
   } catch (err) {
-    if (!global.memoryGlobalStatsCache) global.memoryGlobalStatsCache = new Map();
+    if (!global.memoryGlobalStatsCache)
+      global.memoryGlobalStatsCache = new Map();
     const key = `${userId}_${statKey}`;
     const current = (global.memoryGlobalStatsCache.get(key) || 0) + 1;
     global.memoryGlobalStatsCache.set(key, current);
@@ -163,7 +164,7 @@ export async function addFlagScore(serverId, userId, pointsGained) {
         },
         updatedAt: FieldValue.serverTimestamp(),
       },
-      { merge: true }
+      { merge: true },
     );
     const snapshot = await ref.get();
     const data = snapshot.data()?.stats || {};
@@ -215,7 +216,7 @@ export async function addPokemonScore(serverId, userId, pointsGained) {
         },
         updatedAt: FieldValue.serverTimestamp(),
       },
-      { merge: true }
+      { merge: true },
     );
     const snapshot = await ref.get();
     const data = snapshot.data()?.stats || {};
@@ -226,7 +227,10 @@ export async function addPokemonScore(serverId, userId, pointsGained) {
   } catch (err) {
     if (!global.memoryPokemonScores) global.memoryPokemonScores = new Map();
     const key = `${serverId}_${userId}`;
-    const current = global.memoryPokemonScores.get(key) || { points: 0, wins: 0 };
+    const current = global.memoryPokemonScores.get(key) || {
+      points: 0,
+      wins: 0,
+    };
     current.points += pointsGained;
     current.wins += 1;
     global.memoryPokemonScores.set(key, current);
@@ -253,6 +257,30 @@ export async function getTopPokemonPlayers(serverId, limitCount = 10) {
     logger.warn(`Failed to fetch pokemon leaderboard: ${err.message}`);
     return [];
   }
+}
+
+export async function getUserProfile(userId) {
+  if (!userId) return null;
+  try {
+    const snapshot = await userDoc(userId).get();
+    if (!snapshot.exists) return null;
+    return snapshot.data();
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function setUserGender(userId, gender) {
+  if (!userId || !gender) return;
+  try {
+    await userDoc(userId).set(
+      {
+        gender,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+  } catch (err) {}
 }
 
 cron.schedule("0 0 * * *", async () => {

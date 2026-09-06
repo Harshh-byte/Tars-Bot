@@ -31,7 +31,9 @@ export async function execute(interaction, client) {
     const splashUrl = guild.splashURL({ size: 4096 });
 
     const owner = await guild.fetchOwner().catch(() => null);
-    const ownerDisplay = owner ? `${owner.user.username} (<@${guild.ownerId}>)` : `<@${guild.ownerId}>`;
+    const ownerDisplay = owner
+      ? `${owner.user.username} (<@${guild.ownerId}>)`
+      : `<@${guild.ownerId}>`;
 
     let generalText = `> **Server Name:** ${guild.name}\n`;
     generalText += `> **Server ID:** \`${guild.id}\`\n`;

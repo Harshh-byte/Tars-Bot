@@ -58,9 +58,11 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
         .setColor(0xffa502)
         .setTitle("<:Updates:1526472917964030053> **System Maintenance**")
         .setDescription(
-          "Tars is currently undergoing scheduled maintenance and will be back online shortly."
+          "Tars is currently undergoing scheduled maintenance and will be back online shortly.",
         )
-        .setFooter({ text: getFormattedMaintenanceTime(client.maintenanceStartTime) });
+        .setFooter({
+          text: getFormattedMaintenanceTime(client.maintenanceStartTime),
+        });
 
       await message.reply({ embeds: [maintenanceEmbed] }).catch(() => null);
     }
@@ -131,7 +133,9 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
             if (name === "target" || name === "user2") {
               return mentions[1] || null;
             }
-            return name === "opponent" ? targetUser : (mentions[0] || targetUser || null);
+            return name === "opponent"
+              ? targetUser
+              : mentions[0] || targetUser || null;
           },
           getString: () => args.join(" ") || null,
         },
@@ -166,7 +170,10 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
       };
 
       try {
-        await command.execute(mockInteraction, client, { buildAiReply, BOT_INFO });
+        await command.execute(mockInteraction, client, {
+          buildAiReply,
+          BOT_INFO,
+        });
       } catch (err) {
         logger.error(`Error executing prefix command .${commandName}:`, err);
         Sentry.captureException(err);

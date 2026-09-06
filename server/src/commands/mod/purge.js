@@ -7,7 +7,12 @@ import {
   ComponentType,
 } from "discord.js";
 import { deleteUserData, deleteServerData } from "../../services/database.js";
-import { successEmbed, warningEmbed, errorEmbed, EMBED_COLORS } from "../../utils/embeds.js";
+import {
+  successEmbed,
+  warningEmbed,
+  errorEmbed,
+  EMBED_COLORS,
+} from "../../utils/embeds.js";
 import logger from "../../utils/logger.js";
 
 export const aliases = ["erase"];
@@ -78,7 +83,8 @@ export async function execute(interaction, client) {
       embeds: [
         errorEmbed({
           title: "Access Denied",
-          description: "Only the bot owner can execute the memory purge command.",
+          description:
+            "Only the bot owner can execute the memory purge command.",
         }),
       ],
       flags: MessageFlags.Ephemeral,
@@ -147,9 +153,14 @@ async function handlePurgeUser(interaction, targetUser) {
           fields: [
             {
               name: "Deleted Data",
-              value: "• Conversation history\n• Saved profile\n• AI context & memory",
+              value:
+                "• Conversation history\n• Saved profile\n• AI context & memory",
             },
-            { name: "Requested By", value: `<@${interaction.user.id}>`, inline: true },
+            {
+              name: "Requested By",
+              value: `<@${interaction.user.id}>`,
+              inline: true,
+            },
             { name: "User", value: `<@${targetUser.id}>`, inline: true },
           ],
         }),
@@ -182,7 +193,8 @@ async function handlePurgeUser(interaction, targetUser) {
       embeds: [
         errorEmbed({
           title: "Purge Failed",
-          description: "I couldn't delete this user's stored memory. Please try again later.",
+          description:
+            "I couldn't delete this user's stored memory. Please try again later.",
         }),
       ],
       flags: MessageFlags.Ephemeral,
@@ -335,9 +347,14 @@ async function handlePurgeServer(interaction) {
           fields: [
             {
               name: "Deleted Data",
-              value: "• All conversation history\n• All member profiles\n• AI memory\n• Server settings",
+              value:
+                "• All conversation history\n• All member profiles\n• AI memory\n• Server settings",
             },
-            { name: "Requested By", value: `<@${interaction.user.id}>`, inline: true },
+            {
+              name: "Requested By",
+              value: `<@${interaction.user.id}>`,
+              inline: true,
+            },
           ],
         }),
       ],
@@ -371,7 +388,8 @@ async function handlePurgeServer(interaction) {
       embeds: [
         warningEmbed({
           title: "Confirmation Expired",
-          description: "No response was received within 30 seconds. The purge operation has been cancelled.",
+          description:
+            "No response was received within 30 seconds. The purge operation has been cancelled.",
         }),
       ],
       components: [],

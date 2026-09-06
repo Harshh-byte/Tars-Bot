@@ -22,10 +22,8 @@ export const data = {
 function getAutismCategory(percentage) {
   if (percentage >= 85)
     return { category: "Hyperfixation Master", emoji: "🧩" };
-  if (percentage >= 60)
-    return { category: "Knows Way Too Much", emoji: "📚" };
-  if (percentage >= 35)
-    return { category: "Slightly Acoustic", emoji: "🎧" };
+  if (percentage >= 60) return { category: "Knows Way Too Much", emoji: "📚" };
+  if (percentage >= 35) return { category: "Slightly Acoustic", emoji: "🎧" };
   if (percentage >= 15)
     return { category: "Suspiciously Specific", emoji: "🔎" };
   return { category: "NPC Settings: Default", emoji: "🤖" };
@@ -46,7 +44,7 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} autism percentage is \`${percentage}%\` \n*${category}*`
+        `${authorMention}: ${emoji} ${textPrefix} autism percentage is \`${percentage}%\` \n*${category}*`,
       )
       .setColor(EMBED_COLORS.GREY);
 

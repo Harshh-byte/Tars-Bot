@@ -29,7 +29,12 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
   try {
     const roll = Math.floor(Math.random() * 6) + 1;
     const emoji = DICE_EMOJIS[roll] || "🎲";
-    let aiCommentary = roll === 6 ? FALLBACK_ROLL_REMARKS[6] : roll === 1 ? FALLBACK_ROLL_REMARKS[1] : FALLBACK_ROLL_REMARKS.mid;
+    let aiCommentary =
+      roll === 6
+        ? FALLBACK_ROLL_REMARKS[6]
+        : roll === 1
+          ? FALLBACK_ROLL_REMARKS[1]
+          : FALLBACK_ROLL_REMARKS.mid;
 
     if (typeof buildAiReply === "function") {
       try {
@@ -50,8 +55,8 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
     const embed = new EmbedBuilder()
       .setDescription(
         `${userMention} rolled a dice...\n\n` +
-        `🎲 Result: **${emoji} ${roll}**\n\n` +
-        `*Tars: ${aiCommentary}*`
+          `🎲 Result: **${emoji} ${roll}**\n\n` +
+          `*Tars: ${aiCommentary}*`,
       )
       .setColor(Math.floor(Math.random() * 16777215));
 

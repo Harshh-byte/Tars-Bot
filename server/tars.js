@@ -12,7 +12,13 @@ import { Client, GatewayIntentBits, ActivityType, Events } from "discord.js";
 import { GoogleGenAI } from "@google/genai";
 import express from "express";
 import { tarsSystemPrompt } from "./src/config.js";
-import { getConversation, saveConversation } from "./src/services/database.js";
+import {
+  getConversation,
+  saveConversation,
+  getUserProfile,
+  setUserGender,
+} from "./src/services/database.js";
+import { detectUserGender } from "./src/utils/genderDetector.js";
 import logger from "./src/utils/logger.js";
 import * as interactionCreateEvent from "./src/events/interactionCreate.js";
 import * as messageCreateEvent from "./src/events/messageCreate.js";
@@ -296,6 +302,19 @@ export async function buildAiReply({
   const targetName = targetMember
     ? targetMember.displayName || targetMember.user.username
     : "Self";
+
+  let authorGender = detectUserGender(authorMember);
+  if (authorGender) {
+    setUserGender(authorId, authorGender).catch(() => null);
+  } else {
+    try {
+      const userProfile = await getUserProfile(authorId);
+      if (userProfile?.gender) {
+        authorGender = userProfile.gender;
+      }
+    } catch (e) {}
+  }
+
   const Time = getTarsTime();
 
   let emojisContext = "";
@@ -316,7 +335,7 @@ export async function buildAiReply({
     logger.warn("Could not aggregate global client emojis:", e);
   }
 
-  const systemPrompt = `${tarsSystemPrompt}\n### USER_CONTEXT:\n- Mode: ${mode}\n- Author: ${authorName}\n- Target: ${targetName}\n### LIVE_DATA:\n- Time: ${Time.time} | Date: ${Time.date}\n${emojisContext}`;
+  const systemPrompt = `${tarsSystemPrompt}\n### USER_CONTEXT:\n- Mode: ${mode}\n- Author: ${authorName}\n- Author Gender: ${authorGender || "Unknown"}\n- Target: ${targetName}\n### LIVE_DATA:\n- Time: ${Time.time} | Date: ${Time.date}\n${emojisContext}`;
 
   let replyObj = await generateContentJson(
     convo.messages.map((m) => ({

@@ -66,11 +66,17 @@ async function fetchNhieQuestion(rating = "pg") {
     logger.warn(`NHIE API failed, using fallback: ${err.message}`);
   }
 
-  const question = FALLBACK_NHIE[Math.floor(Math.random() * FALLBACK_NHIE.length)];
+  const question =
+    FALLBACK_NHIE[Math.floor(Math.random() * FALLBACK_NHIE.length)];
   return { question, rating: targetRating.toUpperCase() };
 }
 
-async function sendNhieMessage(interaction, ratingInput, isFollowUp = false, buildAiReply) {
+async function sendNhieMessage(
+  interaction,
+  ratingInput,
+  isFollowUp = false,
+  buildAiReply,
+) {
   const { question, rating } = await fetchNhieQuestion(ratingInput);
 
   let aiCommentary = "";
@@ -139,7 +145,10 @@ async function sendNhieMessage(interaction, ratingInput, isFollowUp = false, bui
 
   const response = await sendAndFetchReply(interaction, v2Payload);
 
-  if (!response || typeof response.createMessageComponentCollector !== "function") {
+  if (
+    !response ||
+    typeof response.createMessageComponentCollector !== "function"
+  ) {
     return;
   }
 
@@ -162,13 +171,21 @@ async function sendNhieMessage(interaction, ratingInput, isFollowUp = false, bui
 
 export async function execute(interaction, client, { buildAiReply } = {}) {
   try {
-    let ratingInput = interaction.options?.getString("rating")?.toLowerCase() || "pg";
+    let ratingInput =
+      interaction.options?.getString("rating")?.toLowerCase() || "pg";
 
     if (interaction.commandName) {
-      const rawArgs = interaction.options?.getString("new_prefix") || interaction.options?.getString("user");
+      const rawArgs =
+        interaction.options?.getString("new_prefix") ||
+        interaction.options?.getString("user");
       if (typeof rawArgs === "string") {
         const lower = rawArgs.toLowerCase();
-        if (lower.includes("r") || lower.includes("spicy") || lower.includes("bold")) ratingInput = "r";
+        if (
+          lower.includes("r") ||
+          lower.includes("spicy") ||
+          lower.includes("bold")
+        )
+          ratingInput = "r";
         else if (lower.includes("pg13")) ratingInput = "pg13";
         else if (lower.includes("pg")) ratingInput = "pg";
       }
