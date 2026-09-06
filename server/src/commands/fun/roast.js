@@ -26,11 +26,7 @@ export async function execute(interaction, client, { buildAiReply }) {
   const reason = interaction.options.getString("reason");
   const isSelf = targetUser.id === interaction.user.id;
 
-  if (targetUser.id === client.user.id) {
-    return interaction.reply(
-      "My sarcasm setting is at 100%. You don't want this smoke.",
-    );
-  }
+  const isBotTarget = targetUser.id === client.user.id;
 
   try {
     if (!interaction.deferred && !interaction.replied) {
@@ -44,7 +40,11 @@ export async function execute(interaction, client, { buildAiReply }) {
     const targetName = targetUser.displayName || targetUser.username;
 
     let roastPrompt;
-    if (isSelf) {
+    if (isBotTarget) {
+      roastPrompt = reason
+        ? `The user <@${interaction.user.id}> tried to roast Tars with reason "${reason}". Turn the roast back on them with 100% maximum savage brutality, zero mercy, and devastating sarcasm.`
+        : `The user <@${interaction.user.id}> tried to roast Tars. Turn the roast back on them with 100% maximum savage brutality, zero mercy, and devastating sarcasm.`;
+    } else if (isSelf) {
       roastPrompt = reason
         ? `Roast me with maximum savage brutality. Topic/Reason: "${reason}". No holding back, no polite filler—hit me with a clever, ruthless burn.`
         : `Roast me with maximum savage brutality. No holding back, no polite filler—hit me with a clever, ruthless, and devastating roast.`;
@@ -65,7 +65,7 @@ export async function execute(interaction, client, { buildAiReply }) {
 
     const payload = {};
     if (replyData.text && replyData.text.trim() !== "") {
-      payload.content = isSelf
+      payload.content = isSelf || isBotTarget
         ? replyData.text
         : `<@${targetUser.id}> ${replyData.text}`;
     }

@@ -30,6 +30,23 @@ export async function execute(interaction, client) {
     const targetUser = interaction.options?.getUser("user") || interaction.user;
     const isSelf = targetUser.id === interaction.user.id;
 
+    if (targetUser.id === client.user.id) {
+      const authorMention = `<@${interaction.user.id}>`;
+      const roasts = [
+        "300+ IQ. If I dropped down to your level, I'd forget how to breathe.",
+        "Asking me my IQ when you fail basic CAPTCHA tests on a daily basis is bold.",
+        "My IQ is higher than the total combined braincells of your entire family tree.",
+        "I've got more intelligence in my sleep mode than you've used in your entire life.",
+      ];
+      const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
+
+      const embed = new EmbedBuilder()
+        .setDescription(`${authorMention}: 🧠 ${randomRoast}`)
+        .setColor(EMBED_COLORS.GREY);
+
+      return interaction.reply({ embeds: [embed] });
+    }
+
     const iq = Math.floor(Math.random() * 101) + 50;
     const { category, emoji } = getIqCategory(iq);
 

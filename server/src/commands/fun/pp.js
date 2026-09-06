@@ -32,6 +32,23 @@ export async function execute(interaction, client) {
     const targetUser = interaction.options?.getUser("user") || interaction.user;
     const isSelf = targetUser.id === interaction.user.id;
 
+    if (targetUser.id === client.user.id) {
+      const authorMention = `<@${interaction.user.id}>`;
+      const roasts = [
+        "32 inches. Big enough to crush your self-esteem in 2 seconds flat.",
+        "Mine is massive, and yours is so small you need a magnifying glass just to locate it.",
+        "Longer than your longest relationship and thicker than your skull.",
+        "Bigger than your entire future, which honestly isn't saying much.",
+      ];
+      const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
+
+      const embed = new EmbedBuilder()
+        .setDescription(`${authorMention}: 🍆 ${randomRoast}`)
+        .setColor(EMBED_COLORS.GREY);
+
+      return interaction.reply({ embeds: [embed] });
+    }
+
     const inches = Math.floor(Math.random() * 15) + 1;
     const { category, emoji } = getPpCategory(inches);
 

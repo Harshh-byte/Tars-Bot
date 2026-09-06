@@ -36,6 +36,23 @@ export async function execute(interaction, client) {
     const targetUser = interaction.options?.getUser("user") || interaction.user;
     const isSelf = targetUser.id === interaction.user.id;
 
+    if (targetUser.id === client.user.id) {
+      const authorMention = `<@${interaction.user.id}>`;
+      const roasts = [
+        "0%. I'd rather stare at a blank wall for eternity than find you even remotely attractive.",
+        "I wouldn't touch you with a 50-foot pole, straight, gay, or otherwise.",
+        "I'm 0% gay, and you're 100% out of options.",
+        "You're checking my orientation when your entire life is one giant red flag of desperation.",
+      ];
+      const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
+
+      const embed = new EmbedBuilder()
+        .setDescription(`${authorMention}: 💅 ${randomRoast}`)
+        .setColor(EMBED_COLORS.GREY);
+
+      return interaction.reply({ embeds: [embed] });
+    }
+
     const percentage = Math.floor(Math.random() * 101);
     const { category, emoji } = getGayCategory(percentage);
 

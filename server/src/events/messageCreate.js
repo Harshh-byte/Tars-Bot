@@ -37,11 +37,13 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
 
   const isMentioned = message.mentions.has(client.user);
   let isReplyToBot = false;
+  let referencedAuthor = null;
 
   if (message.reference?.messageId) {
     try {
       const original = await message.fetchReference();
       isReplyToBot = original?.author?.id === client.user.id;
+      referencedAuthor = original?.author || null;
     } catch {
       isReplyToBot = false;
     }
@@ -96,6 +98,7 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
       }
       let targetUser =
         message.mentions.users.find((u) => message.content.includes(u.id)) ||
+        referencedAuthor ||
         null;
 
       if (!targetUser && args.length > 0) {
