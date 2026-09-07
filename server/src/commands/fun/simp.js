@@ -30,7 +30,8 @@ function getSimpCategory(percentage) {
       category: "Feet-Pic Donor",
       emoji: "<a:pepe_simp:1546229473589072062>",
     };
-  if (percentage >= 35) return { category: "Down Bad & Desperate", emoji: "🥵" };
+  if (percentage >= 35)
+    return { category: "Down Bad & Desperate", emoji: "🥵" };
   if (percentage >= 15)
     return { category: "Licking the Floor Boots", emoji: "👅" };
   return { category: "Cold-Hearted", emoji: "🗿" };

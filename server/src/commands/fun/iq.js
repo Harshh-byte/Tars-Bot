@@ -18,12 +18,28 @@ export const data = {
 };
 
 function getIqCategory(iq) {
-  if (iq >= 130) return { category: "Megamind", emoji: "🍷" };
-  if (iq >= 115) return { category: "Smartass", emoji: "🎓" };
-  if (iq >= 85) return { category: "Mid-tier", emoji: "🧠" };
-  if (iq >= 70) return { category: "Brain-Damaged", emoji: "📉" };
-  if (iq >= 50) return { category: "Room-Temperature", emoji: "🤡" };
-  return { category: "Sub-Human", emoji: "🧊" };
+  if (iq >= 140)
+    return {
+      category: "Psychopathic Genius",
+      emoji: "🍷",
+    };
+  if (iq >= 120)
+    return {
+      category: "Pretentious Prick",
+      emoji: "🎓",
+    };
+  if (iq >= 90)
+    return {
+      category: "Mid-tier NPC",
+      emoji: "🧠",
+    };
+  if (iq >= 70)
+    return { category: "Mouth-Breathing Window Licker", emoji: "📉" };
+  if (iq >= 40) return { category: "Cum-Stain", emoji: "🤡" };
+  return {
+    category: "Failed Abortion",
+    emoji: "🪦",
+  };
 }
 
 export async function execute(interaction, client) {
