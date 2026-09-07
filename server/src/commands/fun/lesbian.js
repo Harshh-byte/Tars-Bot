@@ -23,8 +23,9 @@ function getLesbianCategory(percentage) {
   if (percentage >= 85) return { category: "Scissor Queen", emoji: "✂️" };
   if (percentage >= 60)
     return { category: "Eats Pussy for Breakfast", emoji: "🚨" };
-  if (percentage >= 35) return { category: "Finger Bang Enthusiast", emoji: "🦄" };
-  if (percentage >= 15) return { category: "Closet Fruity", emoji: "👀" };
+  if (percentage >= 35)
+    return { category: "Finger Bang Enthusiast", emoji: "🦄" };
+  if (percentage >= 15) return { category: "Curious", emoji: "👀" };
   return { category: "Straight", emoji: "🗿" };
 }
 

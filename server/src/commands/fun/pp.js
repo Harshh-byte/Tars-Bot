@@ -21,15 +21,18 @@ export const data = {
 
 function getPpCategory(inches) {
   if (inches >= 12)
-    return { category: "Anaconda", emoji: "<:lipbite:1543158624572932156>" };
-  if (inches >= 8) return { category: "Throat Destroyer", emoji: "🍌" };
-  if (inches >= 4) return { category: "Decent Meat", emoji: "🍆" };
+    return {
+      category: "Throat Destroyer",
+      emoji: "<:lipbite:1543158624572932156>",
+    };
+  if (inches >= 8) return { category: "Heavy Duty Meat", emoji: "🍌" };
+  if (inches >= 4) return { category: "Average Pencil Pusher", emoji: "🍆" };
   if (inches > 0)
     return {
       category: "Limp Micro-Needle",
       emoji: "<:nopepe:1543158686870937661>",
     };
-  return { category: "Inverted Clit", emoji: "🔍" };
+  return { category: "Inverted Hole", emoji: "🕳️" };
 }
 
 export async function execute(interaction, client) {

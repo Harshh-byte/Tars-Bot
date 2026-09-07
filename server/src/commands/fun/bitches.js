@@ -25,7 +25,8 @@ function getBitchesCategory(count) {
       category: "Getting Your Dick Wet",
       emoji: "<:blushed:1543158784653004810>",
     };
-  if (count >= 15) return { category: "Scraping Bottom of the Barrel", emoji: "😏" };
+  if (count >= 15)
+    return { category: "Scraping Bottom of the Barrel", emoji: "🚮" };
   if (count > 0) return { category: "Desperate Crumb-Snatcher", emoji: "🤏" };
   return {
     category: "Chronically Maidenless",

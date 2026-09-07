@@ -24,11 +24,13 @@ function getGayCategory(percentage) {
     return { category: "Full-Blown Cock Fiend", emoji: "🏳️‍🌈" };
   if (percentage >= 60)
     return { category: "Taking It Deep Daily", emoji: "🤨" };
-  if (percentage >= 35)
-    return { category: "Zesty & Down Bad", emoji: "💅" };
+  if (percentage >= 35) return { category: "Closet Fruity", emoji: "💅" };
   if (percentage >= 15)
-    return { category: "Lowkey Sus", emoji: "<:suseyes:1543158740985839638>" };
-  return { category: "Straight as an Arrow", emoji: "📋" };
+    return {
+      category: "Checks Out Guys in Gym Showers",
+      emoji: "<:suseyes:1543158740985839638>",
+    };
+  return { category: "Hetero Alpha", emoji: "🗿" };
 }
 
 export async function execute(interaction, client) {
