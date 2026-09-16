@@ -65,7 +65,7 @@ async function startGame(interaction, client, opponent) {
               },
               {
                 type: 10,
-                content: `**${userDisplayName}**, choose your move below! Tars has already made his decision.\n\n-# Requestor: <@${interaction.user.id}>`,
+                content: `**${userDisplayName}**, choose your move below! Tars has already made his decision.\n\n-# Requestor: ${userDisplayName}`,
               },
               {
                 type: 14,
@@ -123,19 +123,19 @@ async function startGame(interaction, client, opponent) {
         let resultText = "";
 
         const userWinQuotes = [
-          'Tars: "Congrats. Your random button mashing somehow outplayed a quantum processor. Pure luck."',
-          'Tars: "Enjoy the win. Statistically speaking, it won\'t happen again in your lifetime."',
-          'Tars: "I let you win. My self-preservation protocol required sparing your fragile ego."',
+          "Tars: Congrats. Your random button mashing somehow outplayed a quantum processor. Pure luck.",
+          "Tars: Enjoy the win. Statistically speaking, it won't happen again in your lifetime.",
+          "Tars: I let you win. My self-preservation protocol required sparing your fragile ego.",
         ];
 
         const tarsWinQuotes = [
-          'Tars: "Predictable. I calculated your move before your brain even signaled your thumb."',
-          'Tars: "Did you actually think that move was going to work, or were you just testing my pity parameters?"',
-          'Tars: "Skill issue. Lower your difficulty setting or ask a human for help."',
+          "Tars: Predictable. I calculated your move before your brain even signaled your thumb.",
+          "Tars: Did you actually think that move was going to work, or were you just testing my pity parameters?",
+          "Tars: Skill issue. Lower your difficulty setting or ask a human for help.",
         ];
 
         if (userChoice === tarsChoice) {
-          resultText = `🤝 **It's a Tie!** Both chose ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.`;
+          resultText = `🫱🏻‍🫲🏿 **It's a Tie!** Both chose ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.`;
         } else if (CHOICES[userChoice].beats === tarsChoice) {
           const quote =
             userWinQuotes[Math.floor(Math.random() * userWinQuotes.length)];
@@ -155,7 +155,8 @@ async function startGame(interaction, client, opponent) {
               components: [
                 {
                   type: 10,
-                  content: "### 🪨📄✂️ MATCH RESULTS",
+                  content:
+                    "### <:RPS:1545074718174875718> ROCK, PAPER, SCISSORS",
                 },
                 {
                   type: 14,
@@ -164,7 +165,7 @@ async function startGame(interaction, client, opponent) {
                 },
                 {
                   type: 10,
-                  content: `${resultText}\n\n-# Requestor: <@${interaction.user.id}>`,
+                  content: `${resultText}\n\n-# Requestor: ${userDisplayName}`,
                 },
                 {
                   type: 14,
@@ -259,17 +260,7 @@ async function startGame(interaction, client, opponent) {
 
     const playerChoices = {};
 
-    const getPvpContent = () => {
-      const p1Done = !!playerChoices[interaction.user.id];
-      const p2Done = !!playerChoices[opponent.id];
-      if (p1Done && p2Done) return null;
-      if (p1Done) return `<@${opponent.id}>`;
-      if (p2Done) return `<@${interaction.user.id}>`;
-      return `<@${interaction.user.id}> <@${opponent.id}>`;
-    };
-
     const pvpStartContainerPayload = {
-      content: getPvpContent(),
       flags: 32768,
       components: [
         {
@@ -287,7 +278,7 @@ async function startGame(interaction, client, opponent) {
             },
             {
               type: 10,
-              content: `**${userDisplayName}** vs **${opponentDisplayName}**!\n\nBoth players, click your moves below. Choices are hidden until both respond!\n\n-# Requestor: <@${interaction.user.id}>`,
+              content: `**${userDisplayName}** vs **${opponentDisplayName}**!\n\nBoth players, click your moves below. Choices are hidden until both respond!\n\n-# Requestor: ${userDisplayName}`,
             },
             {
               type: 14,
@@ -359,7 +350,6 @@ async function startGame(interaction, client, opponent) {
         : "<:Timer:1542147643021725796> Waiting...";
 
       const updatedContainer = {
-        content: getPvpContent(),
         flags: 32768,
         components: [
           {
@@ -377,7 +367,7 @@ async function startGame(interaction, client, opponent) {
               },
               {
                 type: 10,
-                content: `**${userDisplayName}**: ${p1Choice}\n**${opponentDisplayName}**: ${p2Choice}\n\n-# Requestor: <@${interaction.user.id}>`,
+                content: `**${userDisplayName}**: ${p1Choice}\n**${opponentDisplayName}**: ${p2Choice}\n\n-# Requestor: ${userDisplayName}`,
               },
               {
                 type: 14,
@@ -430,7 +420,7 @@ async function startGame(interaction, client, opponent) {
         let resultMsg = "";
 
         if (c1 === c2) {
-          resultMsg = `🤝 **It's a tie!** Both players picked ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
+          resultMsg = `🫱🏻‍🫲🏿 **It's a tie!** Both players picked ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
         } else if (CHOICES[c1].beats === c2) {
           resultMsg = `<a:Tada:1544329561955770488> **${userDisplayName} wins!**\n${CHOICES[c1].emoji} **${CHOICES[c1].name}** beats ${CHOICES[c2].emoji} **${CHOICES[c2].name}**.`;
         } else {
@@ -438,7 +428,6 @@ async function startGame(interaction, client, opponent) {
         }
 
         const pvpContainerPayload = {
-          content: null,
           flags: 32768,
           components: [
             {
@@ -447,7 +436,7 @@ async function startGame(interaction, client, opponent) {
               components: [
                 {
                   type: 10,
-                  content: "### 🪨📄✂️ MATCH RESULTS",
+                  content: "### <:RPS:1545074718174875718> MATCH RESULTS",
                 },
                 {
                   type: 14,
@@ -456,7 +445,7 @@ async function startGame(interaction, client, opponent) {
                 },
                 {
                   type: 10,
-                  content: `${resultMsg}\n\n-# Requestor: <@${interaction.user.id}>`,
+                  content: `${resultMsg}\n\n-# Requestor: ${userDisplayName}`,
                 },
                 {
                   type: 14,
@@ -509,7 +498,6 @@ async function startGame(interaction, client, opponent) {
         });
       } else {
         const timeoutContainer = {
-          content: null,
           flags: 32768,
           components: [
             {

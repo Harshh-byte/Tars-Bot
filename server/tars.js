@@ -241,6 +241,40 @@ async function generateContentJson(
   }
 }
 
+async function generateAskContent(contents, systemInstruction) {
+  const apiCall = () =>
+    ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents,
+      config: {
+        systemInstruction,
+        maxOutputTokens: 250,
+        temperature: 0.7,
+        tools: [{ googleSearch: {} }],
+      },
+    });
+
+  try {
+    const res = await callGeminiWithRetry(apiCall);
+    const text =
+      res.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") ||
+      res.text ||
+      "";
+    return {
+      text: text.trim(),
+      reactions: [],
+      gifSearchQuery: "",
+    };
+  } catch (error) {
+    logger.error("Error in generateAskContent with Google Search:", error);
+    return {
+      text: "I couldn't retrieve an answer right now. Please try again later.",
+      reactions: [],
+      gifSearchQuery: "",
+    };
+  }
+}
+
 function sanitizeEmojiTags(text) {
   if (!text) return text;
   return text
@@ -335,16 +369,45 @@ export async function buildAiReply({
     logger.warn("Could not aggregate global client emojis:", e);
   }
 
-  const systemPrompt = `${tarsSystemPrompt}\n### USER_CONTEXT:\n- Mode: ${mode}\n- Author: ${authorName}\n- Author Gender: ${authorGender || "Unknown"}\n- Target: ${targetName}\n### LIVE_DATA:\n- Time: ${Time.time} | Date: ${Time.date}\n${emojisContext}`;
+  let systemPrompt;
+  if (mode === "ask") {
+    systemPrompt = `You are Tars — the sharp, witty Discord AI assistant.
+The user asked: "${inputText}".
 
-  let replyObj = await generateContentJson(
-    convo.messages.map((m) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: sanitizeEmojiTags(m.content) }],
-    })),
-    systemPrompt,
-    mode === "roast" ? 1.25 : 1.0,
-  );
+LIVE SYSTEM DATA:
+- Current Time: ${Time.time} | Date: ${Time.date}
+
+Rules for ASK mode:
+1. Response Length: Keep your answer SHORT, CONCISE, and direct (1 to 2 sentences max).
+2. ROASTING RULE: You are ONLY allowed to include a 1-liner roast if the user's question is explicitly about one of these 4 specific topics:
+   - Weather query ➔ Include a short roast about going outside/looking out a window + exact weather.
+   - Time query ➔ Include a short roast about checking their screen's clock + exact time.
+   - Date query ➔ Include a short roast about checking a calendar + exact date.
+   - Day query ➔ Include a short roast about forgetting the day of the week + exact day of the week.
+3. FOR ALL OTHER TOPICS: DO NOT include any roast or jokes. Give a 100% straight, direct, plain factual answer only.
+4. Format in plain text only.`;
+  } else {
+    systemPrompt = `${tarsSystemPrompt}\n### USER_CONTEXT:\n- Mode: ${mode}\n- Author: ${authorName}\n- Author Gender: ${authorGender || "Unknown"}\n- Target: ${targetName}\n### LIVE_DATA:\n- Time: ${Time.time} | Date: ${Time.date}\n${emojisContext}`;
+  }
+
+  const messagesPayload =
+    mode === "ask"
+      ? [{ role: "user", parts: [{ text: sanitizeEmojiTags(inputText) }] }]
+      : convo.messages.map((m) => ({
+          role: m.role === "assistant" ? "model" : "user",
+          parts: [{ text: sanitizeEmojiTags(m.content) }],
+        }));
+
+  let replyObj;
+  if (mode === "ask") {
+    replyObj = await generateAskContent(messagesPayload, systemPrompt);
+  } else {
+    replyObj = await generateContentJson(
+      messagesPayload,
+      systemPrompt,
+      mode === "roast" ? 1.25 : 1.0,
+    );
+  }
 
   replyObj.text = cleanReplyText(replyObj.text);
 
@@ -437,7 +500,10 @@ client.on(Events.MessageCreate, (message) =>
 );
 
 const app = express();
-app.use("/assets", express.static(fileURLToPath(new URL("../assets", import.meta.url))));
+app.use(
+  "/assets",
+  express.static(fileURLToPath(new URL("../assets", import.meta.url))),
+);
 
 app.get("/", (req, res) => {
   res.send(`<!DOCTYPE html>

@@ -63,7 +63,18 @@ function getLoveRating(percentage) {
   };
 }
 
-function calculateShipScore() {
+function calculateShipScore(id1, id2) {
+  const ownerId = process.env.OWNER_ID;
+  const herId = process.env.HER_ID;
+
+  if (ownerId && herId) {
+    const isOwner = id1 === ownerId || id2 === ownerId;
+    const isHer = id1 === herId || id2 === herId;
+
+    if (isOwner && isHer) return 100;
+    if (isHer) return 0;
+  }
+
   return Math.floor(Math.random() * 101);
 }
 
@@ -283,23 +294,30 @@ export async function execute(interaction, client) {
     ctx.roundRect(barX, barY, barW, barH, cornerRadius);
     ctx.fill();
 
-    const fillWidth = Math.max(12, (barW * percentage) / 100);
-    const fillGradient = ctx.createLinearGradient(barX, 0, barX + fillWidth, 0);
-    if (percentage >= 70) {
-      fillGradient.addColorStop(0, "#ff0055");
-      fillGradient.addColorStop(1, "#ff5599");
-    } else if (percentage >= 40) {
-      fillGradient.addColorStop(0, "#ff2a6d");
-      fillGradient.addColorStop(1, "#ff62a5");
-    } else {
-      fillGradient.addColorStop(0, "#3f51b5");
-      fillGradient.addColorStop(1, "#7986cb");
-    }
+    if (percentage > 0) {
+      const fillWidth = (barW * percentage) / 100;
 
-    ctx.fillStyle = fillGradient;
-    ctx.beginPath();
-    ctx.roundRect(barX, barY, fillWidth, barH, cornerRadius);
-    ctx.fill();
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(barX, barY, barW, barH, cornerRadius);
+      ctx.clip();
+
+      const fillGradient = ctx.createLinearGradient(barX, 0, barX + fillWidth, 0);
+      if (percentage >= 70) {
+        fillGradient.addColorStop(0, "#ff0055");
+        fillGradient.addColorStop(1, "#ff5599");
+      } else if (percentage >= 40) {
+        fillGradient.addColorStop(0, "#ff2a6d");
+        fillGradient.addColorStop(1, "#ff62a5");
+      } else {
+        fillGradient.addColorStop(0, "#3f51b5");
+        fillGradient.addColorStop(1, "#7986cb");
+      }
+
+      ctx.fillStyle = fillGradient;
+      ctx.fillRect(barX, barY, fillWidth, barH);
+      ctx.restore();
+    }
 
     const imageBuffer = await canvas.toBuffer("image/png");
     const attachment = new AttachmentBuilder(imageBuffer, { name: "ship.png" });

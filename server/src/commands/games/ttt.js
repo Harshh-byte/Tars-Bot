@@ -85,7 +85,7 @@ function buildGridComponents(board, disabled = false) {
         btn.emoji = { id: "1542154996013863023", name: "o_" };
         btn.style = 3;
       } else {
-        btn.label = "​";
+        btn.emoji = { name: "▫️" };
         btn.style = 2;
       }
       row.components.push(btn);
@@ -151,7 +151,7 @@ function buildV2GridPayload(
     },
     {
       type: 10,
-      content: `**${playerXName}** vs **${playerOName}**\n\nTurn: ${symbol} <@${turnUserId}>\n\n-# Requestor: <@${playerXId}>`,
+      content: `**${playerXName}** vs **${playerOName}**\n\nTurn: ${symbol} <@${turnUserId}>\n\n-# Requestor: ${playerXName}`,
     },
     {
       type: 14,
@@ -162,7 +162,6 @@ function buildV2GridPayload(
   ];
 
   return {
-    content: !disabled && !isVsTars ? `<@${turnUserId}>` : null,
     flags: 32768,
     components: [
       {
@@ -192,9 +191,7 @@ async function startGame(interaction, client, opponent) {
       }
       if (opponent.id === interaction.user.id) {
         return interaction.reply({
-          content:
-            "You can't play against yourself! Leave the opponent option blank to play with Tars.",
-          ephemeral: true,
+          content: "You can't play against yourself!",
         });
       }
     }
@@ -239,13 +236,12 @@ async function startGame(interaction, client, opponent) {
         const winnerMention = isVsTars ? "**Tars**" : `<@${playerO.id}>`;
         winnerText =
           `<a:Tada:1544329561955770488> **${winnerMention} won the match!**` +
-          (isVsTars ? `\n\n*Tars: "Predictable outcome."*` : "");
+          (isVsTars ? `\n\n*Tars: Predictable outcome.*` : "");
       } else if (winner === "TIE") {
-        winnerText = `🤝 **It's a Tie Game!**`;
+        winnerText = `🫱🏻‍🫲🏿 **It's a Tie Game!**`;
       }
 
       const v2EndPayload = {
-        content: null,
         flags: 32768,
         components: [
           {
@@ -254,7 +250,7 @@ async function startGame(interaction, client, opponent) {
             components: [
               {
                 type: 10,
-                content: "### ⚔️ TIC-TAC-TOE MATCH RESULTS",
+                content: "### ⚔️ TIC-TAC-TOE",
               },
               {
                 type: 14,
@@ -263,7 +259,7 @@ async function startGame(interaction, client, opponent) {
               },
               {
                 type: 10,
-                content: `${winnerText}\n\n-# Requestor: <@${playerX.id}>`,
+                content: `${winnerText}\n\n-# Requestor: ${playerXName}`,
               },
               {
                 type: 14,
@@ -370,7 +366,6 @@ async function startGame(interaction, client, opponent) {
       if (["X", "O", "TIE"].includes(reason)) return;
 
       const timeoutContainer = {
-        content: null,
         flags: 32768,
         components: [
           {
@@ -388,7 +383,7 @@ async function startGame(interaction, client, opponent) {
               },
               {
                 type: 10,
-                content: `The game was cancelled due to inactivity.\n\n-# Requestor: <@${playerX.id}>`,
+                content: `The game was cancelled due to inactivity.\n\n-# Requestor: ${playerXName}`,
               },
               {
                 type: 14,
