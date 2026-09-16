@@ -112,6 +112,11 @@ const modulesCatalog = {
         cmd: "meme",
         desc: "Display a trending meme from Reddit!",
       },
+      {
+        name: "AutoMeme",
+        cmd: "automeme",
+        desc: "Automated scheduled Reddit memes.",
+      },
     ],
   },
   module_actions: {

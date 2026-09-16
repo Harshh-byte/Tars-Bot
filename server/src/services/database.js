@@ -283,6 +283,61 @@ export async function setUserGender(userId, gender) {
   } catch (err) {}
 }
 
+export async function saveAutoMemeConfig(serverId, config) {
+  if (!serverId) return;
+  try {
+    await serverDoc(serverId).set(
+      {
+        autoMeme: {
+          ...config,
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+      },
+      { merge: true },
+    );
+  } catch (err) {
+    logger.error(`Failed to save autoMeme config for ${serverId}:`, err);
+  }
+}
+
+export async function getAutoMemeConfigs() {
+  try {
+    const snapshot = await serversRef.get();
+    if (snapshot.empty) return [];
+    const results = [];
+    snapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      if (data?.autoMeme && data.autoMeme.enabled) {
+        results.push({
+          serverId: doc.id,
+          ...data.autoMeme,
+        });
+      }
+    });
+    return results;
+  } catch (err) {
+    logger.error(`Failed to get autoMeme configs:`, err);
+    return [];
+  }
+}
+
+export async function deleteAutoMemeConfig(serverId) {
+  if (!serverId) return;
+  try {
+    await serverDoc(serverId).set(
+      {
+        autoMeme: {
+          enabled: false,
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+      },
+      { merge: true },
+    );
+  } catch (err) {
+    logger.error(`Failed to delete autoMeme config for ${serverId}:`, err);
+  }
+}
+
 cron.schedule("0 0 * * *", async () => {
   try {
     const cutoff = Timestamp.fromDate(new Date(Date.now() - DATA_RETENTION_MS));

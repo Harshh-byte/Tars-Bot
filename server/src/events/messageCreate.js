@@ -140,6 +140,10 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
               ? targetUser
               : mentions[0] || targetUser || null;
           },
+          getChannel: (name) => {
+            const channelMention = message.mentions.channels.first();
+            return channelMention || null;
+          },
           getString: () => args.join(" ") || null,
         },
         deferReply: async () => {
