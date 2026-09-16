@@ -23,6 +23,7 @@ import logger from "./src/utils/logger.js";
 import * as interactionCreateEvent from "./src/events/interactionCreate.js";
 import * as messageCreateEvent from "./src/events/messageCreate.js";
 import { initReminderManager } from "./src/services/reminder.js";
+import { initAutoMemeService } from "./src/services/automeme.js";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -475,6 +476,7 @@ client.once(Events.ClientReady, async (c) => {
   logger.info(`${c.user.tag} is online.`);
   client.updateBotPresence();
   initReminderManager(client);
+  initAutoMemeService(client);
 
   const uniqueCommandsMap = new Map();
   for (const cmd of client.commands.values()) {

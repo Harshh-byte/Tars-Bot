@@ -15,14 +15,6 @@ export async function execute(interaction, client) {
   try {
     const guild = interaction.guild;
 
-    if (!guild) {
-      const errEmbed = errorEmbed({
-        title: "Command Failed",
-        description: "This command can only be used inside a server.",
-      });
-      return interaction.reply({ embeds: [errEmbed] });
-    }
-
     await guild.fetch().catch(() => null);
 
     const createdTimestamp = Math.floor(guild.createdTimestamp / 1000);

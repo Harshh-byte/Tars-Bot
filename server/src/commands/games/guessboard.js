@@ -69,18 +69,6 @@ export async function execute(interaction, client) {
 
 export async function showLeaderboard(interaction, client, category = "flag") {
   const serverId = interaction.guild?.id;
-  if (!serverId) {
-    const errorPayload = {
-      content: "Leaderboard is only available inside a server!",
-      ephemeral: true,
-    };
-    return interaction.isButton && interaction.isButton()
-      ? interaction.reply(errorPayload)
-      : interaction.replied || interaction.deferred
-        ? interaction.followUp(errorPayload)
-        : interaction.reply(errorPayload);
-  }
-
   const payload = await buildLbPayload(serverId, category);
   const response = await sendAndFetchReply(interaction, payload);
 

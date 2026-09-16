@@ -176,6 +176,14 @@ export const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
+    trigger: "/automeme",
+    category: "fun",
+    title: "AutoMeme Scheduler",
+    description: "Automated scheduled Reddit memes.",
+    badge: "Fun",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
     trigger: "/smoke",
     category: "actions",
     title: "Smoke",
