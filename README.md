@@ -8,7 +8,7 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 
 ## ✨ Features
 
-- **🧠 AI & Sarcasm Engine:** Powered by `@google/genai` for roasts, wishes, and conversational AI responses.
+- **🧠 AI & Search Engine:** Powered by `@google/genai` for roasts, wishes, `.ask` AI question search, and conversational responses.
 - **⚙️ Dynamic Prefix Manager:** Per-server prefix configuration (`.prefix`) backed by Firebase Firestore.
 - **📖 Interactive Help System:** Module selection menus, 5-item pagination, and detailed command inspectors (`.help`).
 - **🚬 Server Action Trackers:** Persistent hit counters for `.smoke` and `.vape` commands per server.
@@ -23,7 +23,7 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 
 | Category | Commands | Description |
 | :--- | :--- | :--- |
-| **Utility** | `.help`, `.prefix`, `.ping`, `.about` | Interactive menus, prefix control, diagnostics & bot info |
+| **Utility** | `.help`, `.prefix`, `.ping`, `.about`, `.ask` | Interactive menus, prefix control, diagnostics, bot info & AI question search |
 | **Actions** | `.smoke`, `.vape` | Per-server hit counters with animated emojis |
 | **Games** | `.guess`, `.guessboard`, `.flag`, `.pokemon`, `.flb`, `.plb`, `.tod`, `.wyr`, `.nhie`, `.rps`, `.ttt`, `.flip`, `.roll` | Interactive guessing mini-games, party games & decision tools |
 | **Fun** | `.ship`, `.iq`, `.pp`, `.gay`, `.lesbian`, `.bitches`, `.autism`, `.roast`, `.wish`, `.meme` | Calculators, AI roasts, wishes & Reddit memes |

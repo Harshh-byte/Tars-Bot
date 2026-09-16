@@ -141,6 +141,7 @@ const modulesCatalog = {
       { name: "Ping", cmd: "ping", desc: "Check bot latency." },
       { name: "About", cmd: "about", desc: "View information about the bot." },
       { name: "Remind", cmd: "remind", desc: "Set a smart reminder." },
+      { name: "Ask", cmd: "ask", desc: "Ask Tars anything." },
       { name: "Help", cmd: "help", desc: "View command list or help." },
     ],
   },

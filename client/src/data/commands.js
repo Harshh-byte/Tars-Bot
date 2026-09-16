@@ -247,6 +247,14 @@ export const commands = [
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },
+  {
+    trigger: "/ask",
+    category: "util",
+    title: "Ask Tars",
+    description: "Ask Tars anything.",
+    badge: "Utility",
+    badgeColor: "text-ds-green bg-ds-green/10",
+  },
 ];
 
 export const categories = [

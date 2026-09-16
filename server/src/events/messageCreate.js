@@ -148,14 +148,14 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
         },
         reply: async (payload) => {
           mockInteraction.replied = true;
-          sentMessage = await message.channel.send(payload);
+          sentMessage = await message.reply(payload).catch(() => message.channel.send(payload));
           return sentMessage;
         },
         followUp: async (payload) => {
           if (sentMessage) {
             return sentMessage.edit(payload);
           }
-          sentMessage = await message.channel.send(payload);
+          sentMessage = await message.reply(payload).catch(() => message.channel.send(payload));
           return sentMessage;
         },
         editReply: async (payload) => {
@@ -163,7 +163,7 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
           if (sentMessage) {
             return sentMessage.edit(payload);
           }
-          sentMessage = await message.channel.send(payload);
+          sentMessage = await message.reply(payload).catch(() => message.channel.send(payload));
           return sentMessage;
         },
         deleteReply: async () => {

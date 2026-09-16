@@ -82,6 +82,7 @@ async function fetchQuestion(type, rating = "pg") {
       if (data && data.question) {
         return {
           type: chosenType,
+          headerType: type,
           question: data.question,
           rating: (data.rating || targetRating).toUpperCase(),
         };
@@ -93,7 +94,12 @@ async function fetchQuestion(type, rating = "pg") {
 
   const fallbacks = chosenType === "truth" ? FALLBACK_TRUTHS : FALLBACK_DARES;
   const question = fallbacks[Math.floor(Math.random() * fallbacks.length)];
-  return { type: chosenType, question, rating: targetRating.toUpperCase() };
+  return {
+    type: chosenType,
+    headerType: type,
+    question,
+    rating: targetRating.toUpperCase(),
+  };
 }
 
 function buildV2Payload(
@@ -102,8 +108,13 @@ function buildV2Payload(
   rating,
   aiCommentary,
   requestorName,
+  headerType,
 ) {
-  const titleIcon = promptType === "truth" ? "❓" : "🎯";
+  const displayHeader = headerType || promptType;
+  let titleIcon = "🎲";
+  if (displayHeader === "truth") titleIcon = "❓";
+  else if (displayHeader === "dare") titleIcon = "🎯";
+
   return {
     flags: 32768,
     components: [
@@ -113,7 +124,7 @@ function buildV2Payload(
         components: [
           {
             type: 10,
-            content: `### ${titleIcon} ${promptType.toUpperCase()}`,
+            content: `### ${titleIcon} ${displayHeader.toUpperCase()}`,
           },
           {
             type: 14,
@@ -192,6 +203,7 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       rawInput && ["truth", "dare"].includes(rawInput) ? rawInput : "random";
     const {
       type: promptType,
+      headerType,
       question,
       rating,
     } = await fetchQuestion(type, ratingInput);
@@ -224,6 +236,7 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       rating,
       aiCommentary,
       requestorName,
+      headerType,
     );
     const response = await sendAndFetchReply(interaction, payload);
 
@@ -278,6 +291,7 @@ function attachTodCollector(message, ratingInput, buildAiReply) {
         nextPrompt.rating,
         nextAiComment,
         requestorName,
+        nextPrompt.headerType,
       );
       const newMsg = await sendAndFetchReply(btnInteraction, payload);
 
