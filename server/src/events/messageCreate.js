@@ -152,7 +152,7 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
         },
         reply: async (payload) => {
           mockInteraction.replied = true;
-          sentMessage = commandName === "ask"
+          sentMessage = (commandName === "ask" || commandName === "about")
             ? await message.reply(payload).catch(() => message.channel.send(payload))
             : await message.channel.send(payload).catch(() => null);
           return sentMessage;
@@ -161,7 +161,7 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
           if (sentMessage) {
             return sentMessage.edit(payload);
           }
-          sentMessage = commandName === "ask"
+          sentMessage = (commandName === "ask" || commandName === "about")
             ? await message.reply(payload).catch(() => message.channel.send(payload))
             : await message.channel.send(payload).catch(() => null);
           return sentMessage;
@@ -171,7 +171,7 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
           if (sentMessage) {
             return sentMessage.edit(payload);
           }
-          sentMessage = commandName === "ask"
+          sentMessage = (commandName === "ask" || commandName === "about")
             ? await message.reply(payload).catch(() => message.channel.send(payload))
             : await message.channel.send(payload).catch(() => null);
           return sentMessage;
@@ -237,7 +237,7 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
     }
 
     if (messagePayload.content || messagePayload.files) {
-      await message.channel.send(messagePayload);
+      await message.reply(messagePayload);
     }
   } catch (err) {
     logger.error("Error in MessageCreate event handler execution:", err);

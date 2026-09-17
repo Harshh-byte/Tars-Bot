@@ -367,7 +367,7 @@ function buildButtons() {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId("flag_next")
-      .setLabel("Next Flag")
+      .setLabel("Play Again")
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
       .setCustomId("show_lb_flag")
@@ -414,6 +414,9 @@ async function startFlagGame(
     const allCountries = await fetchCountriesFromApi();
     const channelId =
       interaction.channelId || interaction.channel?.id || "default";
+    if (!isFollowUp) {
+      channelSkipsMap.set(channelId, 0);
+    }
 
     let filteredCountries = allCountries;
     if (selectedDifficulty) {
@@ -539,7 +542,7 @@ async function startFlagGame(
           closeMatchUsers.add(m.author.id);
           await m
             .reply({
-              content: `*<@${m.author.id}>, you're so close! Check for typos!*`,
+              content: `*You're so close! Check for typos!*`,
             })
             .catch(() => null);
         }
