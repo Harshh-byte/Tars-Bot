@@ -169,7 +169,7 @@ function buildButtons() {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId("pokemon_next")
-      .setLabel("Next Pokémon")
+      .setLabel("Play Again")
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
       .setCustomId("show_lb_pokemon")
@@ -213,6 +213,9 @@ async function startPokemonGame(
   try {
     const channelId =
       interaction.channelId || interaction.channel?.id || "default";
+    if (!isFollowUp) {
+      channelSkipsMap.set(channelId, 0);
+    }
     const targetPokemon = await fetchRandomPokemon(genSelection, channelId);
 
     const userDisplayName =
@@ -318,7 +321,7 @@ async function startPokemonGame(
           closeMatchUsers.add(m.author.id);
           await m
             .reply({
-              content: `*<@${m.author.id}>, you're so close! Check for typos!*`,
+              content: `*You're so close! Check for typos!*`,
             })
             .catch(() => null);
         }

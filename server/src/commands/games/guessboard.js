@@ -89,9 +89,15 @@ async function buildLbPayload(serverId, category) {
   } else {
     bodyContent = topPlayers
       .map((player, index) => {
-        const medal =
-          index === 0 ? "🥇 " : index === 1 ? "🥈 " : index === 2 ? "🥉 " : "";
-        return `${medal}<@${player.userId}> — **${player.points}** Pts *(${player.wins} guessed)*`;
+        const rankPrefix =
+          index === 0
+            ? "🥇 "
+            : index === 1
+            ? "🥈 "
+            : index === 2
+            ? "🥉 "
+            : `\`${index + 1}.\` `;
+        return `${rankPrefix}<@${player.userId}> — **${player.points}** Pts *(${player.wins} guessed)*`;
       })
       .join("\n");
   }
@@ -100,6 +106,7 @@ async function buildLbPayload(serverId, category) {
 
   return {
     flags: 32768,
+    allowedMentions: { parse: [] },
     components: [
       {
         type: 17,

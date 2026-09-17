@@ -50,7 +50,7 @@ export async function execute(interaction, client) {
           components: [
             {
               type: 10,
-              content: "### SMOKE SESSION",
+              content: "<a:smok:1542640291654144082> ### SMOKE SESSION",
             },
             {
               type: 14,
@@ -74,11 +74,6 @@ export async function execute(interaction, client) {
                   custom_id: "smoke_again",
                   style: 2,
                   label: "Take Another Hit",
-                  emoji: {
-                    id: "1542640291654144082",
-                    name: "smok",
-                    animated: true,
-                  },
                 },
               ],
             },

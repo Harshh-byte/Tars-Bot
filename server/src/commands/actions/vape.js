@@ -48,7 +48,7 @@ export async function execute(interaction, client) {
           components: [
             {
               type: 10,
-              content: "### VAPE SESSION",
+              content: "🌬️ ### VAPE SESSION",
             },
             {
               type: 14,
@@ -72,7 +72,6 @@ export async function execute(interaction, client) {
                   custom_id: "vape_again",
                   style: 2,
                   label: "Hit Vape Again",
-                  emoji: { name: "🌬️" },
                 },
               ],
             },
