@@ -7,6 +7,7 @@ const SUBREDDITS = [
   "darkmemers",
   "dankmemes",
   "me_irl",
+  "FingMemes",
 ];
 
 async function fetchMeme() {
@@ -16,6 +17,11 @@ async function fetchMeme() {
     if (!res.ok) return null;
     const data = await res.json();
     if (!data || !data.url) return null;
+
+    const lowerUrl = data.url.toLowerCase();
+    const isImage = /\.(jpg|jpeg|png|webp)(\?.*)?$/i.test(lowerUrl);
+    if (!isImage) return null;
+
     return data;
   } catch (err) {
     logger.warn(`Failed to fetch auto-meme: ${err.message}`);
