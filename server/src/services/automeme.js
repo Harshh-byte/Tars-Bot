@@ -4,13 +4,9 @@ import logger from "../utils/logger.js";
 import { getAutoMemeConfigs, saveAutoMemeConfig } from "./database.js";
 
 const SUBREDDITS = [
-  "dankmemes",
   "darkmemers",
-  "memes",
-  "wholesomememes",
+  "dankmemes",
   "me_irl",
-  "programmerhumor",
-  "comics",
 ];
 
 async function fetchMeme() {
@@ -19,7 +15,7 @@ async function fetchMeme() {
     const res = await fetch(`https://meme-api.com/gimme/${subreddit}`);
     if (!res.ok) return null;
     const data = await res.json();
-    if (!data || !data.url || data.nsfw) return null;
+    if (!data || !data.url) return null;
     return data;
   } catch (err) {
     logger.warn(`Failed to fetch auto-meme: ${err.message}`);
@@ -54,7 +50,7 @@ export function initAutoMemeService(client) {
               .setImage(meme.url)
               .setColor(randomColor)
               .setFooter({
-                text: `AutoMeme • ${meme.ups ? meme.ups.toLocaleString() : 0} upvotes • r/${meme.subreddit}`,
+                text: `AutoMeme • ${meme.ups ? meme.ups.toLocaleString() : 0} upvotes`,
                 iconURL: "https://cdn.discordapp.com/emojis/1540698439594016778.png",
               });
 
