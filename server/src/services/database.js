@@ -75,11 +75,12 @@ export async function saveConversation(serverId, userId, data) {
 export async function incrementUserStat(serverId, userId, statKey) {
   validateIds(serverId, userId);
   const ref = memberDoc(serverId, userId);
+  const cleanKey = statKey.replace(/^stats\./, "");
   try {
     await ref.set(
       {
         stats: {
-          [statKey]: FieldValue.increment(1),
+          [cleanKey]: FieldValue.increment(1),
         },
         updatedAt: FieldValue.serverTimestamp(),
       },
@@ -87,10 +88,10 @@ export async function incrementUserStat(serverId, userId, statKey) {
     );
     const snapshot = await ref.get();
     const data = snapshot.data();
-    return data?.stats?.[statKey] ?? data?.[`stats.${statKey}`] ?? 1;
+    return data?.stats?.[cleanKey] ?? 1;
   } catch (err) {
     if (!global.memoryStatsCache) global.memoryStatsCache = new Map();
-    const key = `${serverId}_${userId}_${statKey}`;
+    const key = `${serverId}_${userId}_${cleanKey}`;
     const current = (global.memoryStatsCache.get(key) || 0) + 1;
     global.memoryStatsCache.set(key, current);
     return current;
@@ -100,12 +101,13 @@ export async function incrementUserStat(serverId, userId, statKey) {
 export async function incrementGlobalUserStat(userId, statKey) {
   if (!userId) throw new Error("userId is required.");
   const ref = userDoc(userId);
+  const cleanKey = statKey.replace(/^stats\./, "");
   try {
     await ref.set(
       {
         userId,
         stats: {
-          [statKey]: FieldValue.increment(1),
+          [cleanKey]: FieldValue.increment(1),
         },
         updatedAt: FieldValue.serverTimestamp(),
       },
@@ -113,11 +115,11 @@ export async function incrementGlobalUserStat(userId, statKey) {
     );
     const snapshot = await ref.get();
     const data = snapshot.data();
-    return data?.stats?.[statKey] ?? data?.[`stats.${statKey}`] ?? 1;
+    return data?.stats?.[cleanKey] ?? 1;
   } catch (err) {
     if (!global.memoryGlobalStatsCache)
       global.memoryGlobalStatsCache = new Map();
-    const key = `${userId}_${statKey}`;
+    const key = `${userId}_${cleanKey}`;
     const current = (global.memoryGlobalStatsCache.get(key) || 0) + 1;
     global.memoryGlobalStatsCache.set(key, current);
     return current;
@@ -259,10 +261,47 @@ export async function getTopPokemonPlayers(serverId, limitCount = 10) {
   }
 }
 
-export async function getUserProfile(userId) {
-  if (!userId) return null;
+export async function resetLeaderboards(serverId, category = "all") {
+  if (!serverId) return;
   try {
-    const snapshot = await userDoc(userId).get();
+    const membersSnapshot = await serverDoc(serverId).collection("members").get();
+    if (membersSnapshot.empty) return;
+
+    const batch = db.batch();
+    membersSnapshot.docs.forEach((doc) => {
+      const updateData = {};
+      if (category === "flag" || category === "all") {
+        updateData["stats.flag_points"] = 0;
+        updateData["stats.flag_wins"] = 0;
+      }
+      if (category === "pokemon" || category === "all") {
+        updateData["stats.pokemon_points"] = 0;
+        updateData["stats.pokemon_wins"] = 0;
+      }
+      batch.set(doc.ref, updateData, { merge: true });
+    });
+    await batch.commit();
+
+    if (global.memoryFlagScores) global.memoryFlagScores.clear();
+    if (global.memoryPokemonScores) global.memoryPokemonScores.clear();
+  } catch (err) {
+    logger.error(`Failed to reset leaderboards for ${serverId}:`, err);
+  }
+}
+
+export async function getUserProfile(serverId, userId) {
+  const targetUserId = typeof serverId === "string" && !userId ? serverId : userId;
+  const targetServerId = typeof serverId === "string" && userId ? serverId : null;
+
+  if (!targetUserId) return null;
+  try {
+    if (targetServerId && targetServerId !== "DM") {
+      const memberSnapshot = await memberDoc(targetServerId, targetUserId).get();
+      if (memberSnapshot.exists && memberSnapshot.data()?.stats?.gender) {
+        return memberSnapshot.data();
+      }
+    }
+    const snapshot = await userDoc(targetUserId).get();
     if (!snapshot.exists) return null;
     return snapshot.data();
   } catch (err) {
@@ -270,12 +309,38 @@ export async function getUserProfile(userId) {
   }
 }
 
-export async function setUserGender(userId, gender) {
-  if (!userId || !gender) return;
+export async function setUserGender(serverId, userId, gender) {
+  let targetServerId = serverId;
+  let targetUserId = userId;
+  let targetGender = gender;
+
+  if (!gender && userId) {
+    targetGender = userId;
+    targetUserId = serverId;
+    targetServerId = null;
+  }
+
+  if (!targetUserId || !targetGender) return;
   try {
-    await userDoc(userId).set(
+    if (targetServerId && targetServerId !== "DM") {
+      await memberDoc(targetServerId, targetUserId).set(
+        {
+          stats: {
+            gender: targetGender,
+          },
+          gender: FieldValue.delete(),
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+    }
+    await userDoc(targetUserId).set(
       {
-        gender,
+        userId: targetUserId,
+        stats: {
+          gender: targetGender,
+        },
+        gender: FieldValue.delete(),
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },

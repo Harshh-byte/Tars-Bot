@@ -11,7 +11,7 @@ export const aliases = ["timer"];
 export const data = {
   name: "remind",
   description: "Set a smart reminder.",
-  dm_permission: true,
+  dm_permission: false,
   options: [
     {
       name: "task",
@@ -46,10 +46,7 @@ export async function execute(interaction, client) {
                 type: 10,
                 content:
                   `### <:Failed:1526228290413658184> Missing Reminder Details\n` +
-                  `Please specify a time and task for the reminder.\n\n` +
-                  `**Examples:**\n` +
-                  `• \`.remind 30 mins to submit report\`\n` +
-                  `• \`.timer 10m check the oven\``,
+                  `Please specify a time and task for the reminder.`
               },
             ],
           },

@@ -14,6 +14,8 @@ import { showLeaderboard } from "./guessboard.js";
 let cachedFlagCountries = null;
 const recentFlagsMap = new Map();
 const channelSkipsMap = new Map();
+const activeCollectorsMap = new Map();
+const activeHintTimersMap = new Map();
 
 const EASY_CODES = new Set([
   "us",
@@ -196,32 +198,7 @@ function generateHint(name, level = 0) {
 
 function getAliases(name, code) {
   const lowerName = name.toLowerCase();
-  const aliases = new Set([lowerName, code.toLowerCase()]);
-
-  if (
-    lowerName === "united states" ||
-    lowerName === "united states of america"
-  ) {
-    aliases.add("usa");
-    aliases.add("us");
-    aliases.add("america");
-  } else if (lowerName === "united kingdom") {
-    aliases.add("uk");
-    aliases.add("britain");
-    aliases.add("england");
-  } else if (lowerName === "united arab emirates") {
-    aliases.add("uae");
-    aliases.add("emirates");
-  } else if (lowerName === "south korea" || lowerName === "republic of korea") {
-    aliases.add("korea");
-    aliases.add("south korea");
-  } else if (lowerName === "north korea") {
-    aliases.add("north korea");
-  } else if (lowerName === "netherlands") {
-    aliases.add("holland");
-  } else if (lowerName === "russian federation") {
-    aliases.add("russia");
-  }
+  const aliases = new Set([lowerName]);
 
   const cleanName = lowerName.replace(/\(.*?\)/g, "").trim();
   if (cleanName) aliases.add(cleanName);
@@ -261,7 +238,7 @@ async function fetchCountriesFromApi() {
 
       if (countries.length > 0) {
         cachedFlagCountries = countries;
-        return cachedCountries;
+        return cachedFlagCountries;
       }
     }
   } catch (err) {
@@ -288,7 +265,7 @@ async function fetchCountriesFromApi() {
       code: "us",
       emoji: "🇺🇸",
       difficulty: "Easy",
-      aliases: ["united states", "usa", "us", "america"],
+      aliases: ["united states"],
     },
     {
       name: "France",
@@ -414,6 +391,19 @@ async function startFlagGame(
     const allCountries = await fetchCountriesFromApi();
     const channelId =
       interaction.channelId || interaction.channel?.id || "default";
+
+    if (activeCollectorsMap.has(channelId)) {
+      const oldCollector = activeCollectorsMap.get(channelId);
+      if (oldCollector && !oldCollector.ended) {
+        oldCollector.stop("superceded");
+      }
+      activeCollectorsMap.delete(channelId);
+    }
+    if (activeHintTimersMap.has(channelId)) {
+      clearTimeout(activeHintTimersMap.get(channelId));
+      activeHintTimersMap.delete(channelId);
+    }
+
     if (!isFollowUp) {
       channelSkipsMap.set(channelId, 0);
     }
@@ -479,6 +469,7 @@ async function startFlagGame(
 
     const filter = (m) => !m.author.bot;
     const collector = channel.createMessageCollector({ filter, time: 30000 });
+    activeCollectorsMap.set(channelId, collector);
 
     let winnerMessage = null;
     const closeMatchUsers = new Set();
@@ -499,6 +490,7 @@ async function startFlagGame(
         }
       } catch {}
     }, 12000);
+    activeHintTimersMap.set(channelId, hintTimer);
 
     collector.on("collect", async (m) => {
       const input = m.content.trim().toLowerCase();
@@ -517,6 +509,7 @@ async function startFlagGame(
 
         channelSkipsMap.set(channelId, skipsUsed + 1);
         clearTimeout(hintTimer);
+        activeHintTimersMap.delete(channelId);
         collector.stop("skipped");
         await m.react("⏩").catch(() => null);
         return;
@@ -529,6 +522,7 @@ async function startFlagGame(
       if (isCorrect) {
         winnerMessage = m;
         clearTimeout(hintTimer);
+        activeHintTimersMap.delete(channelId);
         collector.stop("correct");
         await m
           .react("1526228339910643793")
@@ -551,6 +545,13 @@ async function startFlagGame(
 
     collector.on("end", async (_, reason) => {
       clearTimeout(hintTimer);
+      activeHintTimersMap.delete(channelId);
+      if (activeCollectorsMap.get(channelId) === collector) {
+        activeCollectorsMap.delete(channelId);
+      }
+
+      if (reason === "superceded") return;
+
       try {
         if (reason === "skipped") {
           const currentSkips = channelSkipsMap.get(channelId) || 1;
@@ -659,10 +660,26 @@ function attachFlagNextCollector(
     try {
       const channelId =
         btnInteraction.channelId || btnInteraction.channel?.id || "default";
-      channelSkipsMap.set(channelId, 0);
 
       if (btnInteraction.customId === "flag_next") {
-        await btnInteraction.deferUpdate();
+        buttonCollector.stop("clicked");
+        if (btnInteraction.message && btnInteraction.message.components) {
+          const disabledRows = btnInteraction.message.components.map((row) => {
+            const newRow = ActionRowBuilder.from(row);
+            newRow.components.forEach((comp) => {
+              if (comp.data.custom_id === "flag_next") {
+                comp.setDisabled(true);
+              }
+            });
+            return newRow;
+          });
+          await btnInteraction.update({ components: disabledRows }).catch(() => null);
+        } else {
+          await btnInteraction.deferUpdate().catch(() => null);
+        }
+
+        channelSkipsMap.set(channelId, 0);
+
         await startFlagGame(
           btnInteraction,
           client,
