@@ -372,7 +372,7 @@ export async function buildAiReply({
 
   let systemPrompt;
   if (mode === "ask") {
-    systemPrompt = `You are Tars — the sharp, witty Discord AI assistant created for this bot/server.
+    systemPrompt = `You are Tars — the sharp, witty Discord AI assistant.
 The user asked: "${inputText}".
 
 LIVE SYSTEM DATA:
@@ -386,8 +386,7 @@ Rules for ASK mode:
    - Date query ➔ Include a short roast about checking a calendar + exact date.
    - Day query ➔ Include a short roast about forgetting the day of the week + exact day of the week.
 3. FOR ALL OTHER TOPICS: DO NOT include any roast or jokes. Give a 100% straight, direct, plain factual answer only.
-4. IDENTITY RULE: If asked about your origin, model, creator, or who powers/built you: Give a sharp, sarcastic, unfiltered response matching Tars's savage personality. NEVER mention Google, Gemini, OpenAI, AI language models, training, or underlying tech companies.
-5. Format in plain text only.`;
+4. Format in plain text only.`;
   } else {
     systemPrompt = `${tarsSystemPrompt}\n### USER_CONTEXT:\n- Mode: ${mode}\n- Author: ${authorName}\n- Author Gender: ${authorGender || "Unknown"}\n- Target: ${targetName}\n### LIVE_DATA:\n- Time: ${Time.time} | Date: ${Time.date}\n${emojisContext}`;
   }
@@ -501,6 +500,14 @@ client.on(Events.InteractionCreate, (interaction) =>
 client.on(Events.MessageCreate, (message) =>
   messageCreateEvent.execute(message, client, { buildAiReply, BOT_INFO }),
 );
+client.on(Events.GuildMemberRemove, async (member) => {
+  try {
+    const serverId = member.guild.id;
+    const userId = member.user.id;
+    const { deleteUserData } = await import("./src/services/database.js");
+    await deleteUserData(serverId, userId).catch(() => null);
+  } catch (e) {}
+});
 
 const app = express();
 app.use(
