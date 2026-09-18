@@ -673,7 +673,9 @@ function attachFlagNextCollector(
             });
             return newRow;
           });
-          await btnInteraction.update({ components: disabledRows }).catch(() => null);
+          await btnInteraction
+            .update({ components: disabledRows })
+            .catch(() => null);
         } else {
           await btnInteraction.deferUpdate().catch(() => null);
         }

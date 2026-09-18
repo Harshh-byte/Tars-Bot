@@ -1,6 +1,6 @@
 import { PermissionFlagsBits, EmbedBuilder } from "discord.js";
 import { resetLeaderboards } from "../../services/database.js";
-import { EMBED_COLORS, errorEmbed } from "../../utils/embeds.js";
+import { EMBED_COLORS, errorEmbed, warningEmbed } from "../../utils/embeds.js";
 import logger from "../../utils/logger.js";
 
 export const data = {
@@ -12,7 +12,7 @@ export const data = {
       name: "category",
       description: "Category to reset.",
       type: 3,
-      required: false,
+      required: true,
       choices: [
         { name: "All Games", value: "all" },
         { name: "Flag Game", value: "flag" },
@@ -44,15 +44,37 @@ export async function execute(interaction, client) {
       return interaction.channel?.send({ embeds: [denyEmbed] });
     }
 
-    const rawInput = (
-      interaction.options?.getString("category") || ""
-    ).toLowerCase();
+    const rawInput = (interaction.options?.getString("category") || "")
+      .trim()
+      .toLowerCase();
 
-    let category = "all";
+    if (!rawInput) {
+      const warnEmbed = warningEmbed({
+        title: "Category Required",
+        description: "Please specify a category to reset.",
+      });
+      if (typeof interaction.reply === "function") {
+        return interaction.reply({ embeds: [warnEmbed], flags: 64 });
+      }
+      return interaction.channel?.send({ embeds: [warnEmbed] });
+    }
+
+    let category = null;
     if (rawInput.includes("flag")) {
       category = "flag";
     } else if (rawInput.includes("poke") || rawInput.includes("pokemon")) {
       category = "pokemon";
+    } else if (rawInput.includes("all")) {
+      category = "all";
+    } else {
+      const warnEmbed = warningEmbed({
+        title: "Invalid Category",
+        description: "Invalid category specified.",
+      });
+      if (typeof interaction.reply === "function") {
+        return interaction.reply({ embeds: [warnEmbed], flags: 64 });
+      }
+      return interaction.channel?.send({ embeds: [warnEmbed] });
     }
 
     const serverId = interaction.guild?.id;

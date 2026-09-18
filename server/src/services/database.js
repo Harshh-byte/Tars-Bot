@@ -264,7 +264,9 @@ export async function getTopPokemonPlayers(serverId, limitCount = 10) {
 export async function resetLeaderboards(serverId, category = "all") {
   if (!serverId) return;
   try {
-    const membersSnapshot = await serverDoc(serverId).collection("members").get();
+    const membersSnapshot = await serverDoc(serverId)
+      .collection("members")
+      .get();
     if (membersSnapshot.empty) return;
 
     const batch = db.batch();
@@ -290,13 +292,18 @@ export async function resetLeaderboards(serverId, category = "all") {
 }
 
 export async function getUserProfile(serverId, userId) {
-  const targetUserId = typeof serverId === "string" && !userId ? serverId : userId;
-  const targetServerId = typeof serverId === "string" && userId ? serverId : null;
+  const targetUserId =
+    typeof serverId === "string" && !userId ? serverId : userId;
+  const targetServerId =
+    typeof serverId === "string" && userId ? serverId : null;
 
   if (!targetUserId) return null;
   try {
     if (targetServerId && targetServerId !== "DM") {
-      const memberSnapshot = await memberDoc(targetServerId, targetUserId).get();
+      const memberSnapshot = await memberDoc(
+        targetServerId,
+        targetUserId,
+      ).get();
       if (memberSnapshot.exists && memberSnapshot.data()?.stats?.gender) {
         return memberSnapshot.data();
       }
