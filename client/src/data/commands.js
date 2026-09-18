@@ -263,6 +263,14 @@ export const commands = [
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },
+  {
+    trigger: "/resetlb",
+    category: "util",
+    title: "Reset Leaderboard",
+    description: "Reset game leaderboards.",
+    badge: "Utility",
+    badgeColor: "text-ds-green bg-ds-green/10",
+  },
 ];
 
 export const categories = [

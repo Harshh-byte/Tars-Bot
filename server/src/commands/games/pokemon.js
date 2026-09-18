@@ -13,6 +13,8 @@ import { showLeaderboard } from "./guessboard.js";
 
 const recentPokemonMap = new Map();
 const channelSkipsMap = new Map();
+const activeCollectorsMap = new Map();
+const activeHintTimersMap = new Map();
 
 function levenshteinDistance(a, b) {
   if (a.length === 0) return b.length;
@@ -213,6 +215,19 @@ async function startPokemonGame(
   try {
     const channelId =
       interaction.channelId || interaction.channel?.id || "default";
+
+    if (activeCollectorsMap.has(channelId)) {
+      const oldCollector = activeCollectorsMap.get(channelId);
+      if (oldCollector && !oldCollector.ended) {
+        oldCollector.stop("superceded");
+      }
+      activeCollectorsMap.delete(channelId);
+    }
+    if (activeHintTimersMap.has(channelId)) {
+      clearTimeout(activeHintTimersMap.get(channelId));
+      activeHintTimersMap.delete(channelId);
+    }
+
     if (!isFollowUp) {
       channelSkipsMap.set(channelId, 0);
     }
@@ -258,6 +273,7 @@ async function startPokemonGame(
 
     const filter = (m) => !m.author.bot;
     const collector = channel.createMessageCollector({ filter, time: 30000 });
+    activeCollectorsMap.set(channelId, collector);
 
     let winnerMessage = null;
     const closeMatchUsers = new Set();
@@ -278,6 +294,7 @@ async function startPokemonGame(
         }
       } catch {}
     }, 12000);
+    activeHintTimersMap.set(channelId, hintTimer);
 
     collector.on("collect", async (m) => {
       const input = m.content.trim().toLowerCase();
@@ -296,6 +313,7 @@ async function startPokemonGame(
 
         channelSkipsMap.set(channelId, skipsUsed + 1);
         clearTimeout(hintTimer);
+        activeHintTimersMap.delete(channelId);
         collector.stop("skipped");
         await m.react("⏩").catch(() => null);
         return;
@@ -308,6 +326,7 @@ async function startPokemonGame(
       if (isCorrect) {
         winnerMessage = m;
         clearTimeout(hintTimer);
+        activeHintTimersMap.delete(channelId);
         collector.stop("correct");
         await m
           .react("1526228339910643793")
@@ -330,6 +349,13 @@ async function startPokemonGame(
 
     collector.on("end", async (_, reason) => {
       clearTimeout(hintTimer);
+      activeHintTimersMap.delete(channelId);
+      if (activeCollectorsMap.get(channelId) === collector) {
+        activeCollectorsMap.delete(channelId);
+      }
+
+      if (reason === "superceded") return;
+
       try {
         if (reason === "skipped") {
           const currentSkips = channelSkipsMap.get(channelId) || 1;
@@ -441,10 +467,26 @@ function attachPokemonNextCollector(
     try {
       const channelId =
         btnInteraction.channelId || btnInteraction.channel?.id || "default";
-      channelSkipsMap.set(channelId, 0);
 
       if (btnInteraction.customId === "pokemon_next") {
-        await btnInteraction.deferUpdate();
+        buttonCollector.stop("clicked");
+        if (btnInteraction.message && btnInteraction.message.components) {
+          const disabledRows = btnInteraction.message.components.map((row) => {
+            const newRow = ActionRowBuilder.from(row);
+            newRow.components.forEach((comp) => {
+              if (comp.data.custom_id === "pokemon_next") {
+                comp.setDisabled(true);
+              }
+            });
+            return newRow;
+          });
+          await btnInteraction.update({ components: disabledRows }).catch(() => null);
+        } else {
+          await btnInteraction.deferUpdate().catch(() => null);
+        }
+
+        channelSkipsMap.set(channelId, 0);
+
         await startPokemonGame(
           btnInteraction,
           client,

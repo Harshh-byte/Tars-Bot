@@ -340,12 +340,13 @@ export async function buildAiReply({
 
   let authorGender = detectUserGender(authorMember);
   if (authorGender) {
-    setUserGender(authorId, authorGender).catch(() => null);
+    setUserGender(serverId, authorId, authorGender).catch(() => null);
   } else {
     try {
-      const userProfile = await getUserProfile(authorId);
-      if (userProfile?.gender) {
-        authorGender = userProfile.gender;
+      const userProfile = await getUserProfile(serverId, authorId);
+      const profileGender = userProfile?.stats?.gender || userProfile?.gender;
+      if (profileGender) {
+        authorGender = profileGender;
       }
     } catch (e) {}
   }

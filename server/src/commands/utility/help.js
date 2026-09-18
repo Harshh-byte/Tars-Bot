@@ -108,14 +108,14 @@ const modulesCatalog = {
       { name: "Sarcastic Roast", cmd: "roast", desc: "Roast a user." },
       { name: "Charismatic Wish", cmd: "wish", desc: "Send a wish message." },
       {
-        name: "Reddit Memes",
+        name: "Memes",
         cmd: "meme",
         desc: "Display a trending meme from Reddit!",
       },
       {
         name: "AutoMeme",
         cmd: "automeme",
-        desc: "Automated scheduled Reddit memes.",
+        desc: "Automated scheduled memes.",
       },
     ],
   },
@@ -132,17 +132,18 @@ const modulesCatalog = {
     description: "Essential server diagnostics and configuration tools.",
     commands: [
       {
-        name: "ServerInfo",
+        name: "Server Info",
         cmd: "serverinfo",
         desc: "Gets information about the server.",
       },
       {
-        name: "UserInfo",
+        name: "User Info",
         cmd: "userinfo",
         desc: "Gets information about a user.",
       },
       { name: "Avatar", cmd: "avatar", desc: "View a user's avatar." },
       { name: "Prefix", cmd: "prefix", desc: "View or change command prefix." },
+      { name: "Reset Leaderboard", cmd: "resetlb", desc: "Reset game leaderboards." },
       { name: "Ping", cmd: "ping", desc: "Check bot latency." },
       { name: "About", cmd: "about", desc: "View information about the bot." },
       { name: "Remind", cmd: "remind", desc: "Set a smart reminder." },

@@ -27,7 +27,7 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 | **Actions** | `.smoke`, `.vape` | Per-server hit counters with animated emojis |
 | **Games** | `.guess`, `.guessboard`, `.flag`, `.pokemon`, `.flb`, `.plb`, `.tod`, `.wyr`, `.nhie`, `.rps`, `.ttt`, `.flip`, `.roll` | Interactive guessing mini-games, party games & decision tools |
 | **Fun** | `.ship`, `.iq`, `.pp`, `.gay`, `.lesbian`, `.bitches`, `.autism`, `.roast`, `.wish`, `.meme`, `.automeme` | Calculators, AI roasts, wishes, Reddit memes & AutoMeme scheduler |
-| **Admin** | `/maintenance` | Toggle bot maintenance mode |
+| **Admin** | `/maintenance`, `/resetlb` | Toggle bot maintenance mode & reset game leaderboards |
 
 ---
 

@@ -10,7 +10,7 @@ import {
 export const data = {
   name: "vape",
   description: "Hit the vape.",
-  dm_permission: true,
+  dm_permission: false,
 };
 
 async function sendAndFetchReply(interaction, payload) {
@@ -24,7 +24,7 @@ async function sendAndFetchReply(interaction, payload) {
 export async function execute(interaction, client) {
   try {
     const userId = interaction.user.id;
-    const serverId = interaction.guild?.id || "DM";
+    const serverId = interaction.guild.id;
 
     let count;
     if (serverId !== "DM") {
