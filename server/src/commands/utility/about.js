@@ -13,7 +13,7 @@ export const data = {
 export async function execute(interaction, client, context = {}) {
   const BOT_INFO = context?.BOT_INFO || {
     authorText: "Tars",
-    version: "3.0",
+    version: "4.0",
     framework: "discord.js",
   };
   const botAvatar = client.user.displayAvatarURL({
@@ -47,7 +47,7 @@ export async function execute(interaction, client, context = {}) {
           `## About Tars\n` +
           `-# ᴘʟᴇɴᴛʏ ᴏꜰ ʜᴜᴍᴀɴꜱ ᴏᴜᴛ ᴛʜᴇʀᴇ, ʙᴜᴛ ᴅᴏᴡɴ ʜᴇʀᴇ ɪᴛ'ꜱ ᴊᴜꜱᴛ ᴜꜱ.\n\n` +
           `Hey, I'm **Tars**!\n` +
-          `*A sarcasm-packed AI companion ready to roast or wish on demand.*`,
+          `*A sarcasm-packed AI companion ready to chat, entertain, and assist on demand.*`,
       },
     ],
     accessory: {
@@ -65,7 +65,7 @@ export async function execute(interaction, client, context = {}) {
       `• **Active Servers:** \`${serverCount}\`\n` +
       `• **Users Monitored:** \`${totalMembers.toLocaleString()}\`\n` +
       `• **Uptime:** \`${uptimeString}\`\n` +
-      `• **Memory Policy:** \`6-Month Auto Cleanup\``,
+      `• **Memory Policy:** \`2-Month Auto Cleanup\``,
   };
 
   const buttonRow = {
@@ -133,7 +133,7 @@ export async function execute(interaction, client, context = {}) {
       description:
         "ᴘʟᴇɴᴛʏ ᴏꜰ ʜᴜᴍᴀɴꜱ ᴏᴜᴛ ᴛʜᴇʀᴇ, ʙᴜᴛ ᴅᴏᴡɴ ʜᴇʀᴇ ɪᴛ'ꜱ ᴊᴜꜱᴛ ᴜꜱ.\n\n" +
         "Hey, I'm **Tars**!\n" +
-        "*A sarcasm-packed AI companion ready to roast or wish on demand.*",
+        "*A sarcasm-packed Discord companion ready to chat, entertain, and assist on demand.*",
       thumbnail: botAvatar,
       footer: `v${BOT_INFO.version} • Built with discord.js`,
       fields: [
@@ -143,7 +143,7 @@ export async function execute(interaction, client, context = {}) {
             `• **Active Servers:** \`${serverCount}\`\n` +
             `• **Users Monitored:** \`${totalMembers.toLocaleString()}\`\n` +
             `• **Uptime:** \`${uptimeString}\`\n` +
-            `• **Memory Policy:** \`6-Month Auto Cleanup\``,
+            `• **Memory Policy:** \`2-Month Auto Cleanup\``,
         },
       ],
     });

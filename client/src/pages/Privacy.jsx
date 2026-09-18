@@ -68,13 +68,13 @@ export default function Privacy() {
                 <span className="text-ds-fuchsia font-bold" aria-hidden="true">
                   &gt;&gt;
                 </span>{" "}
-                Discord User IDs (for tracking author configurations)
+                Discord User IDs
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-ds-fuchsia font-bold" aria-hidden="true">
                   &gt;&gt;
                 </span>{" "}
-                Server IDs (for saving channel settings)
+                Server IDs
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-ds-fuchsia font-bold" aria-hidden="true">
@@ -86,7 +86,7 @@ export default function Privacy() {
                 <span className="text-ds-fuchsia font-bold" aria-hidden="true">
                   &gt;&gt;
                 </span>{" "}
-                Latency Logs (for internal performance profiling)
+                Latency Logs
               </li>
             </ul>
           </section>
@@ -96,11 +96,9 @@ export default function Privacy() {
               <span className="text-ds-blurple">02.</span> Retention & Purging
             </h2>
             <p className="text-ds-muted">
-              All transient chat contexts (used for calculating roasts and
-              wishes) are held exclusively in short-term RAM buffers and
-              automatically purged. Persistent database storage is strictly
-              reserved for user/guild configurations and is deleted after six
-              months of consecutive server inactivity.
+              Transient chat data is processed purely in memory and immediately purged after use.
+              Persistent storage is restricted to server and user configurations, which are
+              permanently deleted after Two Months of server inactivity.
             </p>
           </section>
 
@@ -110,10 +108,9 @@ export default function Privacy() {
               Boundaries
             </h2>
             <p className="text-ds-muted">
-              Tars executes commands through the official Discord API.
-              Consequently, all communications are subject to Discord's
-              Developer Terms and Privacy Protocols. We never sell, exchange, or
-              rent server statistics to outer third parties.
+              Tars operates using official Discord APIs in full compliance with Discord's
+              Developer Terms and Privacy Policy. We do not sell, trade, or share
+              server statistics or user data with third parties.
             </p>
           </section>
 
@@ -122,14 +119,14 @@ export default function Privacy() {
               <span className="text-ds-blurple">04.</span> Inquiries
             </h2>
             <p className="text-ds-muted">
-              For access requests, compliance tickets, or standard data purge
-              requests, please reach out through our official support channel.
+              For data access inquiries, compliance requests, or data deletion,
+              please contact us through our official support channel.
             </p>
           </section>
 
           <section className="pt-8 border-t border-ds-border/40 mt-8">
             <p className="text-sm font-medium text-ds-muted">
-              Last Updated: August 2026
+              Last Updated: September 2026
             </p>
           </section>
         </div>
