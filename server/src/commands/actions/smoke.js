@@ -50,7 +50,7 @@ export async function execute(interaction, client) {
           components: [
             {
               type: 10,
-              content: "<a:smok:1542640291654144082> ### SMOKE SESSION",
+              content: "### <a:smok:1542640291654144082> SMOKE SESSION",
             },
             {
               type: 14,

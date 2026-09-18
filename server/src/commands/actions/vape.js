@@ -48,7 +48,7 @@ export async function execute(interaction, client) {
           components: [
             {
               type: 10,
-              content: "🌬️ ### VAPE SESSION",
+              content: "### 🌬️ VAPE SESSION",
             },
             {
               type: 14,
