@@ -22,7 +22,7 @@ const serversRef = db.collection("servers");
 const usersRef = db.collection("users");
 const MAX_MESSAGES = 10;
 const DELETE_BATCH_SIZE = 500;
-const DATA_RETENTION_MS = 1000 * 60 * 60 * 24 * 30 * 6;
+const DATA_RETENTION_MS = 1000 * 60 * 60 * 24 * 30 * 2;
 const serverDoc = (serverId) => serversRef.doc(serverId);
 const memberDoc = (serverId, userId) =>
   serverDoc(serverId).collection("members").doc(userId);

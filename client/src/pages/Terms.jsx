@@ -73,8 +73,8 @@ export default function Terms() {
               <span className="text-ds-blurple">02.</span> Permitted Usage
             </h2>
             <p className="text-ds-muted mb-4">
-              Tars is designated for entertainment and moderation support. Users
-              must not:
+              Tars is designed for interactive entertainment.
+              Users must not:
             </p>
             <ul className="list-none pl-4 space-y-2 text-sm">
               <li className="flex items-center gap-2.5">
@@ -111,11 +111,11 @@ export default function Terms() {
               <span className="text-ds-blurple">03.</span> Liability Boundaries
             </h2>
             <p className="text-ds-muted">
-              Tars' responses are dynamically generated and designed with a high level
-              of sarcasm. The bot operators accept absolutely zero liability for
-              any mental strain, severe roasts, or misunderstandings caused by
-              Tars' automated sarcasm index. Use under server moderation
-              oversight.
+              Tars' responses are dynamically generated and designed with a high
+              level of sarcasm. The bot operators accept absolutely zero
+              liability for any output, sarcastic content, or
+              misunderstandings caused by Tars' sarcasm index.
+              Use under server moderation oversight.
             </p>
           </section>
 
@@ -131,7 +131,7 @@ export default function Terms() {
 
           <section className="pt-8 border-t border-ds-border/40 mt-8">
             <p className="text-sm font-medium text-ds-muted">
-              Last Updated: August 2026
+              Last Updated: September 2026
             </p>
           </section>
         </div>
