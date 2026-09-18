@@ -97,7 +97,10 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
         guild.members.cache.get(player.userId) ||
         (await guild.members.fetch(player.userId).catch(() => null));
       if (member) {
-        activePlayers.push(player);
+        activePlayers.push({
+          ...player,
+          username: member.user.username,
+        });
         if (userId && player.userId === userId && !userRankInfo) {
           userRankInfo = {
             rank: activePlayers.length,
@@ -116,7 +119,10 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
   const currentPage = Math.max(1, Math.min(page, totalPages));
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const pagePlayers = activePlayers.slice(startIndex, startIndex + itemsPerPage);
+  const pagePlayers = activePlayers.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
 
   const categoryName = isPokemon ? "Pokémon" : "Flag";
 
@@ -131,11 +137,12 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
           globalRank === 0
             ? "🥇 "
             : globalRank === 1
-            ? "🥈 "
-            : globalRank === 2
-            ? "🥉 "
-            : `**${globalRank + 1}.** `;
-        return `${rankPrefix}<@${player.userId}>\n-# Guessed: ${player.wins} times`;
+              ? "🥈 "
+              : globalRank === 2
+                ? "🥉 "
+                : `**${globalRank + 1}.** `;
+        const displayName = player.username || player.userId;
+        return `${rankPrefix}@${displayName}\n-# Guessed: ${player.wins} times`;
       })
       .join("\n\n");
   }
