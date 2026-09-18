@@ -54,9 +54,10 @@ export async function execute(interaction, client, { buildAiReply }) {
 
     const payload = {};
     if (replyData.text && replyData.text.trim() !== "") {
-      payload.content = isSelf || isBotTarget
-        ? replyData.text
-        : `<@${targetUser.id}> ${replyData.text}`;
+      payload.content =
+        isSelf || isBotTarget
+          ? replyData.text
+          : `<@${targetUser.id}> ${replyData.text}`;
     }
     if (replyData.gifUrl) {
       payload.files = [{ attachment: replyData.gifUrl, name: "tars.gif" }];

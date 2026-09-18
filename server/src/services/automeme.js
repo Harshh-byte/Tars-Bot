@@ -3,12 +3,7 @@ import { EmbedBuilder } from "discord.js";
 import logger from "../utils/logger.js";
 import { getAutoMemeConfigs, saveAutoMemeConfig } from "./database.js";
 
-const SUBREDDITS = [
-  "darkmemers",
-  "dankmemes",
-  "me_irl",
-  "FingMemes",
-];
+const SUBREDDITS = ["darkmemers", "dankmemes", "me_irl", "FingMemes"];
 
 async function fetchMeme() {
   const subreddit = SUBREDDITS[Math.floor(Math.random() * SUBREDDITS.length)];
@@ -40,7 +35,9 @@ export function initAutoMemeService(client) {
         if (!cfg.enabled || !cfg.channelId || !cfg.nextPostAt) continue;
 
         if (now >= cfg.nextPostAt) {
-          const channel = await client.channels.fetch(cfg.channelId).catch(() => null);
+          const channel = await client.channels
+            .fetch(cfg.channelId)
+            .catch(() => null);
           if (!channel) continue;
 
           const meme = await fetchMeme();
@@ -56,8 +53,9 @@ export function initAutoMemeService(client) {
               .setImage(meme.url)
               .setColor(randomColor)
               .setFooter({
-                text: `AutoMeme • ${meme.ups ? meme.ups.toLocaleString() : 0} upvotes`,
-                iconURL: "https://cdn.discordapp.com/emojis/1540698439594016778.png",
+                text: `AutoMeme • ${meme.ups ? meme.ups.toLocaleString() : 0} upvotes • r/${meme.subreddit}`,
+                iconURL:
+                  "https://cdn.discordapp.com/emojis/1540698439594016778.png",
               });
 
             await channel.send({ embeds: [embed] }).catch(() => null);

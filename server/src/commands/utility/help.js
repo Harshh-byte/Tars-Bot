@@ -143,7 +143,11 @@ const modulesCatalog = {
       },
       { name: "Avatar", cmd: "avatar", desc: "View a user's avatar." },
       { name: "Prefix", cmd: "prefix", desc: "View or change command prefix." },
-      { name: "Reset Leaderboard", cmd: "resetlb", desc: "Reset game leaderboards." },
+      {
+        name: "Reset Leaderboard",
+        cmd: "resetlb",
+        desc: "Reset game leaderboards.",
+      },
       { name: "Ping", cmd: "ping", desc: "Check bot latency." },
       { name: "About", cmd: "about", desc: "View information about the bot." },
       { name: "Remind", cmd: "remind", desc: "Set a smart reminder." },

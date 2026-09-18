@@ -302,7 +302,12 @@ export async function execute(interaction, client) {
       ctx.roundRect(barX, barY, barW, barH, cornerRadius);
       ctx.clip();
 
-      const fillGradient = ctx.createLinearGradient(barX, 0, barX + fillWidth, 0);
+      const fillGradient = ctx.createLinearGradient(
+        barX,
+        0,
+        barX + fillWidth,
+        0,
+      );
       if (percentage >= 70) {
         fillGradient.addColorStop(0, "#ff0055");
         fillGradient.addColorStop(1, "#ff5599");

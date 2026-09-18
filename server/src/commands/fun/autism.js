@@ -22,8 +22,10 @@ export const data = {
 function getAutismCategory(percentage) {
   if (percentage >= 85)
     return { category: "Hyperfixated On Hating Women", emoji: "👺" };
-  if (percentage >= 60) return { category: "Brain-Rotted Discord Mod", emoji: "💀" };
-  if (percentage >= 35) return { category: "Socially Disabled Incel", emoji: "📉" };
+  if (percentage >= 60)
+    return { category: "Brain-Rotted Discord Mod", emoji: "💀" };
+  if (percentage >= 35)
+    return { category: "Socially Disabled Incel", emoji: "📉" };
   if (percentage >= 15)
     return { category: "Slightly Brain-Damaged", emoji: "🥴" };
   return { category: "Sober & Boring As Fuck", emoji: "🥱" };

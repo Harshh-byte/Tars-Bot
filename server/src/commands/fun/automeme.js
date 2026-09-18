@@ -1,8 +1,4 @@
-import {
-  EmbedBuilder,
-  PermissionFlagsBits,
-  ChannelType,
-} from "discord.js";
+import { EmbedBuilder, PermissionFlagsBits, ChannelType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import {
@@ -55,7 +51,8 @@ export async function execute(interaction, client) {
 
     if (!hasPerms) {
       const permsRes = {
-        content: "You need `Manage Channels` or `Administrator` permission to configure AutoMeme!",
+        content:
+          "You need `Manage Channels` or `Administrator` permission to configure AutoMeme!",
         ephemeral: true,
       };
       return interaction.reply ? interaction.reply(permsRes) : null;
@@ -73,11 +70,23 @@ export async function execute(interaction, client) {
 
       if (["off", "stop", "disable"].some((kw) => lower.includes(kw))) {
         intervalInput = "off";
-      } else if (firstWord.includes("daily") || firstWord.includes("24h") || firstWord.includes("day")) {
+      } else if (
+        firstWord.includes("daily") ||
+        firstWord.includes("24h") ||
+        firstWord.includes("day")
+      ) {
         intervalInput = "daily";
-      } else if (firstWord.includes("quarterly") || firstWord.includes("6h") || firstWord.includes("quarter")) {
+      } else if (
+        firstWord.includes("quarterly") ||
+        firstWord.includes("6h") ||
+        firstWord.includes("quarter")
+      ) {
         intervalInput = "quarterly";
-      } else if (firstWord.includes("hourly") || firstWord.includes("1h") || firstWord.includes("hour")) {
+      } else if (
+        firstWord.includes("hourly") ||
+        firstWord.includes("1h") ||
+        firstWord.includes("hour")
+      ) {
         intervalInput = "hourly";
       } else if (lower.includes("daily") || lower.includes("24h")) {
         intervalInput = "daily";
@@ -91,7 +100,9 @@ export async function execute(interaction, client) {
     if (!intervalInput) {
       const usageMsg =
         "Please specify a frequency! Options: `hourly`, `quarterly`, `daily`, or `off`.\nExample: `.automeme hourly`";
-      return interaction.reply ? interaction.reply({ content: usageMsg }) : null;
+      return interaction.reply
+        ? interaction.reply({ content: usageMsg })
+        : null;
     }
 
     if (intervalInput === "off") {
@@ -100,7 +111,9 @@ export async function execute(interaction, client) {
         .setTitle("🛑 AutoMeme Disabled")
         .setDescription("Meme delivery has been turned off for the server.")
         .setColor(EMBED_COLORS.ERROR);
-      return interaction.reply ? interaction.reply({ embeds: [disableEmbed] }) : null;
+      return interaction.reply
+        ? interaction.reply({ embeds: [disableEmbed] })
+        : null;
     }
 
     const hours = INTERVAL_HOURS_MAP[intervalInput] || 1;
@@ -140,11 +153,16 @@ export async function execute(interaction, client) {
       })
       .setColor(EMBED_COLORS.SUCCESS);
 
-    return interaction.reply ? interaction.reply({ embeds: [confirmEmbed] }) : null;
+    return interaction.reply
+      ? interaction.reply({ embeds: [confirmEmbed] })
+      : null;
   } catch (err) {
     logger.error("Error in AutoMeme command execution:", err);
     Sentry.captureException(err);
-    const errRes = { content: "An error occurred while configuring AutoMeme.", ephemeral: true };
+    const errRes = {
+      content: "An error occurred while configuring AutoMeme.",
+      ephemeral: true,
+    };
     return interaction.reply ? interaction.reply(errRes) : null;
   }
 }

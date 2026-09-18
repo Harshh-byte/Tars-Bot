@@ -46,7 +46,7 @@ export async function execute(interaction, client) {
                 type: 10,
                 content:
                   `### <:Failed:1526228290413658184> Missing Reminder Details\n` +
-                  `Please specify a time and task for the reminder.`
+                  `Please specify a time and task for the reminder.`,
               },
             ],
           },
