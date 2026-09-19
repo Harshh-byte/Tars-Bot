@@ -57,8 +57,8 @@ const modulesCatalog = {
         desc: "Guess the Pokémon by its artwork!",
       },
       {
-        name: "Guess Leaderboard",
-        cmd: "guessboard",
+        name: "Leaderboard",
+        cmd: "leaderboard",
         desc: "View top guessers in the server.",
       },
       { name: "Coin Flip", cmd: "flip", desc: "Flip a coin." },

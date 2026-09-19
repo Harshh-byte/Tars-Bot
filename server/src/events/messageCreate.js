@@ -3,6 +3,10 @@ import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { checkCooldown } from "../utils/cooldowns.js";
 import { errorEmbed } from "../utils/embeds.js";
+import {
+  createSlashNoticeEmbed,
+  shouldSendSlashNotice,
+} from "../utils/slashNotice.js";
 
 export const name = Events.MessageCreate;
 
@@ -196,6 +200,13 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
           buildAiReply,
           BOT_INFO,
         });
+
+        if (shouldSendSlashNotice(message.author.id, 15, 600000)) {
+          setTimeout(async () => {
+            const noticeEmbed = createSlashNoticeEmbed(client.user?.username || "Tars");
+            await message.channel.send({ embeds: [noticeEmbed] }).catch(() => null);
+          }, 1000);
+        }
       } catch (err) {
         logger.error(`Error executing prefix command .${commandName}:`, err);
         Sentry.captureException(err);

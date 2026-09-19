@@ -80,9 +80,10 @@ export const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
-    trigger: "/guessboard",
+    trigger: "/leaderboard",
+    alias: ".leaderboard",
     category: "games",
-    title: "Guess Leaderboard",
+    title: "Leaderboard",
     description: "View top guessers in the server.",
     badge: "Games",
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
