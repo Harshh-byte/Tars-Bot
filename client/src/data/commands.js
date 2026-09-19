@@ -48,6 +48,14 @@ export const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
+    trigger: "/impostor",
+    category: "games",
+    title: "Impostor",
+    description: "Find the Imposter.",
+    badge: "Games",
+    badgeColor: "text-ds-blurple bg-ds-blurple/10",
+  },
+  {
     trigger: "/rps",
     category: "games",
     title: "Rock, Paper, Scissors",

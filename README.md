@@ -13,7 +13,7 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 - **📖 Interactive Help System:** Module selection menus, 5-item pagination, and detailed command inspectors (`.help`).
 - **🚬 Server Action Trackers:** Persistent hit counters for `.smoke` and `.vape` commands per server.
 - **🛠️ System Maintenance Mode:** Owner-controlled maintenance mode (`/maintenance`) with custom presence updates.
-- **🎮 Interactive Party Games:** Truth or Dare (`.tod`), Would You Rather (`.wyr`), Never Have I Ever (`.nhie`), RPS (`.rps`), and Tic-Tac-Toe (`.ttt`).
+- **🎮 Interactive Party Games:** Impostor (`.impostor`), Truth or Dare (`.tod`), Would You Rather (`.wyr`), Never Have I Ever (`.nhie`), RPS (`.rps`), and Tic-Tac-Toe (`.ttt`).
 - **📊 Fun Calculators:** IQ, PP size, Gay/Lesbian ratings, Bitches count, and Autism ratings.
 - **🌐 Web Dashboard:** Sleek React + Vite landing page displaying real-time command reference and system stats.
 
@@ -25,7 +25,7 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 | :---------- | :------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
 | **Utility** | `.help`, `.prefix`, `.ping`, `.about`, `.ask`                                                                                                | Interactive menus, prefix control, diagnostics, bot info & AI question search |
 | **Actions** | `.smoke`, `.vape`                                                                                                                            | Per-server hit counters with animated emojis                                  |
-| **Games**   | `.guess`, `.leaderboard`, `.flag`, `.pokemon`, `.flb`, `.plb`, `.tod`, `.wyr`, `.nhie`, `.rps`, `.ttt`, `.flip`, `.roll` | Interactive guessing mini-games, party games & decision tools                 |
+| **Games**   | `.impostor`, `.imp`, `.guess`, `.leaderboard`, `.flag`, `.pokemon`, `.flb`, `.plb`, `.tod`, `.wyr`, `.nhie`, `.rps`, `.ttt`, `.flip`, `.roll` | Interactive guessing mini-games, party games & decision tools                 |
 | **Fun**     | `.ship`, `.iq`, `.pp`, `.gay`, `.lesbian`, `.bitches`, `.autism`, `.roast`, `.wish`, `.meme`, `.automeme`                                    | Calculators, AI roasts, wishes, Reddit memes & AutoMeme scheduler             |
 | **Admin**   | `/maintenance`, `/resetlb`                                                                                                                   | Toggle bot maintenance mode & reset game leaderboards                         |
 
