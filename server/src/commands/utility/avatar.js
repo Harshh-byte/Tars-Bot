@@ -26,8 +26,19 @@ export const data = {
 
 export async function execute(interaction, client) {
   try {
-    let targetUser = interaction.options?.getUser("user");
-    const rawInput = interaction.options?.getString?.("user");
+    let targetUser = null;
+    let rawInput = null;
+
+    if (typeof interaction.options?.getUser === "function") {
+      try {
+        targetUser = interaction.options.getUser("user");
+      } catch (_) {}
+    }
+    if (typeof interaction.options?.getString === "function") {
+      try {
+        rawInput = interaction.options.getString("user");
+      } catch (_) {}
+    }
 
     if (!targetUser && rawInput) {
       const idMatch = rawInput.match(/\d{17,20}/)?.[0];

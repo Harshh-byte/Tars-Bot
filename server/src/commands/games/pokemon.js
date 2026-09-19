@@ -9,10 +9,11 @@ import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
 import { addPokemonScore } from "../../services/database.js";
-import { showLeaderboard } from "./guessboard.js";
+import { showLeaderboard } from "./leaderboard.js";
 
 const recentPokemonMap = new Map();
 const channelSkipsMap = new Map();
+const channelSessionScoresMap = new Map();
 const activeCollectorsMap = new Map();
 const activeHintTimersMap = new Map();
 
@@ -393,12 +394,15 @@ async function startPokemonGame(
           }
 
           const winnerMention = `<@${winnerId}>`;
+          const currentSessionScore = (channelSessionScoresMap.get(channelId) || 0) + pointsGained;
+          channelSessionScoresMap.set(channelId, currentSessionScore);
+
           const winEmbed = new EmbedBuilder()
             .setTitle("<a:Tada:1544329561955770488> **Correct Guess!**")
             .setDescription(
               `${winnerMention} guessed it right!\n` +
                 `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                `🏆 **+${pointsGained} Points** *(Total: **${scoreData.totalPoints}** Pts)*`,
+                `🏆 **+${pointsGained} Points** *(Game Score: **${currentSessionScore}** Pts | Total: **${scoreData.totalPoints}** Pts)*`,
             )
             .setThumbnail(targetPokemon.imageUrl)
             .setColor(EMBED_COLORS.SUCCESS);
@@ -416,6 +420,7 @@ async function startPokemonGame(
           }, 1500);
         } else {
           channelSkipsMap.set(channelId, 0);
+          channelSessionScoresMap.set(channelId, 0);
           const timeoutEmbed = new EmbedBuilder()
             .setTitle("⌛ **Time's Up!**")
             .setDescription(
@@ -488,6 +493,7 @@ function attachPokemonNextCollector(
         }
 
         channelSkipsMap.set(channelId, 0);
+        channelSessionScoresMap.set(channelId, 0);
 
         await startPokemonGame(
           btnInteraction,

@@ -1,15 +1,20 @@
-import { ComponentType } from "discord.js";
+import {
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+} from "discord.js";
 import logger from "../../utils/logger.js";
-import { EMBED_COLORS } from "../../utils/embeds.js";
 import {
   getTopFlagPlayers,
   getTopPokemonPlayers,
 } from "../../services/database.js";
 
-export const aliases = ["flb", "plb", "guesslb"];
+export const aliases = ["flb", "plb", "lb"];
 
 export const data = {
-  name: "guessboard",
+  name: "leaderboard",
   description: "View top guessers in the server.",
   dm_permission: false,
   options: [
@@ -28,32 +33,37 @@ export const data = {
 
 async function sendAndFetchReply(interaction, payload) {
   if (interaction.isButton && interaction.isButton()) {
-    await interaction.update(payload);
-    return await interaction.fetchReply();
+    if (!interaction.replied && !interaction.deferred) {
+      await interaction.update(payload).catch(() => null);
+    } else {
+      await interaction.editReply(payload).catch(() => null);
+    }
+    return (await interaction.fetchReply().catch(() => null)) || interaction.message;
   }
   if (interaction.replied || interaction.deferred) {
-    return await interaction.followUp(payload);
+    return await interaction.followUp(payload).catch(() => null);
   }
-  const res = await interaction.reply({ ...payload, withResponse: true });
+  const res = await interaction.reply({ ...payload, withResponse: true }).catch(() => null);
   return res?.resource?.message || res;
 }
 
 export async function execute(interaction, client) {
   const cmdName = (interaction.commandName || "").toLowerCase();
-  const selectedCategory =
-    interaction.options?.getString("category")?.toLowerCase() || "";
-  const rawArgs = (
-    interaction.options?.getString("category") ||
-    interaction.options?.getString("getString") ||
-    ""
-  ).toLowerCase();
+  let rawArgs = "";
+  if (typeof interaction.options?.getString === "function") {
+    try {
+      rawArgs = (interaction.options.getString("category") || "").toLowerCase();
+    } catch (_) {}
+  }
 
-  let lbCategory = selectedCategory || "flag";
+  let lbCategory = rawArgs || "flag";
+
   if (
     cmdName === "pklb" ||
     cmdName === "plb" ||
     rawArgs.includes("pokemon") ||
-    rawArgs.includes("plb")
+    rawArgs.includes("plb") ||
+    rawArgs.includes("pk")
   ) {
     lbCategory = "pokemon";
   } else if (
@@ -61,6 +71,8 @@ export async function execute(interaction, client) {
     rawArgs.includes("flb") ||
     rawArgs.includes("flag")
   ) {
+    lbCategory = "flag";
+  } else if (!rawArgs) {
     lbCategory = "flag";
   }
 
@@ -93,6 +105,7 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
 
   if (rawPlayers && rawPlayers.length > 0 && guild) {
     for (const player of rawPlayers) {
+      if ((player.points || 0) <= 0 && (player.wins || 0) <= 0) continue;
       const member =
         guild.members.cache.get(player.userId) ||
         (await guild.members.fetch(player.userId).catch(() => null));
@@ -111,7 +124,9 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
       }
     }
   } else {
-    activePlayers = rawPlayers || [];
+    activePlayers = (rawPlayers || []).filter(
+      (p) => (p.points || 0) > 0 || (p.wins || 0) > 0,
+    );
   }
 
   const itemsPerPage = 10;
@@ -149,87 +164,54 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
 
   let userRankText = "";
   if (userRankInfo) {
-    userRankText = `\n\n-# Your Rank: #${userRankInfo.rank}`;
-  } else if (userId) {
-    userRankText = `\n\n-# Your Rank: Unranked`;
+    userRankText = `Your Rank: **#${userRankInfo.rank}** (${userRankInfo.wins} wins)`;
+  } else if (activePlayers.length > 0) {
+    userRankText = "You are not ranked yet.";
   }
 
-  bodyContent += `${userRankText}\n-# Earn points by playing /${isPokemon ? "pokemon" : "flag"}!`;
+  const descriptionText = userRankText
+    ? `${bodyContent}\n\n-# ${userRankText}`
+    : bodyContent;
+
+  const embed = new EmbedBuilder()
+    .setTitle(`🏆 ${categoryName} Leaderboard`)
+    .setDescription(descriptionText)
+    .setColor(isPokemon ? 0xffcc00 : 0xed4245);
+
+  const pageRow = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`lb_prev_${category}_${currentPage}`)
+      .setStyle(ButtonStyle.Secondary)
+      .setEmoji("1542658287894528100")
+      .setDisabled(currentPage <= 1),
+    new ButtonBuilder()
+      .setCustomId("lb_page_count")
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel(`Page ${currentPage} of ${totalPages}`)
+      .setDisabled(true),
+    new ButtonBuilder()
+      .setCustomId(`lb_next_${category}_${currentPage}`)
+      .setStyle(ButtonStyle.Secondary)
+      .setEmoji("1542658241400414298")
+      .setDisabled(currentPage >= totalPages),
+  );
+
+  const categoryRow = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`show_lb_flag_${currentPage}`)
+      .setStyle(!isPokemon ? ButtonStyle.Primary : ButtonStyle.Secondary)
+      .setLabel("Flag LB")
+      .setEmoji("🗺️"),
+    new ButtonBuilder()
+      .setCustomId(`show_lb_pokemon_${currentPage}`)
+      .setStyle(isPokemon ? ButtonStyle.Primary : ButtonStyle.Secondary)
+      .setLabel("Pokémon LB")
+      .setEmoji("🔮"),
+  );
 
   return {
-    flags: 32768,
-    allowedMentions: { parse: [] },
-    components: [
-      {
-        type: 17,
-        accent_color: EMBED_COLORS.WHITE,
-        components: [
-          {
-            type: 10,
-            content: `### 🏆 ${categoryName} Leaderboard`,
-          },
-          {
-            type: 14,
-            divider: true,
-            spacing: 1,
-          },
-          {
-            type: 10,
-            content: bodyContent,
-          },
-          {
-            type: 1,
-            components: [
-              {
-                type: 2,
-                custom_id: `lb_prev_${category}_${currentPage}`,
-                style: 2,
-                emoji: { id: "1542658287894528100", name: "Left" },
-                disabled: currentPage <= 1,
-              },
-              {
-                type: 2,
-                custom_id: `lb_page_count`,
-                style: 2,
-                label: `Page ${currentPage} of ${totalPages}`,
-                disabled: true,
-              },
-              {
-                type: 2,
-                custom_id: `lb_next_${category}_${currentPage}`,
-                style: 2,
-                emoji: { id: "1542658241400414298", name: "Right" },
-                disabled: currentPage >= totalPages,
-              },
-            ],
-          },
-          {
-            type: 14,
-            divider: true,
-            spacing: 1,
-          },
-          {
-            type: 1,
-            components: [
-              {
-                type: 2,
-                custom_id: `show_lb_flag_${currentPage}`,
-                style: !isPokemon ? 1 : 2,
-                label: "Flag LB",
-                emoji: { name: "🏁" },
-              },
-              {
-                type: 2,
-                custom_id: `show_lb_pokemon_${currentPage}`,
-                style: isPokemon ? 1 : 2,
-                label: "Pokémon LB",
-                emoji: { name: "⚡" },
-              },
-            ],
-          },
-        ],
-      },
-    ],
+    embeds: [embed],
+    components: [pageRow, categoryRow],
   };
 }
 
