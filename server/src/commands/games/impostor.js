@@ -1,0 +1,971 @@
+import { EMBED_COLORS } from "../../utils/embeds.js";
+
+export const aliases = ["imp"];
+
+export const data = {
+  name: "impostor",
+  description: "Find the Imposter.",
+  dm_permission: false,
+};
+
+function getProgressBar(current, total, length = 10) {
+  const progress = Math.min(Math.max(current / total, 0), 1);
+  const filled = Math.round(length * progress);
+  const empty = length - filled;
+  return "■".repeat(filled) + "□".repeat(empty);
+}
+
+async function sendAndFetchReply(interaction, payload) {
+  const fullPayload = {
+    ...payload,
+    allowedMentions: { parse: [] },
+    allowed_mentions: { parse: [] },
+  };
+  if (interaction.replied || interaction.deferred) {
+    if (typeof interaction.followUp === "function") {
+      return await interaction.followUp(fullPayload);
+    }
+  }
+  if (typeof interaction.reply === "function") {
+    const res = await interaction.reply({ ...fullPayload, fetchReply: true });
+    return res;
+  }
+  return null;
+}
+
+export async function execute(interaction) {
+  const host = interaction.user || interaction.author;
+  const channel = interaction.channel;
+  const hostMember =
+    interaction.member || interaction.guild?.members?.cache.get(host.id);
+  const hostDisplayName =
+    hostMember?.displayName || host.globalName || host.username;
+
+  if (!channel) return;
+
+  let players = [
+    {
+      id: host.id,
+      user: host,
+      displayName: hostDisplayName,
+      isBot: false,
+      role: null,
+      alive: true,
+      hasShot: false,
+    },
+  ];
+
+  let gameStarted = false;
+
+  const buildLobbyV2 = () => {
+    const playerListStr = players
+      .map(
+        (p, idx) =>
+          `${idx + 1}. ${p.isBot ? "🤖 " : ""}${p.displayName} (<@${p.id}>)`,
+      )
+      .join("\n");
+
+    return {
+      flags: 32768,
+      allowedMentions: { parse: [] },
+      allowed_mentions: { parse: [] },
+      components: [
+        {
+          type: 17,
+          accent_color: EMBED_COLORS.INFO || 0x5865f2,
+          components: [
+            {
+              type: 10,
+              content: "### IMPOSTOR LOBBY",
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 10,
+              content:
+                `**Host:** ${hostDisplayName} (<@${host.id}>)\n\n` +
+                `**Current Players (${players.length}/10):**\n${playerListStr}\n\n` +
+                `Click **Join** to participate! Host can click **Start** once ready.`,
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 1,
+              components: [
+                {
+                  type: 2,
+                  style: 3,
+                  custom_id: "imp_join",
+                  label: "Join",
+                },
+                {
+                  type: 2,
+                  style: 2,
+                  custom_id: "imp_leave",
+                  label: "Leave",
+                },
+                {
+                  type: 2,
+                  style: 1,
+                  custom_id: "imp_start",
+                  label: "Start",
+                },
+                {
+                  type: 2,
+                  style: 4,
+                  custom_id: "imp_cancel",
+                  label: "Cancel",
+                },
+              ],
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 10,
+              content: "-# Min 3 players required.",
+            },
+          ],
+        },
+      ],
+    };
+  };
+
+  const msg = await sendAndFetchReply(interaction, buildLobbyV2());
+
+  if (!msg) return;
+
+  const collector = msg.createMessageComponentCollector({
+    time: 60000,
+  });
+
+  collector.on("collect", async (btnInt) => {
+    const clicker = btnInt.user;
+    const member =
+      btnInt.member || btnInt.guild?.members?.cache.get(clicker.id);
+    const displayName =
+      member?.displayName || clicker.globalName || clicker.username;
+
+    if (btnInt.customId === "imp_join") {
+      if (players.some((p) => p.id === clicker.id)) {
+        return btnInt.reply({
+          content: "You are already in the lobby!",
+          flags: 64,
+        });
+      }
+      if (players.length >= 10) {
+        return btnInt.reply({
+          content: "The lobby is full (Max 10 players)!",
+          flags: 64,
+        });
+      }
+      players.push({
+        id: clicker.id,
+        user: clicker,
+        displayName: displayName,
+        isBot: false,
+        role: null,
+        alive: true,
+        hasShot: false,
+      });
+      await btnInt.update(buildLobbyV2());
+    } else if (btnInt.customId === "imp_leave") {
+      if (!players.some((p) => p.id === clicker.id)) {
+        return btnInt.reply({
+          content: "You are not in the lobby!",
+          flags: 64,
+        });
+      }
+      if (clicker.id === host.id) {
+        return btnInt.reply({
+          content: "The host cannot leave the lobby! Click Cancel to abort.",
+          flags: 64,
+        });
+      }
+      players = players.filter((p) => p.id !== clicker.id);
+      await btnInt.update(buildLobbyV2());
+    } else if (btnInt.customId === "imp_cancel") {
+      if (clicker.id !== host.id) {
+        return btnInt.reply({
+          content: "Only the host can cancel the game!",
+          flags: 64,
+        });
+      }
+      collector.stop("cancelled");
+      await btnInt.update({
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: 0xff4757,
+            components: [
+              {
+                type: 10,
+                content:
+                  "<:Failed:1526228290413658184> Game lobby was cancelled by the host.",
+              },
+            ],
+          },
+        ],
+      });
+    } else if (btnInt.customId === "imp_start") {
+      if (clicker.id !== host.id) {
+        return btnInt.reply({
+          content: "Only the host can start the game!",
+          flags: 64,
+        });
+      }
+
+      if (players.length < 3) {
+        const botNames = ["Tars-Alpha", "Tars-Beta", "Tars-Gamma"];
+        let needed = 3 - players.length;
+        for (let i = 0; i < needed; i++) {
+          players.push({
+            id: `bot_${i + 1}`,
+            user: null,
+            displayName: botNames[i],
+            isBot: true,
+            role: null,
+            alive: true,
+            hasShot: false,
+          });
+        }
+      }
+
+      gameStarted = true;
+      collector.stop("started");
+      await btnInt.deferUpdate().catch(() => null);
+      await msg.delete().catch(() => null);
+      runGameLoop(channel, players);
+    }
+  });
+
+  collector.on("end", async (_, reason) => {
+    if (!gameStarted && reason !== "cancelled") {
+      await msg
+        .edit({
+          flags: 32768,
+          components: [
+            {
+              type: 17,
+              accent_color: 0x2b2d31,
+              components: [
+                {
+                  type: 10,
+                  content:
+                    "<:Timer:1542147643021725796> **Lobby expired due to inactivity.**",
+                },
+              ],
+            },
+          ],
+        })
+        .catch(() => null);
+    }
+  });
+}
+
+async function runGameLoop(channel, players) {
+  const total = players.length;
+  let roles = ["IMPOSTOR"];
+  if (total >= 3) roles.push("SHERIFF");
+  if (total >= 4) roles.push("DOCTOR");
+  if (total >= 5) roles.push("DETECTIVE");
+  if (total >= 6) roles.push("JESTER");
+  while (roles.length < total) {
+    roles.push("CREWMATE");
+  }
+
+  roles.sort(() => Math.random() - 0.5);
+  players.forEach((p, i) => {
+    p.role = roles[i];
+  });
+  const roleDescriptions = {
+    IMPOSTOR:
+      "🔪 **IMPOSTOR**: Eliminate all crewmates without getting caught!",
+    DOCTOR: "🩺 **DOCTOR**: Save 1 player each night from being killed!",
+    DETECTIVE:
+      "🕵🏻 **DETECTIVE**: Investigate 1 player each night to discover their role!",
+    SHERIFF:
+      "🤠 **SHERIFF**: You have 1 shot! Shoot the Impostor, or die if you hit an Innocent!",
+    JESTER:
+      "🤡 **JESTER**: Your goal is to get voted out during the day to win the game!",
+    CREWMATE:
+      "🧑🏻‍🚀 **CREWMATE**: Work together with the crew to identify & eject the Impostor!",
+  };
+
+  const announceV2 = {
+    flags: 32768,
+    components: [
+      {
+        type: 17,
+        accent_color: EMBED_COLORS.INFO || 0x5865f2,
+        components: [
+          {
+            type: 10,
+            content: "### 🎭 Game Started: Roles Assigned!",
+          },
+          {
+            type: 14,
+            divider: true,
+            spacing: 1,
+          },
+          {
+            type: 10,
+            content:
+              `All ${players.length} players have been assigned their secret roles.\n\n` +
+              `Click the **View My Role** button below to check your secret role privately!`,
+          },
+          {
+            type: 14,
+            divider: true,
+            spacing: 1,
+          },
+          {
+            type: 1,
+            components: [
+              {
+                type: 2,
+                style: 1,
+                custom_id: "view_secret_role",
+                label: "View My Role",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  const announceMsg = await channel.send(announceV2);
+
+  const roleCollector = announceMsg.createMessageComponentCollector({
+    time: 300000,
+  });
+
+  roleCollector.on("collect", async (rInt) => {
+    if (rInt.customId === "view_secret_role") {
+      const p = players.find((player) => player.id === rInt.user.id);
+      if (!p) {
+        return rInt.reply({
+          content: "You are not a registered player in this game!",
+          flags: 64,
+        });
+      }
+
+      await rInt.reply({
+        flags: 32832,
+        components: [
+          {
+            type: 17,
+            accent_color: p.role === "IMPOSTOR" ? 0xff4757 : 0x2ecc71,
+            components: [
+              {
+                type: 10,
+                content: `### Your Secret Role`,
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content: roleDescriptions[p.role],
+              },
+            ],
+          },
+        ],
+      });
+    }
+  });
+
+  let gameOver = false;
+
+  while (!gameOver) {
+    const alivePlayers = players.filter((p) => p.alive);
+    const impostorsAlive = alivePlayers.filter((p) => p.role === "IMPOSTOR");
+    const crewAlive = alivePlayers.filter((p) => p.role !== "IMPOSTOR");
+
+    if (impostorsAlive.length === 0) {
+      await channel.send({
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: 0x2ecc71,
+            components: [
+              {
+                type: 10,
+                content: "### <a:Tada:1544329561955770488> CREWMATES WIN!",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content:
+                  "All Impostors have been eliminated from the ship! Great job team!",
+              },
+            ],
+          },
+        ],
+      });
+      break;
+    }
+
+    if (impostorsAlive.length >= crewAlive.length) {
+      await channel.send({
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: 0xff4757,
+            components: [
+              {
+                type: 10,
+                content: "### 🔪 IMPOSTORS WIN!",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content:
+                  "The Impostors have taken over the ship! Better luck next time.",
+              },
+            ],
+          },
+        ],
+      });
+      break;
+    }
+
+    const nightV2 = {
+      flags: 32768,
+      components: [
+        {
+          type: 17,
+          accent_color: 0x2b2d31,
+          components: [
+            {
+              type: 10,
+              content: "### 🌃 Night Phase",
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 10,
+              content: `Special roles are taking their actions.\n-# Night ends in 20s...`,
+            },
+          ],
+        },
+      ],
+    };
+
+    await channel.send(nightV2);
+
+    let nightKilledId = null;
+    let nightSavedId = null;
+    let sheriffShotTargetId = null;
+    let sheriffShooterId = null;
+
+    const botImpostor = players.find(
+      (p) => p.alive && p.isBot && p.role === "IMPOSTOR",
+    );
+    if (botImpostor) {
+      const validTargets = alivePlayers.filter((p) => p.id !== botImpostor.id);
+      if (validTargets.length > 0) {
+        nightKilledId =
+          validTargets[Math.floor(Math.random() * validTargets.length)].id;
+      }
+    }
+
+    const botDoctor = players.find(
+      (p) => p.alive && p.isBot && p.role === "DOCTOR",
+    );
+    if (botDoctor) {
+      nightSavedId =
+        alivePlayers[Math.floor(Math.random() * alivePlayers.length)].id;
+    }
+
+    const humanSpecialRoles = alivePlayers.filter(
+      (p) => !p.isBot && p.role !== "CREWMATE" && p.role !== "JESTER",
+    );
+
+    if (humanSpecialRoles.length > 0) {
+      const actionV2 = {
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: 0x5865f2,
+            components: [
+              {
+                type: 10,
+                content:
+                  "### 🎭 Special Roles Action Menu\nSelect a target player below to perform your night action.",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 3,
+                    custom_id: "night_action",
+                    placeholder: "Select a target player...",
+                    options: alivePlayers.map((p) => ({
+                      label: p.displayName,
+                      value: p.id,
+                      description: `Target ${p.displayName}`,
+                    })),
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      const menuMsg = await channel.send(actionV2);
+
+      const menuCollector = menuMsg.createMessageComponentCollector({
+        time: 18000,
+      });
+
+      menuCollector.on("collect", async (selInt) => {
+        const actor = players.find((p) => p.id === selInt.user.id && p.alive);
+        if (!actor || actor.role === "CREWMATE" || actor.role === "JESTER") {
+          return selInt.reply({
+            content: "You don't have a special action tonight!",
+            flags: 64,
+          });
+        }
+
+        const targetId = selInt.values[0];
+        const target = players.find((p) => p.id === targetId);
+
+        if (actor.role === "IMPOSTOR") {
+          nightKilledId = targetId;
+          await selInt.reply({
+            content: `🔪 You targeted **${target.displayName}** for elimination!`,
+            flags: 64,
+          });
+        } else if (actor.role === "DOCTOR") {
+          nightSavedId = targetId;
+          await selInt.reply({
+            content: `🩺 You chose to protect **${target.displayName}** tonight!`,
+            flags: 64,
+          });
+        } else if (actor.role === "DETECTIVE") {
+          const isImp = target.role === "IMPOSTOR";
+          await selInt.reply({
+            content: `🕵🏻 Investigation Result: **${target.displayName}** is ${isImp ? "🗡️ **AN IMPOSTOR!**" : "🛡️ **INNOCENT**"}.`,
+            flags: 64,
+          });
+        } else if (actor.role === "SHERIFF") {
+          if (actor.hasShot) {
+            return selInt.reply({
+              content: "🤠 You have already used your 1 bullet in this game!",
+              flags: 64,
+            });
+          }
+          actor.hasShot = true;
+          sheriffShooterId = actor.id;
+          sheriffShotTargetId = targetId;
+          await selInt.reply({
+            content: `🤠 You took a shot at **${target.displayName}**!`,
+            flags: 64,
+          });
+        }
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 20000));
+      await menuMsg.delete().catch(() => null);
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+    }
+
+    const deathNotices = [];
+
+    if (nightKilledId && nightKilledId !== nightSavedId) {
+      const killedPlayer = players.find((p) => p.id === nightKilledId);
+      if (killedPlayer && killedPlayer.alive) {
+        killedPlayer.alive = false;
+        deathNotices.push(
+          `\`${killedPlayer.displayName}\` was found eliminated in the hallway!`,
+        );
+      }
+    }
+
+    if (sheriffShotTargetId && sheriffShooterId) {
+      const target = players.find((p) => p.id === sheriffShotTargetId);
+      const shooter = players.find((p) => p.id === sheriffShooterId);
+      if (target && target.role === "IMPOSTOR") {
+        if (target.alive) {
+          target.alive = false;
+          deathNotices.push(
+            `🤠 \`${target.displayName}\` (Impostor) was shot dead by the Sheriff!`,
+          );
+        }
+      } else if (shooter && shooter.alive) {
+        shooter.alive = false;
+        deathNotices.push(
+          `🤠 \`${shooter.displayName}\` (Sheriff) shot an innocent and died from guilt!`,
+        );
+      }
+    }
+
+    const daybreakV2 = {
+      flags: 32768,
+      components: [
+        {
+          type: 17,
+          accent_color: 0xffa502,
+          components: [
+            {
+              type: 10,
+              content: "### 🌅 Daybreak Arrives!",
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 10,
+              content:
+                deathNotices.length > 0
+                  ? deathNotices.join("\n")
+                  : `The sun rises. Nobody was killed last night! (maybe the doctor saved someone?)`,
+            },
+          ],
+        },
+      ],
+    };
+
+    await channel.send(daybreakV2);
+
+    const postNightAlive = players.filter((p) => p.alive);
+    const postNightImpostors = postNightAlive.filter(
+      (p) => p.role === "IMPOSTOR",
+    );
+    const postNightCrew = postNightAlive.filter((p) => p.role !== "IMPOSTOR");
+
+    if (postNightImpostors.length === 0) {
+      await channel.send({
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: 0x2ecc71,
+            components: [
+              {
+                type: 10,
+                content: "### <a:Tada:1544329561955770488> CREWMATES WIN!",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content: "All Impostors have been eliminated! Crewmates win!",
+              },
+            ],
+          },
+        ],
+      });
+      break;
+    }
+
+    if (postNightImpostors.length >= postNightCrew.length) {
+      await channel.send({
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: 0xff4757,
+            components: [
+              {
+                type: 10,
+                content: "### 🔪 IMPOSTORS WIN!",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content:
+                  "The Impostors have taken over the ship! Impostors win!",
+              },
+            ],
+          },
+        ],
+      });
+      break;
+    }
+
+    const voteOptions = postNightAlive.map((p) => ({
+      label: p.displayName,
+      value: p.id,
+      description: `Vote to eject ${p.displayName}`,
+    }));
+    voteOptions.push({
+      label: "Skip Vote",
+      value: "SKIP",
+      description: "Vote to skip ejection",
+    });
+
+    const votes = new Map();
+
+    for (const b of postNightAlive.filter((p) => p.isBot)) {
+      const candidates = postNightAlive.filter((p) => p.id !== b.id);
+      if (candidates.length > 0) {
+        const randomTarget =
+          candidates[Math.floor(Math.random() * candidates.length)].id;
+        votes.set(b.id, randomTarget);
+      }
+    }
+
+    const buildVoteV2 = () => {
+      const totalVoters = postNightAlive.length;
+      const currentVotes = votes.size;
+      const bar = getProgressBar(currentVotes, totalVoters, 10);
+      const playerStatusList = postNightAlive
+        .map((p) => {
+          const hasVoted = votes.has(p.id);
+          return `• ${p.isBot ? "🤖 " : ""}${p.displayName} ${hasVoted ? "<:Picked:1542151058929746090> *(Voted)*" : "<:Timer:1542147643021725796> *(Thinking...)*"}`;
+        })
+        .join("\n");
+
+      return {
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: 0x5865f2,
+            components: [
+              {
+                type: 10,
+                content: "### 🗳️ Discussion & Voting",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content:
+                  `Discuss in chat who you think the Impostor is!\n\n` +
+                  `**Alive Players:**\n${playerStatusList}\n\n` +
+                  `**Voting Progress:** \`${currentVotes}/${totalVoters}\` Votes Cast\n${bar}\n\n` +
+                  `-# Voting ends in 25 seconds...`,
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 3,
+                    custom_id: "day_vote",
+                    placeholder: "Cast your vote...",
+                    options: voteOptions,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+    };
+
+    const voteMsg = await channel.send(buildVoteV2());
+
+    const voteCollector = voteMsg.createMessageComponentCollector({
+      time: 25000,
+    });
+
+    voteCollector.on("collect", async (vInt) => {
+      const voter = players.find((p) => p.id === vInt.user.id);
+      if (!voter || !voter.alive) {
+        return vInt.reply({
+          content: "Dead players cannot vote!",
+          flags: 64,
+        });
+      }
+
+      const choice = vInt.values[0];
+      votes.set(voter.id, choice);
+
+      const choiceName =
+        choice === "SKIP"
+          ? "Skip Vote"
+          : players.find((p) => p.id === choice)?.displayName;
+
+      await vInt.reply({
+        content: `🗳️ You voted for **${choiceName}**!`,
+        flags: 64,
+      });
+
+      await voteMsg.edit(buildVoteV2()).catch(() => null);
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 26000));
+    await voteMsg.delete().catch(() => null);
+
+    const voteCounts = {};
+    for (const [, targetId] of votes.entries()) {
+      voteCounts[targetId] = (voteCounts[targetId] || 0) + 1;
+    }
+
+    let topTarget = null;
+    let maxVotes = 0;
+    let tie = false;
+
+    for (const [targetId, count] of Object.entries(voteCounts)) {
+      if (count > maxVotes) {
+        maxVotes = count;
+        topTarget = targetId;
+        tie = false;
+      } else if (count === maxVotes) {
+        tie = true;
+      }
+    }
+
+    if (tie || !topTarget || topTarget === "SKIP") {
+      await channel.send({
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: 0x2b2d31,
+            components: [
+              {
+                type: 10,
+                content: "### 🗳️ Voting Result: No Ejection",
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content:
+                  "No single player received a clear majority vote. **No one was ejected!**",
+              },
+            ],
+          },
+        ],
+      });
+    } else {
+      const ejectedPlayer = players.find((p) => p.id === topTarget);
+      if (ejectedPlayer) {
+        ejectedPlayer.alive = false;
+
+        if (ejectedPlayer.role === "JESTER") {
+          await channel.send({
+            flags: 32768,
+            components: [
+              {
+                type: 17,
+                accent_color: 0x9b59b6,
+                components: [
+                  {
+                    type: 10,
+                    content: "### <a:Tada:1544329561955770488> 🤡 JESTER WINS!",
+                  },
+                  {
+                    type: 14,
+                    divider: true,
+                    spacing: 1,
+                  },
+                  {
+                    type: 10,
+                    content:
+                      `**${ejectedPlayer.displayName}** fooled everyone into voting them out!\n\n` +
+                      `🤡 **The Jester wins the game!**`,
+                  },
+                ],
+              },
+            ],
+          });
+          gameOver = true;
+          break;
+        }
+
+        const isImp = ejectedPlayer.role === "IMPOSTOR";
+        const remainingImps = players.filter(
+          (p) => p.alive && p.role === "IMPOSTOR",
+        ).length;
+
+        const impQuotes = [
+          `\`${ejectedPlayer.displayName}\` was launched into deep space.\n\n🗡️ **\`${ejectedPlayer.displayName}\` was An Impostor.** ${remainingImps === 0 ? "No Impostors remain!" : `(${remainingImps} Impostor${remainingImps > 1 ? "s" : ""} remain)`}`,
+          `\`${ejectedPlayer.displayName}\` was thrown out of the airlock.\n\n🗡️ **\`${ejectedPlayer.displayName}\` was An Impostor.**`,
+          `\`${ejectedPlayer.displayName}\` was ejected into the void.\n\n🗡️ **\`${ejectedPlayer.displayName}\` was An Impostor.**`,
+        ];
+
+        const innocentQuotes = [
+          `\`${ejectedPlayer.displayName}\` was launched into deep space...\n\n🛡️ **\`${ejectedPlayer.displayName}\` was NOT an Impostor.** (${remainingImps} Impostor${remainingImps > 1 ? "s" : ""} remain among us)`,
+          `\`${ejectedPlayer.displayName}\` was voted out by the ship crew...\n\n🛡️ **\`${ejectedPlayer.displayName}\` was innocent.** (${remainingImps} Impostor${remainingImps > 1 ? "s" : ""} remain)`,
+          `\`${ejectedPlayer.displayName}\` was ejected into zero gravity.\n\n🛡️ **\`${ejectedPlayer.displayName}\` was NOT an Impostor.**`,
+        ];
+
+        const quotes = isImp ? impQuotes : innocentQuotes;
+        const selectedQuote = quotes[Math.floor(Math.random() * quotes.length)];
+
+        await channel.send({
+          flags: 32768,
+          components: [
+            {
+              type: 17,
+              accent_color: isImp ? 0x2ecc71 : 0xff4757,
+              components: [
+                {
+                  type: 10,
+                  content: `### 🚀 ${ejectedPlayer.displayName} was Ejected!`,
+                },
+                {
+                  type: 14,
+                  divider: true,
+                  spacing: 1,
+                },
+                {
+                  type: 10,
+                  content: selectedQuote,
+                },
+              ],
+            },
+          ],
+        });
+      }
+    }
+  }
+}

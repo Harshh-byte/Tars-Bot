@@ -37,6 +37,7 @@ const modulesCatalog = {
         cmd: "rps",
         desc: "Play Rock, Paper, Scissors.",
       },
+      { name: "Impostor", cmd: "impostor", desc: "Find the Imposter." },
       { name: "Tic-Tac-Toe", cmd: "ttt", desc: "Play Tic-Tac-Toe." },
       { name: "Truth or Dare", cmd: "tod", desc: "Play Truth or Dare." },
       { name: "Would You Rather", cmd: "wyr", desc: "Play Would You Rather." },
