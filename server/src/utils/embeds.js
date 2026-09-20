@@ -8,6 +8,8 @@ export const EMBED_COLORS = {
   GREY: 0x2b2d31,
   WHITE: 0xffffff,
   TIMEOUT: 0x2b2d31,
+  DAYBREAK: 0xffb703,
+  IMPOSTOR_WIN: 0xdc2626,
 };
 
 export function infoEmbed({
