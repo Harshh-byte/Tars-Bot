@@ -223,7 +223,7 @@ async function startGame(interaction, client, opponent) {
 
     const collector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
-      time: 86400000,
+      time: 60000,
     });
 
     const handleGameEnd = async (winner, lastInteraction) => {
@@ -374,7 +374,7 @@ async function startGame(interaction, client, opponent) {
             components: [
               {
                 type: 10,
-                content: "### <:Timer:1542147643021725796> Match Timed Out",
+                content: "### ⌛ Match Timed Out",
               },
               {
                 type: 14,

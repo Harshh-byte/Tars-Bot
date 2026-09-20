@@ -201,7 +201,9 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
           BOT_INFO,
         });
 
-        if (shouldSendSlashNotice(message.author.id, 15, 600000)) {
+        const isExemptGuild =
+          message.guild?.id && message.guild.id === EXEMPT_GUILD_ID;
+        if (!isExemptGuild && shouldSendSlashNotice(message.author.id, 15, 600000)) {
           setTimeout(async () => {
             const noticeEmbed = createSlashNoticeEmbed(client.user?.username || "Tars");
             await message.channel.send({ embeds: [noticeEmbed] }).catch(() => null);

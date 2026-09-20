@@ -52,25 +52,26 @@ function isCloseMatch(input, targetAliases) {
   });
 }
 
-function generateHint(name, level = 0) {
-  const chars = name.split("");
-  const totalLetters = chars.filter((c) => /[a-zA-Z]/.test(c)).length;
-  const revealCount =
-    level === 0
-      ? 1
-      : Math.min(totalLetters - 1, Math.floor(totalLetters * 0.4) + level);
+function getRevealedHint(name, revealedIndices = new Set()) {
+  const words = name.split(" ");
+  let globalIndex = 0;
 
-  let revealed = 0;
-  return chars
-    .map((char, i) => {
-      if (!/[a-zA-Z]/.test(char)) return char;
-      if (i === 0 || (revealed < revealCount && Math.random() < 0.6)) {
-        revealed++;
-        return `**${char.toUpperCase()}**`;
-      }
-      return "`_`";
+  return words
+    .map((word) => {
+      const chars = word.split("");
+      const wordStr = chars
+        .map((char) => {
+          const idx = globalIndex++;
+          if (!/[a-zA-Z]/.test(char)) return char;
+          if (revealedIndices.has(idx)) {
+            return char.toUpperCase();
+          }
+          return "`_`";
+        })
+        .join(" ");
+      return wordStr;
     })
-    .join(" ");
+    .join("   ");
 }
 
 async function fetchRandomPokemon(gen = "gen1", channelId = "default") {
@@ -242,21 +243,97 @@ async function startPokemonGame(
       extension: "png",
       size: 256,
     });
-    const initialHint = generateHint(targetPokemon.name, 0);
+    const revealedIndices = new Set();
+    const letterIndices = [];
+    let isFirstLetter = true;
+    targetPokemon.name.split("").forEach((char, idx) => {
+      if (/[a-zA-Z]/.test(char)) {
+        letterIndices.push(idx);
+        if (isFirstLetter) {
+          revealedIndices.add(idx);
+          isFirstLetter = false;
+        }
+      } else if (char === " ") {
+        isFirstLetter = true;
+      }
+    });
 
-    const embed = new EmbedBuilder()
-      .setAuthor({ name: userDisplayName, iconURL: userAvatar })
-      .setTitle("Who's That Pokémon?")
-      .setThumbnail(targetPokemon.imageUrl)
-      .setDescription(
-        `**Type:** ${targetPokemon.types}\n` +
-          `**Hint:** ${initialHint}\n\n` +
-          `You have 30 seconds to guess the Pokémon.\n` +
-          `*Type your answer in the chat or \`.skip\` to skip.*`,
-      )
-      .setColor(EMBED_COLORS.GREY);
+    let hintClicks = 0;
+    const maxHintClicks = 1;
 
-    const payload = { embeds: [embed], components: [] };
+    const buildPokemonPrompt = (currentHint) => ({
+      flags: 32768,
+      components: [
+        {
+          type: 17,
+          accent_color: EMBED_COLORS.INFO,
+          components: [
+            {
+              type: 10,
+              content: `### 🔮 Who's That Pokémon?`,
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 9,
+              components: [
+                {
+                  type: 10,
+                  content:
+                    `**Type:** ${targetPokemon.types}\n` +
+                    `**Pokémon:** ${currentHint}\n\n` +
+                    `-# You have 30 seconds to guess!\n` +
+                    `-# Hint Penalty: -5 pts`,
+                },
+              ],
+              accessory: {
+                type: 11,
+                media: {
+                  url: targetPokemon.imageUrl,
+                },
+              },
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 1,
+              components: [
+                hintClicks >= maxHintClicks
+                  ? {
+                      type: 2,
+                      style: 2,
+                      custom_id: "pokemon_hint",
+                      label: "Hint Revealed",
+                      disabled: true,
+                    }
+                  : {
+                      type: 2,
+                      style: 2,
+                      custom_id: "pokemon_hint",
+                      label: "Get Hint",
+                    },
+                {
+                  type: 2,
+                  style: 4,
+                  custom_id: "pokemon_skip",
+                  label: "Skip",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    const payload = buildPokemonPrompt(
+      getRevealedHint(targetPokemon.name, revealedIndices),
+    );
 
     const channel = interaction.channel;
     if (!channel || typeof channel.createMessageCollector !== "function")
@@ -276,49 +353,67 @@ async function startPokemonGame(
     const collector = channel.createMessageCollector({ filter, time: 30000 });
     activeCollectorsMap.set(channelId, collector);
 
+    const btnCollector = response.createMessageComponentCollector({
+      componentType: ComponentType.Button,
+      time: 30000,
+    });
+
+    btnCollector.on("collect", async (bInt) => {
+      if (bInt.customId === "pokemon_hint") {
+        if (hintClicks >= maxHintClicks) {
+          return bInt
+            .reply({
+              content: "Maximum hints already revealed for this Pokémon!",
+              flags: 64,
+            })
+            .catch(() => null);
+        }
+
+        const unrevealed = letterIndices.filter(
+          (idx) => !revealedIndices.has(idx),
+        );
+        if (unrevealed.length > 0) {
+          const revealAmount = Math.min(
+            unrevealed.length,
+            Math.ceil(unrevealed.length * 0.4),
+          );
+          for (let i = 0; i < revealAmount; i++) {
+            const randomIndex = Math.floor(Math.random() * unrevealed.length);
+            const chosen = unrevealed.splice(randomIndex, 1)[0];
+            revealedIndices.add(chosen);
+          }
+        }
+        hintClicks++;
+
+        const updatedHint = getRevealedHint(
+          targetPokemon.name,
+          revealedIndices,
+        );
+        await bInt.update(buildPokemonPrompt(updatedHint)).catch(() => null);
+      } else if (bInt.customId === "pokemon_skip") {
+        const currentSkips = channelSkipsMap.get(channelId) || 0;
+        if (currentSkips >= 5) {
+          return bInt
+            .reply({
+              content:
+                "<:Warning:1526228248458035381> **Maximum skips reached (5/5)!** You must guess this Pokémon or wait for the timer.",
+              flags: 64,
+            })
+            .catch(() => null);
+        }
+
+        channelSkipsMap.set(channelId, currentSkips + 1);
+        collector.stop("skipped");
+        btnCollector.stop("skipped");
+        await bInt.deferUpdate().catch(() => null);
+      }
+    });
+
     let winnerMessage = null;
     const closeMatchUsers = new Set();
 
-    const hintTimer = setTimeout(async () => {
-      try {
-        if (!collector.ended) {
-          const secondHint = generateHint(targetPokemon.name, 1);
-          const updatedEmbed = EmbedBuilder.from(embed).setDescription(
-            `**Type:** ${targetPokemon.types}\n` +
-              `**Hint:** ${secondHint}\n\n` +
-              `You have 30 seconds to guess the Pokémon.\n` +
-              `*Type your answer in the chat or \`.skip\` to skip.*`,
-          );
-          if (response && typeof response.edit === "function") {
-            await response.edit({ embeds: [updatedEmbed] }).catch(() => null);
-          }
-        }
-      } catch {}
-    }, 12000);
-    activeHintTimersMap.set(channelId, hintTimer);
-
     collector.on("collect", async (m) => {
       const input = m.content.trim().toLowerCase();
-
-      if (input === ".skip" || input === ".s") {
-        const skipsUsed = channelSkipsMap.get(channelId) || 0;
-        if (skipsUsed >= 5) {
-          await m
-            .reply({
-              content:
-                "⚠️ **Maximum skips reached (5/5)!** You must guess this Pokémon or wait for the timer.",
-            })
-            .catch(() => null);
-          return;
-        }
-
-        channelSkipsMap.set(channelId, skipsUsed + 1);
-        clearTimeout(hintTimer);
-        activeHintTimersMap.delete(channelId);
-        collector.stop("skipped");
-        await m.react("⏩").catch(() => null);
-        return;
-      }
 
       const isCorrect = targetPokemon.aliases.some(
         (alias) => alias.toLowerCase() === input,
@@ -326,8 +421,6 @@ async function startPokemonGame(
 
       if (isCorrect) {
         winnerMessage = m;
-        clearTimeout(hintTimer);
-        activeHintTimersMap.delete(channelId);
         collector.stop("correct");
         await m
           .react("1526228339910643793")
@@ -349,8 +442,6 @@ async function startPokemonGame(
     });
 
     collector.on("end", async (_, reason) => {
-      clearTimeout(hintTimer);
-      activeHintTimersMap.delete(channelId);
       if (activeCollectorsMap.get(channelId) === collector) {
         activeCollectorsMap.delete(channelId);
       }
@@ -362,16 +453,32 @@ async function startPokemonGame(
           const currentSkips = channelSkipsMap.get(channelId) || 1;
           const remainingSkips = Math.max(0, 5 - currentSkips);
 
-          const skipEmbed = new EmbedBuilder()
-            .setTitle("**Pokémon Skipped!**")
-            .setDescription(
-              `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                `*Skips remaining for this game:* **${remainingSkips}/5**`,
-            )
-            .setThumbnail(targetPokemon.imageUrl)
-            .setColor(EMBED_COLORS.WARNING);
-
-          await channel.send({ embeds: [skipEmbed] });
+          await channel.send({
+            flags: 32768,
+            components: [
+              {
+                type: 17,
+                accent_color: EMBED_COLORS.WARNING,
+                components: [
+                  {
+                    type: 10,
+                    content: `### Pokémon Skipped!`,
+                  },
+                  {
+                    type: 14,
+                    divider: true,
+                    spacing: 1,
+                  },
+                  {
+                    type: 10,
+                    content:
+                      `The Pokémon was **${targetPokemon.name}**!\n\n` +
+                      `Skips remaining: **${remainingSkips}/5**`,
+                  },
+                ],
+              },
+            ],
+          });
 
           setTimeout(async () => {
             await startPokemonGame(
@@ -394,20 +501,39 @@ async function startPokemonGame(
           }
 
           const winnerMention = `<@${winnerId}>`;
-          const currentSessionScore = (channelSessionScoresMap.get(channelId) || 0) + pointsGained;
+          const currentSessionScore =
+            (channelSessionScoresMap.get(channelId) || 0) + pointsGained;
           channelSessionScoresMap.set(channelId, currentSessionScore);
 
-          const winEmbed = new EmbedBuilder()
-            .setTitle("<a:Tada:1544329561955770488> **Correct Guess!**")
-            .setDescription(
-              `${winnerMention} guessed it right!\n` +
-                `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                `🏆 **+${pointsGained} Points** *(Game Score: **${currentSessionScore}** Pts | Total: **${scoreData.totalPoints}** Pts)*`,
-            )
-            .setThumbnail(targetPokemon.imageUrl)
-            .setColor(EMBED_COLORS.SUCCESS);
-
-          await channel.send({ embeds: [winEmbed] });
+          await channel.send({
+            flags: 32768,
+            allowedMentions: { parse: [] },
+            allowed_mentions: { parse: [] },
+            components: [
+              {
+                type: 17,
+                accent_color: EMBED_COLORS.SUCCESS,
+                components: [
+                  {
+                    type: 10,
+                    content: `### <a:Tada:1544329561955770488> Correct Guess!`,
+                  },
+                  {
+                    type: 14,
+                    divider: true,
+                    spacing: 1,
+                  },
+                  {
+                    type: 10,
+                    content:
+                      `${winnerMention} guessed it right!\n` +
+                      `The Pokémon was **${targetPokemon.name}**!\n\n` +
+                      `🏆 **+${pointsGained} Points** | **Total: ${scoreData.totalPoints}** Pts`,
+                  },
+                ],
+              },
+            ],
+          });
 
           setTimeout(async () => {
             await startPokemonGame(
@@ -421,18 +547,55 @@ async function startPokemonGame(
         } else {
           channelSkipsMap.set(channelId, 0);
           channelSessionScoresMap.set(channelId, 0);
-          const timeoutEmbed = new EmbedBuilder()
-            .setTitle("⌛ **Time's Up!**")
-            .setDescription(
-              `Nobody guessed the Pokémon in time!\n\n` +
-                `The correct answer was **${targetPokemon.name}**.`,
-            )
-            .setThumbnail(targetPokemon.imageUrl)
-            .setColor(EMBED_COLORS.TIMEOUT);
 
           const resultMsg = await channel.send({
-            embeds: [timeoutEmbed],
-            components: [buildButtons()],
+            flags: 32768,
+            components: [
+              {
+                type: 17,
+                accent_color: EMBED_COLORS.TIMEOUT,
+                components: [
+                  {
+                    type: 10,
+                    content: `### ⌛ Time's Up!`,
+                  },
+                  {
+                    type: 14,
+                    divider: true,
+                    spacing: 1,
+                  },
+                  {
+                    type: 10,
+                    content:
+                      `Nobody guessed the Pokémon in time!\n\n` +
+                      `The correct answer was **${targetPokemon.name}**.`,
+                  },
+                  {
+                    type: 14,
+                    divider: true,
+                    spacing: 1,
+                  },
+                  {
+                    type: 1,
+                    components: [
+                      {
+                        type: 2,
+                        style: 1,
+                        custom_id: "pokemon_next",
+                        label: "Play Again",
+                      },
+                      {
+                        type: 2,
+                        style: 2,
+                        custom_id: "show_lb_pokemon",
+                        label: "Leaderboard",
+                        emoji: { name: "🏆" },
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           });
 
           attachPokemonNextCollector(

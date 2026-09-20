@@ -24,6 +24,8 @@ export const data = {
         { name: "All Games", value: "all" },
         { name: "Flag Game", value: "flag" },
         { name: "Pokémon Game", value: "pokemon" },
+        { name: "Logo Game", value: "logo" },
+        { name: "Word Scramble", value: "scramble" },
       ],
     },
   ],
@@ -33,8 +35,14 @@ export async function execute(interaction) {
   try {
     const member = interaction.member;
     const isOwner = interaction.user?.id === process.env.OWNER_ID;
+    const isExemptGuild =
+      interaction.guild?.id &&
+      process.env.EXEMPT_GUILD_ID &&
+      interaction.guild.id === process.env.EXEMPT_GUILD_ID;
+
     const hasPermission =
       isOwner ||
+      isExemptGuild ||
       member?.permissions?.has(PermissionFlagsBits.ManageGuild) ||
       member?.permissions?.has(PermissionFlagsBits.Administrator);
 
@@ -72,6 +80,10 @@ export async function execute(interaction) {
       category = "flag";
     } else if (rawInput.includes("poke") || rawInput.includes("pokemon")) {
       category = "pokemon";
+    } else if (rawInput.includes("brand") || rawInput.includes("logo")) {
+      category = "logo";
+    } else if (rawInput.includes("scramble") || rawInput.includes("word") || rawInput.includes("ws")) {
+      category = "scramble";
     } else if (rawInput.includes("all")) {
       category = "all";
     } else {
@@ -93,13 +105,17 @@ export async function execute(interaction) {
         ? "Flag"
         : category === "pokemon"
           ? "Pokémon"
-          : "All Game";
+          : category === "logo" || category === "brand"
+            ? "Logo"
+            : category === "scramble"
+              ? "Word Scramble"
+              : "All Games";
 
     const warnEmbed = new EmbedBuilder()
       .setColor(EMBED_COLORS.WARNING)
       .setDescription(
         `<:Warning:1526228248458035381> Are you sure you want to reset the **${catTitle}** leaderboard?\n\n` +
-        `This action will **permanently delete all scores** for this category. This cannot be undone!`,
+          `This action will **permanently delete all scores** for this category. This cannot be undone!`,
       );
 
     const confirmBtn = new ButtonBuilder()
@@ -162,7 +178,7 @@ export async function execute(interaction) {
         const sEmbed = new EmbedBuilder()
           .setColor(EMBED_COLORS.SUCCESS)
           .setDescription(
-            `<:Success:1526228339910643793> Successfully reset **${catTitle}** leaderboard scores to **0** for the server!`,
+            `<:Success:1526228339910643793> Reset **${catTitle}** leaderboard!`,
           );
 
         await btnInteraction.update({
@@ -187,9 +203,7 @@ export async function execute(interaction) {
       if (reason !== "handled") {
         const timeoutEmbed = new EmbedBuilder()
           .setColor(EMBED_COLORS.GREY)
-          .setDescription(
-            "⌛ Reset timed out. No data was modified.",
-          );
+          .setDescription("⌛ Reset timed out. No data was modified.");
 
         await msg
           .edit({ embeds: [timeoutEmbed], components: [] })

@@ -176,25 +176,26 @@ function isCloseMatch(input, targetAliases) {
   });
 }
 
-function generateHint(name, level = 0) {
-  const chars = name.split("");
-  const totalLetters = chars.filter((c) => /[a-zA-Z]/.test(c)).length;
-  const revealCount =
-    level === 0
-      ? 1
-      : Math.min(totalLetters - 1, Math.floor(totalLetters * 0.4) + level);
+function getRevealedHint(name, revealedIndices = new Set()) {
+  const words = name.split(" ");
+  let globalIndex = 0;
 
-  let revealed = 0;
-  return chars
-    .map((char, i) => {
-      if (!/[a-zA-Z]/.test(char)) return char;
-      if (i === 0 || (revealed < revealCount && Math.random() < 0.6)) {
-        revealed++;
-        return `**${char.toUpperCase()}**`;
-      }
-      return "`_`";
+  return words
+    .map((word) => {
+      const chars = word.split("");
+      const wordStr = chars
+        .map((char) => {
+          const idx = globalIndex++;
+          if (!/[a-zA-Z]/.test(char)) return char;
+          if (revealedIndices.has(idx)) {
+            return char.toUpperCase();
+          }
+          return "`_`";
+        })
+        .join(" ");
+      return wordStr;
     })
-    .join(" ");
+    .join("   ");
 }
 
 function getAliases(name, code) {
@@ -436,23 +437,98 @@ async function startFlagGame(
       size: 256,
     });
     const flagUrl = `https://flagcdn.com/w320/${targetCountry.code}.png`;
-    const initialHint = generateHint(targetCountry.name, 0);
 
     const diffBadge = targetCountry.difficulty;
 
-    const embed = new EmbedBuilder()
-      .setAuthor({ name: userDisplayName, iconURL: userAvatar })
-      .setTitle("Guess the Flag!")
-      .setThumbnail(flagUrl)
-      .setDescription(
-        `**Difficulty:** ${diffBadge}\n` +
-          `**Hint:** ${initialHint}\n\n` +
-          `You have 30 seconds to guess the country.\n` +
-          `*Type your answer in the chat or \`.skip\` to skip.*`,
-      )
-      .setColor(EMBED_COLORS.GREY);
+    const revealedIndices = new Set();
+    const letterIndices = [];
+    let isFirstLetter = true;
+    targetCountry.name.split("").forEach((char, idx) => {
+      if (/[a-zA-Z]/.test(char)) {
+        letterIndices.push(idx);
+        if (isFirstLetter) {
+          revealedIndices.add(idx);
+          isFirstLetter = false;
+        }
+      } else if (char === " ") {
+        isFirstLetter = true;
+      }
+    });
 
-    const payload = { embeds: [embed], components: [] };
+    let hintClicks = 0;
+    const maxHintClicks = 1;
+
+    const buildPromptPayload = (currentHint) => ({
+      flags: 32768,
+      components: [
+        {
+          type: 17,
+          accent_color: EMBED_COLORS.INFO,
+          components: [
+            {
+              type: 10,
+              content: `### 🗺️ Guess the Country!`,
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 9,
+              components: [
+                {
+                  type: 10,
+                  content:
+                    `**Difficulty:** ${diffBadge}\n` +
+                    `**Country:** ${currentHint}\n\n` +
+                    `-# You have 30 seconds to guess!\n` +
+                    `-# Hint Penalty: -5 pts`,
+                },
+              ],
+              accessory: {
+                type: 11,
+                media: {
+                  url: flagUrl,
+                },
+              },
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 1,
+              components: [
+                hintClicks >= maxHintClicks
+                  ? {
+                      type: 2,
+                      style: 2,
+                      custom_id: "flag_hint",
+                      label: "Hint Revealed",
+                      disabled: true,
+                    }
+                  : {
+                      type: 2,
+                      style: 2,
+                      custom_id: "flag_hint",
+                      label: "Get Hint",
+                    },
+                {
+                  type: 2,
+                  style: 4,
+                  custom_id: "flag_skip",
+                  label: "Skip",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    const payload = buildPromptPayload(getRevealedHint(targetCountry.name, revealedIndices));
 
     const channel = interaction.channel;
     if (!channel || typeof channel.createMessageCollector !== "function")
@@ -472,49 +548,60 @@ async function startFlagGame(
     const collector = channel.createMessageCollector({ filter, time: 30000 });
     activeCollectorsMap.set(channelId, collector);
 
+    const btnCollector = response.createMessageComponentCollector({
+      componentType: ComponentType.Button,
+      time: 30000,
+    });
+
+    btnCollector.on("collect", async (bInt) => {
+      if (bInt.customId === "flag_hint") {
+        if (hintClicks >= maxHintClicks) {
+          return bInt
+            .reply({
+              content: "Maximum hints already revealed for this flag!",
+              flags: 64,
+            })
+            .catch(() => null);
+        }
+
+        const unrevealed = letterIndices.filter((idx) => !revealedIndices.has(idx));
+        if (unrevealed.length > 0) {
+          // Reveal 1 to 2 random unrevealed letters
+          const revealAmount = Math.min(unrevealed.length, Math.ceil(unrevealed.length * 0.4));
+          for (let i = 0; i < revealAmount; i++) {
+            const randomIndex = Math.floor(Math.random() * unrevealed.length);
+            const chosen = unrevealed.splice(randomIndex, 1)[0];
+            revealedIndices.add(chosen);
+          }
+        }
+        hintClicks++;
+
+        const updatedHint = getRevealedHint(targetCountry.name, revealedIndices);
+        await bInt.update(buildPromptPayload(updatedHint)).catch(() => null);
+      } else if (bInt.customId === "flag_skip") {
+        const currentSkips = channelSkipsMap.get(channelId) || 0;
+        if (currentSkips >= 5) {
+          return bInt
+            .reply({
+              content:
+                "<:Warning:1526228248458035381> **Maximum skips reached (5/5)!** You must guess this flag or wait for the timer.",
+              flags: 64,
+            })
+            .catch(() => null);
+        }
+
+        channelSkipsMap.set(channelId, currentSkips + 1);
+        collector.stop("skipped");
+        btnCollector.stop("skipped");
+        await bInt.deferUpdate().catch(() => null);
+      }
+    });
+
     let winnerMessage = null;
     const closeMatchUsers = new Set();
 
-    const hintTimer = setTimeout(async () => {
-      try {
-        if (!collector.ended) {
-          const secondHint = generateHint(targetCountry.name, 1);
-          const updatedEmbed = EmbedBuilder.from(embed).setDescription(
-            `**Difficulty:** ${diffBadge}\n` +
-              `**Hint:** ${secondHint}\n\n` +
-              `You have 30 seconds to guess the country.\n` +
-              `*Type your answer in the chat or \`.skip\` to skip.*`,
-          );
-          if (response && typeof response.edit === "function") {
-            await response.edit({ embeds: [updatedEmbed] }).catch(() => null);
-          }
-        }
-      } catch {}
-    }, 12000);
-    activeHintTimersMap.set(channelId, hintTimer);
-
     collector.on("collect", async (m) => {
       const input = m.content.trim().toLowerCase();
-
-      if (input === ".skip" || input === ".s") {
-        const skipsUsed = channelSkipsMap.get(channelId) || 0;
-        if (skipsUsed >= 5) {
-          await m
-            .reply({
-              content:
-                "⚠️ **Maximum skips reached (5/5)!** You must guess this flag or wait for the timer.",
-            })
-            .catch(() => null);
-          return;
-        }
-
-        channelSkipsMap.set(channelId, skipsUsed + 1);
-        clearTimeout(hintTimer);
-        activeHintTimersMap.delete(channelId);
-        collector.stop("skipped");
-        await m.react("⏩").catch(() => null);
-        return;
-      }
 
       const isCorrect = targetCountry.aliases.some(
         (alias) => alias.toLowerCase() === input,
@@ -522,8 +609,6 @@ async function startFlagGame(
 
       if (isCorrect) {
         winnerMessage = m;
-        clearTimeout(hintTimer);
-        activeHintTimersMap.delete(channelId);
         collector.stop("correct");
         await m
           .react("1526228339910643793")
@@ -545,8 +630,6 @@ async function startFlagGame(
     });
 
     collector.on("end", async (_, reason) => {
-      clearTimeout(hintTimer);
-      activeHintTimersMap.delete(channelId);
       if (activeCollectorsMap.get(channelId) === collector) {
         activeCollectorsMap.delete(channelId);
       }
@@ -558,15 +641,32 @@ async function startFlagGame(
           const currentSkips = channelSkipsMap.get(channelId) || 1;
           const remainingSkips = Math.max(0, 5 - currentSkips);
 
-          const skipEmbed = new EmbedBuilder()
-            .setTitle("**Flag Skipped!**")
-            .setDescription(
-              `The country was **${targetCountry.name}** ${targetCountry.emoji}.\n\n` +
-                `*Skips remaining for this game:* **${remainingSkips}/5**`,
-            )
-            .setColor(EMBED_COLORS.WARNING);
-
-          await channel.send({ embeds: [skipEmbed] });
+          await channel.send({
+            flags: 32768,
+            components: [
+              {
+                type: 17,
+                accent_color: EMBED_COLORS.WARNING,
+                components: [
+                  {
+                    type: 10,
+                    content: `### Flag Skipped!`,
+                  },
+                  {
+                    type: 14,
+                    divider: true,
+                    spacing: 1,
+                  },
+                  {
+                    type: 10,
+                    content:
+                      `The country was **${targetCountry.name}** ${targetCountry.emoji}.\n\n` +
+                      `Skips remaining: **${remainingSkips}/5**`,
+                  },
+                ],
+              },
+            ],
+          });
 
           setTimeout(async () => {
             await startFlagGame(
@@ -589,19 +689,39 @@ async function startFlagGame(
           }
 
           const winnerMention = `<@${winnerId}>`;
-          const currentSessionScore = (channelSessionScoresMap.get(channelId) || 0) + pointsGained;
+          const currentSessionScore =
+            (channelSessionScoresMap.get(channelId) || 0) + pointsGained;
           channelSessionScoresMap.set(channelId, currentSessionScore);
 
-          const winEmbed = new EmbedBuilder()
-            .setTitle("<a:Tada:1544329561955770488> **Correct Guess!**")
-            .setDescription(
-              `${winnerMention} guessed it right!\n` +
-                `The country was **${targetCountry.name}** ${targetCountry.emoji}!\n\n` +
-                `🏆 **+${pointsGained} Points** *(Game Score: **${currentSessionScore}** Pts | Total: **${scoreData.totalPoints}** Pts)*`,
-            )
-            .setColor(EMBED_COLORS.SUCCESS);
-
-          await channel.send({ embeds: [winEmbed] });
+          await channel.send({
+            flags: 32768,
+            allowedMentions: { parse: [] },
+            allowed_mentions: { parse: [] },
+            components: [
+              {
+                type: 17,
+                accent_color: EMBED_COLORS.SUCCESS,
+                components: [
+                  {
+                    type: 10,
+                    content: `### <a:Tada:1544329561955770488> Correct Guess!`,
+                  },
+                  {
+                    type: 14,
+                    divider: true,
+                    spacing: 1,
+                  },
+                  {
+                    type: 10,
+                    content:
+                      `${winnerMention} guessed it right!\n` +
+                      `The country was **${targetCountry.name}** ${targetCountry.emoji}!\n\n` +
+                      `🏆 **+${pointsGained} Points** | **Total: ${scoreData.totalPoints}** Pts`,
+                  },
+                ],
+              },
+            ],
+          });
 
           setTimeout(async () => {
             await startFlagGame(
@@ -615,17 +735,55 @@ async function startFlagGame(
         } else {
           channelSkipsMap.set(channelId, 0);
           channelSessionScoresMap.set(channelId, 0);
-          const timeoutEmbed = new EmbedBuilder()
-            .setTitle("⌛ **Time's Up!**")
-            .setDescription(
-              `Nobody guessed the country in time!\n\n` +
-                `The correct answer was **${targetCountry.name}** ${targetCountry.emoji}.`,
-            )
-            .setColor(EMBED_COLORS.TIMEOUT);
 
           const resultMsg = await channel.send({
-            embeds: [timeoutEmbed],
-            components: [buildButtons()],
+            flags: 32768,
+            components: [
+              {
+                type: 17,
+                accent_color: EMBED_COLORS.TIMEOUT,
+                components: [
+                  {
+                    type: 10,
+                    content: `### ⌛ Time's Up!`,
+                  },
+                  {
+                    type: 14,
+                    divider: true,
+                    spacing: 1,
+                  },
+                  {
+                    type: 10,
+                    content:
+                      `Nobody guessed the country in time!\n\n` +
+                      `The correct answer was **${targetCountry.name}** ${targetCountry.emoji}.`,
+                  },
+                  {
+                    type: 14,
+                    divider: true,
+                    spacing: 1,
+                  },
+                  {
+                    type: 1,
+                    components: [
+                      {
+                        type: 2,
+                        style: 1,
+                        custom_id: "flag_next",
+                        label: "Play Again",
+                      },
+                      {
+                        type: 2,
+                        style: 2,
+                        custom_id: "show_lb_flag",
+                        label: "Leaderboard",
+                        emoji: { name: "🏆" },
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           });
 
           attachFlagNextCollector(
