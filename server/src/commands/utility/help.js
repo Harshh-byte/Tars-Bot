@@ -48,7 +48,7 @@ const modulesCatalog = {
       },
       { name: "Paranoia", cmd: "para", desc: "Play Paranoia." },
       {
-        name: "Guess the Flag",
+        name: "Guess the Country",
         cmd: "flag",
         desc: "Guess the country by its flag.",
       },
@@ -58,9 +58,19 @@ const modulesCatalog = {
         desc: "Guess the Pokémon by its artwork!",
       },
       {
+        name: "Guess the Logo",
+        cmd: "logo",
+        desc: "Guess the brand by its logo!",
+      },
+      {
+        name: "Word Scramble",
+        cmd: "scramble",
+        desc: "Unscramble the word!",
+      },
+      {
         name: "Leaderboard",
         cmd: "leaderboard",
-        desc: "View top guessers in the server.",
+        desc: "View top scorers.",
       },
       { name: "Coin Flip", cmd: "flip", desc: "Flip a coin." },
       { name: "Dice Roll", cmd: "roll", desc: "Roll a dice." },

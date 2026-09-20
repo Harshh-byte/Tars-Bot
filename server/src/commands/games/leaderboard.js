@@ -1,49 +1,51 @@
-import {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType,
-} from "discord.js";
+import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import {
   getTopFlagPlayers,
   getTopPokemonPlayers,
+  getTopLogoPlayers,
+  getTopScramblePlayers,
 } from "../../services/database.js";
 
-export const aliases = ["flb", "plb", "lb"];
+export const aliases = ["flb", "plb", "blb", "logolb", "wslb", "lb"];
 
 export const data = {
   name: "leaderboard",
-  description: "View top guessers in the server.",
+  description: "View top game scorers.",
   dm_permission: false,
   options: [
     {
       name: "category",
-      description: "Select a category.",
+      description: "Select a game category",
       type: 3,
       required: true,
       choices: [
         { name: "Flag", value: "flag" },
         { name: "Pokemon", value: "pokemon" },
+        { name: "Logo", value: "logo" },
+        { name: "Word", value: "scramble" },
       ],
     },
   ],
 };
 
 async function sendAndFetchReply(interaction, payload) {
-  if (interaction.isButton && interaction.isButton()) {
+  if (typeof interaction.isButton === "function" && interaction.isButton()) {
     if (!interaction.replied && !interaction.deferred) {
       await interaction.update(payload).catch(() => null);
     } else {
       await interaction.editReply(payload).catch(() => null);
     }
-    return (await interaction.fetchReply().catch(() => null)) || interaction.message;
+    return (
+      (await interaction.fetchReply().catch(() => null)) || interaction.message
+    );
   }
   if (interaction.replied || interaction.deferred) {
     return await interaction.followUp(payload).catch(() => null);
   }
-  const res = await interaction.reply({ ...payload, withResponse: true }).catch(() => null);
+  const res = await interaction
+    .reply({ ...payload, withResponse: true })
+    .catch(() => null);
   return res?.resource?.message || res;
 }
 
@@ -67,12 +69,25 @@ export async function execute(interaction, client) {
   ) {
     lbCategory = "pokemon";
   } else if (
+    cmdName === "blb" ||
+    cmdName === "logolb" ||
+    rawArgs.includes("logo") ||
+    rawArgs.includes("brand") ||
+    rawArgs.includes("blb")
+  ) {
+    lbCategory = "logo";
+  } else if (
+    cmdName === "wslb" ||
+    rawArgs.includes("scramble") ||
+    rawArgs.includes("wslb") ||
+    rawArgs.includes("word")
+  ) {
+    lbCategory = "scramble";
+  } else if (
     cmdName === "flb" ||
     rawArgs.includes("flb") ||
     rawArgs.includes("flag")
   ) {
-    lbCategory = "flag";
-  } else if (!rawArgs) {
     lbCategory = "flag";
   }
 
@@ -95,10 +110,16 @@ export async function showLeaderboard(
 
 async function buildLbPayload(guild, category, page = 1, userId = null) {
   const serverId = guild?.id;
-  const isPokemon = category === "pokemon";
-  const rawPlayers = isPokemon
-    ? await getTopPokemonPlayers(serverId, 100)
-    : await getTopFlagPlayers(serverId, 100);
+  const normalizedCat = category === "brand" ? "logo" : category;
+
+  const rawPlayers =
+    normalizedCat === "pokemon"
+      ? await getTopPokemonPlayers(serverId, 100)
+      : normalizedCat === "logo"
+        ? await getTopLogoPlayers(serverId, 100)
+        : normalizedCat === "scramble"
+          ? await getTopScramblePlayers(serverId, 100)
+          : await getTopFlagPlayers(serverId, 100);
 
   let activePlayers = [];
   let userRankInfo = null;
@@ -139,11 +160,27 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
     startIndex + itemsPerPage,
   );
 
-  const categoryName = isPokemon ? "Pokémon" : "Flag";
+  const categoryName =
+    normalizedCat === "pokemon"
+      ? "Pokémon"
+      : normalizedCat === "logo"
+        ? "Logo"
+        : normalizedCat === "scramble"
+          ? "Scramble"
+          : "Flag";
+
+  const colorHex =
+    normalizedCat === "pokemon"
+      ? 0xffcc00
+      : normalizedCat === "logo"
+        ? 0x5865f2
+        : normalizedCat === "scramble"
+          ? 0x2ecc71
+          : 0xed4245;
 
   let bodyContent = "";
   if (!pagePlayers || pagePlayers.length === 0) {
-    bodyContent = `No scores recorded yet!`;
+    bodyContent = `No scores recorded yet for ${categoryName}!`;
   } else {
     bodyContent = pagePlayers
       .map((player, idx) => {
@@ -157,61 +194,109 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
                 ? "🥉 "
                 : `**${globalRank + 1}.** `;
         const displayName = player.username || player.userId;
-        return `${rankPrefix}@${displayName}\n-# Guessed: ${player.wins} times`;
+        return `${rankPrefix}@${displayName} - ${player.points || 0}pts\n-# Guessed: ${player.wins} times`;
       })
       .join("\n\n");
   }
 
   let userRankText = "";
   if (userRankInfo) {
-    userRankText = `Your Rank: **#${userRankInfo.rank}** (${userRankInfo.wins} wins)`;
+    userRankText = `Your Rank: **#${userRankInfo.rank}**`;
   } else if (activePlayers.length > 0) {
     userRankText = "You are not ranked yet.";
   }
 
-  const descriptionText = userRankText
+  const fullText = userRankText
     ? `${bodyContent}\n\n-# ${userRankText}`
     : bodyContent;
 
-  const embed = new EmbedBuilder()
-    .setTitle(`🏆 ${categoryName} Leaderboard`)
-    .setDescription(descriptionText)
-    .setColor(isPokemon ? 0xffcc00 : 0xed4245);
-
-  const pageRow = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`lb_prev_${category}_${currentPage}`)
-      .setStyle(ButtonStyle.Secondary)
-      .setEmoji("1542658287894528100")
-      .setDisabled(currentPage <= 1),
-    new ButtonBuilder()
-      .setCustomId("lb_page_count")
-      .setStyle(ButtonStyle.Secondary)
-      .setLabel(`Page ${currentPage} of ${totalPages}`)
-      .setDisabled(true),
-    new ButtonBuilder()
-      .setCustomId(`lb_next_${category}_${currentPage}`)
-      .setStyle(ButtonStyle.Secondary)
-      .setEmoji("1542658241400414298")
-      .setDisabled(currentPage >= totalPages),
-  );
-
-  const categoryRow = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`show_lb_flag_${currentPage}`)
-      .setStyle(!isPokemon ? ButtonStyle.Primary : ButtonStyle.Secondary)
-      .setLabel("Flag LB")
-      .setEmoji("🗺️"),
-    new ButtonBuilder()
-      .setCustomId(`show_lb_pokemon_${currentPage}`)
-      .setStyle(isPokemon ? ButtonStyle.Primary : ButtonStyle.Secondary)
-      .setLabel("Pokémon LB")
-      .setEmoji("🔮"),
-  );
-
   return {
-    embeds: [embed],
-    components: [pageRow, categoryRow],
+    flags: 32768,
+    components: [
+      {
+        type: 17,
+        accent_color: colorHex,
+        components: [
+          {
+            type: 10,
+            content: `### 🏆 ${categoryName} Leaderboard`,
+          },
+          {
+            type: 14,
+            divider: true,
+            spacing: 1,
+          },
+          {
+            type: 10,
+            content: fullText,
+          },
+          {
+            type: 1,
+            components: [
+              {
+                type: 2,
+                style: 2,
+                custom_id: `lb_prev_${normalizedCat}_${currentPage}`,
+                emoji: { id: "1542658287894528100" },
+                disabled: currentPage <= 1,
+              },
+              {
+                type: 2,
+                style: 2,
+                custom_id: "lb_page_count",
+                label: `Page ${currentPage} of ${totalPages}`,
+                disabled: true,
+              },
+              {
+                type: 2,
+                style: 2,
+                custom_id: `lb_next_${normalizedCat}_${currentPage}`,
+                emoji: { id: "1542658241400414298" },
+                disabled: currentPage >= totalPages,
+              },
+            ],
+          },
+          {
+            type: 14,
+            divider: true,
+            spacing: 1,
+          },
+          {
+            type: 1,
+            components: [
+              {
+                type: 2,
+                style: normalizedCat === "flag" ? 1 : 2,
+                custom_id: `show_lb_flag_${currentPage}`,
+                label: "Flag",
+                emoji: { name: "🗺️" },
+              },
+              {
+                type: 2,
+                style: normalizedCat === "pokemon" ? 1 : 2,
+                custom_id: `show_lb_pokemon_${currentPage}`,
+                label: "Pokémon",
+                emoji: { name: "🔮" },
+              },
+              {
+                type: 2,
+                style: normalizedCat === "logo" ? 1 : 2,
+                custom_id: `show_lb_logo_${currentPage}`,
+                label: "Logo",
+                emoji: { name: "🏷️" },
+              },
+              {
+                type: 2,
+                style: normalizedCat === "scramble" ? 1 : 2,
+                custom_id: `show_lb_scramble_${currentPage}`,
+                label: "Word",
+                emoji: { name: "🔤" },
+              },
+            ],
+          },
+        ],
+      },
+    ],
   };
 }
 
@@ -247,6 +332,13 @@ function attachLbToggleCollector(
         await showLeaderboard(btnInteraction, client, "flag", 1);
       } else if (customId.startsWith("show_lb_pokemon")) {
         await showLeaderboard(btnInteraction, client, "pokemon", 1);
+      } else if (
+        customId.startsWith("show_lb_logo") ||
+        customId.startsWith("show_lb_brand")
+      ) {
+        await showLeaderboard(btnInteraction, client, "logo", 1);
+      } else if (customId.startsWith("show_lb_scramble")) {
+        await showLeaderboard(btnInteraction, client, "scramble", 1);
       }
     } catch (err) {
       logger.error("Error in LB toggle collector:", err);

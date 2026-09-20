@@ -261,35 +261,218 @@ export async function getTopPokemonPlayers(serverId, limitCount = 10) {
   }
 }
 
+export async function addLogoScore(serverId, userId, pointsGained) {
+  validateIds(serverId, userId);
+  const ref = memberDoc(serverId, userId);
+  try {
+    await ref.set(
+      {
+        stats: {
+          logo_points: FieldValue.increment(pointsGained),
+          logo_wins: FieldValue.increment(1),
+          brand_points: FieldValue.increment(pointsGained),
+          brand_wins: FieldValue.increment(1),
+        },
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+    const snapshot = await ref.get();
+    const data = snapshot.data()?.stats || {};
+    return {
+      totalPoints: data.logo_points || data.brand_points || pointsGained,
+      totalWins: data.logo_wins || data.brand_wins || 1,
+    };
+  } catch (err) {
+    if (!global.memoryLogoScores) global.memoryLogoScores = new Map();
+    const key = `${serverId}_${userId}`;
+    const current = global.memoryLogoScores.get(key) || {
+      points: 0,
+      wins: 0,
+    };
+    current.points += pointsGained;
+    current.wins += 1;
+    global.memoryLogoScores.set(key, current);
+    return { totalPoints: current.points, totalWins: current.wins };
+  }
+}
+
+export const addBrandScore = addLogoScore;
+
+export async function getTopLogoPlayers(serverId, limitCount = 10) {
+  if (!serverId) return [];
+  try {
+    const snapshot = await serverDoc(serverId)
+      .collection("members")
+      .orderBy("stats.logo_points", "desc")
+      .limit(limitCount)
+      .get();
+
+    if (!snapshot.empty) {
+      return snapshot.docs.map((doc) => ({
+        userId: doc.id,
+        points:
+          doc.data()?.stats?.logo_points ||
+          doc.data()?.stats?.brand_points ||
+          0,
+        wins:
+          doc.data()?.stats?.logo_wins || doc.data()?.stats?.brand_wins || 0,
+      }));
+    }
+
+    const fallbackSnapshot = await serverDoc(serverId)
+      .collection("members")
+      .orderBy("stats.brand_points", "desc")
+      .limit(limitCount)
+      .get();
+
+    if (fallbackSnapshot.empty) return [];
+    return fallbackSnapshot.docs.map((doc) => ({
+      userId: doc.id,
+      points: doc.data()?.stats?.brand_points || 0,
+      wins: doc.data()?.stats?.brand_wins || 0,
+    }));
+  } catch (err) {
+    logger.warn(`Failed to fetch logo leaderboard: ${err.message}`);
+    return [];
+  }
+}
+
+export const getTopBrandPlayers = getTopLogoPlayers;
+
+export async function addScrambleScore(serverId, userId, pointsGained) {
+  validateIds(serverId, userId);
+  const ref = memberDoc(serverId, userId);
+  try {
+    await ref.set(
+      {
+        stats: {
+          scramble_points: FieldValue.increment(pointsGained),
+          scramble_wins: FieldValue.increment(1),
+        },
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+    const snapshot = await ref.get();
+    const data = snapshot.data()?.stats || {};
+    return {
+      totalPoints: data.scramble_points || pointsGained,
+      totalWins: data.scramble_wins || 1,
+    };
+  } catch (err) {
+    if (!global.memoryScrambleScores) global.memoryScrambleScores = new Map();
+    const key = `${serverId}_${userId}`;
+    const current = global.memoryScrambleScores.get(key) || {
+      points: 0,
+      wins: 0,
+    };
+    current.points += pointsGained;
+    current.wins += 1;
+    global.memoryScrambleScores.set(key, current);
+    return { totalPoints: current.points, totalWins: current.wins };
+  }
+}
+
+export async function getTopScramblePlayers(serverId, limitCount = 10) {
+  if (!serverId) return [];
+  try {
+    const snapshot = await serverDoc(serverId)
+      .collection("members")
+      .orderBy("stats.scramble_points", "desc")
+      .limit(limitCount)
+      .get();
+
+    if (snapshot.empty) return [];
+    return snapshot.docs.map((doc) => ({
+      userId: doc.id,
+      points: doc.data()?.stats?.scramble_points || 0,
+      wins: doc.data()?.stats?.scramble_wins || 0,
+    }));
+  } catch (err) {
+    logger.warn(`Failed to fetch scramble leaderboard: ${err.message}`);
+    return [];
+  }
+}
+
 export async function resetLeaderboards(serverId, category = "all") {
   if (!serverId) return;
   try {
     const membersSnapshot = await serverDoc(serverId)
       .collection("members")
       .get();
-    if (membersSnapshot.empty) return;
 
-    const batch = db.batch();
-    membersSnapshot.docs.forEach((doc) => {
-      const updateData = {};
-      if (category === "flag" || category === "all") {
-        updateData["stats.flag_points"] = 0;
-        updateData["stats.flag_wins"] = 0;
-      }
-      if (category === "pokemon" || category === "all") {
-        updateData["stats.pokemon_points"] = 0;
-        updateData["stats.pokemon_wins"] = 0;
-      }
-      batch.set(doc.ref, updateData, { merge: true });
-    });
-    await batch.commit();
+    if (!membersSnapshot.empty) {
+      const batch = db.batch();
+      membersSnapshot.docs.forEach((doc) => {
+        const docData = doc.data();
+        const updates = {};
 
-    if (global.memoryFlagScores) global.memoryFlagScores.clear();
-    if (global.memoryPokemonScores) global.memoryPokemonScores.clear();
+        Object.keys(docData).forEach((key) => {
+          if (key.startsWith("stats.")) {
+            updates[key] = FieldValue.delete();
+          }
+        });
+
+        const statsUpdate = {};
+        if (category === "flag" || category === "all") {
+          statsUpdate.flag_points = FieldValue.delete();
+          statsUpdate.flag_wins = FieldValue.delete();
+        }
+        if (category === "pokemon" || category === "all") {
+          statsUpdate.pokemon_points = FieldValue.delete();
+          statsUpdate.pokemon_wins = FieldValue.delete();
+        }
+        if (category === "logo" || category === "brand" || category === "all") {
+          statsUpdate.logo_points = FieldValue.delete();
+          statsUpdate.logo_wins = FieldValue.delete();
+          statsUpdate.brand_points = FieldValue.delete();
+          statsUpdate.brand_wins = FieldValue.delete();
+        }
+        if (
+          category === "scramble" ||
+          category === "word" ||
+          category === "all"
+        ) {
+          statsUpdate.scramble_points = FieldValue.delete();
+          statsUpdate.scramble_wins = FieldValue.delete();
+        }
+
+        updates.stats = statsUpdate;
+        batch.set(doc.ref, updates, { merge: true });
+      });
+      await batch.commit();
+    }
+
+
+    const clearMemoryMap = (map) => {
+      if (!map) return;
+      const prefix = `${serverId}_`;
+      for (const key of Array.from(map.keys())) {
+        if (key.startsWith(prefix)) {
+          map.delete(key);
+        }
+      }
+    };
+
+    if (category === "flag" || category === "all") {
+      clearMemoryMap(global.memoryFlagScores);
+    }
+    if (category === "pokemon" || category === "all") {
+      clearMemoryMap(global.memoryPokemonScores);
+    }
+    if (category === "logo" || category === "brand" || category === "all") {
+      clearMemoryMap(global.memoryLogoScores);
+      clearMemoryMap(global.memoryBrandScores);
+    }
+    if (category === "scramble" || category === "word" || category === "all") {
+      clearMemoryMap(global.memoryScrambleScores);
+    }
   } catch (err) {
     logger.error(`Failed to reset leaderboards for ${serverId}:`, err);
   }
 }
+
 
 export async function getUserProfile(serverId, userId) {
   const targetUserId =

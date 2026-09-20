@@ -79,18 +79,21 @@ async function startGame(interaction, client, opponent) {
                     type: 2,
                     custom_id: "rps_rock",
                     style: 2,
+                    label: "Rock",
                     emoji: { name: "🪨" },
                   },
                   {
                     type: 2,
                     custom_id: "rps_paper",
                     style: 2,
+                    label: "Paper",
                     emoji: { name: "📄" },
                   },
                   {
                     type: 2,
                     custom_id: "rps_scissors",
                     style: 2,
+                    label: "Scissors",
                     emoji: { name: "✂️" },
                   },
                 ],
@@ -104,7 +107,7 @@ async function startGame(interaction, client, opponent) {
 
       const collector = response.createMessageComponentCollector({
         componentType: ComponentType.Button,
-        time: 86400000,
+        time: 30000,
       });
 
       collector.on("collect", async (i) => {
@@ -221,8 +224,16 @@ async function startGame(interaction, client, opponent) {
                 components: [
                   {
                     type: 10,
-                    content:
-                      "### <:Timer:1542147643021725796> Game Timed Out\n\nYou took too long to pick a move!",
+                    content: "### ⌛ Match Timed Out",
+                  },
+                  {
+                    type: 14,
+                    divider: true,
+                    spacing: 1,
+                  },
+                  {
+                    type: 10,
+                    content: "You took too long to pick a move!",
                   },
                 ],
               },
@@ -323,7 +334,7 @@ async function startGame(interaction, client, opponent) {
 
     const collector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
-      time: 86400000,
+      time: 30000,
     });
 
     collector.on("collect", async (i) => {
@@ -507,8 +518,18 @@ async function startGame(interaction, client, opponent) {
                 {
                   type: 10,
                   content:
-                    "### <:Timer:1542147643021725796> Match Timed Out\n\nOne or both players failed to make a move in time!",
+                    "### ⌛ Match Timed Out",
                 },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              
+              {
+                type: 10,
+                content: `One of the players failed to make a move in time!`,
+              },
               ],
             },
           ],
