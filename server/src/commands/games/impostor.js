@@ -59,10 +59,7 @@ export async function execute(interaction) {
 
   const buildLobbyV2 = () => {
     const playerListStr = players
-      .map(
-        (p, idx) =>
-          `${idx + 1}. ${p.isBot ? "🤖 " : ""}${p.displayName} (<@${p.id}>)`,
-      )
+      .map((p, idx) => `${idx + 1}. ${p.displayName} (<@${p.id}>)`)
       .join("\n");
 
     return {
@@ -72,7 +69,7 @@ export async function execute(interaction) {
       components: [
         {
           type: 17,
-          accent_color: EMBED_COLORS.INFO || 0x5865f2,
+          accent_color: EMBED_COLORS.INFO,
           components: [
             {
               type: 10,
@@ -225,7 +222,18 @@ export async function execute(interaction) {
       }
 
       if (players.length < 3) {
-        const botNames = ["Tars-Alpha", "Tars-Beta", "Tars-Gamma"];
+        const isOwner = clicker.id === process.env.OWNER_ID;
+        const isExemptGuild =
+          btnInt.guild?.id && btnInt.guild.id === process.env.EXEMPT_GUILD_ID;
+
+        if (!isOwner && !isExemptGuild) {
+          return btnInt.reply({
+            content: "At least 3 players are required to start the game!",
+            flags: 64,
+          });
+        }
+
+        const botNames = ["Tars", "Case"];
         let needed = 3 - players.length;
         for (let i = 0; i < needed; i++) {
           players.push({
@@ -306,7 +314,7 @@ async function runGameLoop(channel, players) {
     components: [
       {
         type: 17,
-        accent_color: EMBED_COLORS.INFO || 0x5865f2,
+        accent_color: EMBED_COLORS.INFO,
         components: [
           {
             type: 10,
@@ -394,7 +402,15 @@ async function runGameLoop(channel, players) {
     const impostorsAlive = alivePlayers.filter((p) => p.role === "IMPOSTOR");
     const crewAlive = alivePlayers.filter((p) => p.role !== "IMPOSTOR");
 
+    const totalImpostorsInGame = players.filter(
+      (p) => p.role === "IMPOSTOR",
+    ).length;
+
     if (impostorsAlive.length === 0) {
+      const elimText =
+        totalImpostorsInGame > 1
+          ? "All Impostors have been eliminated from the ship! Great job team!"
+          : "The Impostor has been eliminated from the ship! Great job team!";
       await channel.send({
         flags: 32768,
         components: [
@@ -413,8 +429,7 @@ async function runGameLoop(channel, players) {
               },
               {
                 type: 10,
-                content:
-                  "All Impostors have been eliminated from the ship! Great job team!",
+                content: elimText,
               },
             ],
           },
@@ -424,16 +439,24 @@ async function runGameLoop(channel, players) {
     }
 
     if (impostorsAlive.length >= crewAlive.length) {
+      const isMultiple = impostorsAlive.length > 1 || totalImpostorsInGame > 1;
+      const winTitle = isMultiple
+        ? "### 🔪 IMPOSTORS WIN!"
+        : "### 🔪 IMPOSTOR WINS!";
+      const winContent = isMultiple
+        ? "The Impostors have taken over the ship! Better luck next time."
+        : "The Impostor has taken over the ship! Better luck next time.";
+
       await channel.send({
         flags: 32768,
         components: [
           {
             type: 17,
-            accent_color: 0xff4757,
+            accent_color: EMBED_COLORS.IMPOSTOR_WIN,
             components: [
               {
                 type: 10,
-                content: "### 🔪 IMPOSTORS WIN!",
+                content: winTitle,
               },
               {
                 type: 14,
@@ -442,8 +465,7 @@ async function runGameLoop(channel, players) {
               },
               {
                 type: 10,
-                content:
-                  "The Impostors have taken over the ship! Better luck next time.",
+                content: winContent,
               },
             ],
           },
@@ -604,14 +626,28 @@ async function runGameLoop(channel, players) {
       await new Promise((resolve) => setTimeout(resolve, 10000));
     }
 
+    const ROOMS = [
+      "Electrical",
+      "Navigation",
+      "Shields",
+      "MedBay",
+      "Reactor",
+      "Security",
+      "Storage",
+      "Cafeteria",
+      "Communications",
+      "Weapons",
+    ];
+
     const deathNotices = [];
 
     if (nightKilledId && nightKilledId !== nightSavedId) {
       const killedPlayer = players.find((p) => p.id === nightKilledId);
       if (killedPlayer && killedPlayer.alive) {
         killedPlayer.alive = false;
+        const room = ROOMS[Math.floor(Math.random() * ROOMS.length)];
         deathNotices.push(
-          `\`${killedPlayer.displayName}\` was found eliminated in the hallway!`,
+          `💀 \`${killedPlayer.displayName}\` was found eliminated in **${room}**!`,
         );
       }
     }
@@ -639,7 +675,7 @@ async function runGameLoop(channel, players) {
       components: [
         {
           type: 17,
-          accent_color: 0xffa502,
+          accent_color: EMBED_COLORS.DAYBREAK,
           components: [
             {
               type: 10,
@@ -670,7 +706,15 @@ async function runGameLoop(channel, players) {
     );
     const postNightCrew = postNightAlive.filter((p) => p.role !== "IMPOSTOR");
 
+    const postNightTotalImpostorsInGame = players.filter(
+      (p) => p.role === "IMPOSTOR",
+    ).length;
+
     if (postNightImpostors.length === 0) {
+      const elimText =
+        postNightTotalImpostorsInGame > 1
+          ? "All Impostors have been eliminated! Crewmates win!"
+          : "The Impostor has been eliminated! Crewmates win!";
       await channel.send({
         flags: 32768,
         components: [
@@ -689,7 +733,7 @@ async function runGameLoop(channel, players) {
               },
               {
                 type: 10,
-                content: "All Impostors have been eliminated! Crewmates win!",
+                content: elimText,
               },
             ],
           },
@@ -699,16 +743,25 @@ async function runGameLoop(channel, players) {
     }
 
     if (postNightImpostors.length >= postNightCrew.length) {
+      const isMultiple =
+        postNightImpostors.length > 1 || postNightTotalImpostorsInGame > 1;
+      const winTitle = isMultiple
+        ? "### 🔪 IMPOSTORS WIN!"
+        : "### 🔪 IMPOSTOR WINS!";
+      const winContent = isMultiple
+        ? "The Impostors have taken over the ship! Better luck next time."
+        : "The Impostor has taken over the ship! Better luck next time.";
+
       await channel.send({
         flags: 32768,
         components: [
           {
             type: 17,
-            accent_color: 0xff4757,
+            accent_color: EMBED_COLORS.IMPOSTOR_WIN,
             components: [
               {
                 type: 10,
-                content: "### 🔪 IMPOSTORS WIN!",
+                content: winTitle,
               },
               {
                 type: 14,
@@ -717,8 +770,7 @@ async function runGameLoop(channel, players) {
               },
               {
                 type: 10,
-                content:
-                  "The Impostors have taken over the ship! Impostors win!",
+                content: winContent,
               },
             ],
           },
@@ -756,7 +808,7 @@ async function runGameLoop(channel, players) {
       const playerStatusList = postNightAlive
         .map((p) => {
           const hasVoted = votes.has(p.id);
-          return `• ${p.isBot ? "🤖 " : ""}${p.displayName} ${hasVoted ? "<:Picked:1542151058929746090> *(Voted)*" : "<:Timer:1542147643021725796> *(Thinking...)*"}`;
+          return `• ${p.displayName} ${hasVoted ? "<:Picked:1542151058929746090> *(Voted)*" : "<:Timer:1542147643021725796> *(Thinking...)*"}`;
         })
         .join("\n");
 
