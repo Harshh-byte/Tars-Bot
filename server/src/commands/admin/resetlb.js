@@ -24,7 +24,6 @@ export const data = {
         { name: "All Games", value: "all" },
         { name: "Flag Game", value: "flag" },
         { name: "Pokémon Game", value: "pokemon" },
-        { name: "Logo Game", value: "logo" },
         { name: "Word Scramble", value: "scramble" },
       ],
     },
@@ -80,8 +79,6 @@ export async function execute(interaction) {
       category = "flag";
     } else if (rawInput.includes("poke") || rawInput.includes("pokemon")) {
       category = "pokemon";
-    } else if (rawInput.includes("brand") || rawInput.includes("logo")) {
-      category = "logo";
     } else if (rawInput.includes("scramble") || rawInput.includes("word") || rawInput.includes("ws")) {
       category = "scramble";
     } else if (rawInput.includes("all")) {
@@ -105,11 +102,9 @@ export async function execute(interaction) {
         ? "Flag"
         : category === "pokemon"
           ? "Pokémon"
-          : category === "logo" || category === "brand"
-            ? "Logo"
-            : category === "scramble"
-              ? "Word Scramble"
-              : "All Games";
+          : category === "scramble"
+            ? "Word Scramble"
+            : "All Games";
 
     const warnEmbed = new EmbedBuilder()
       .setColor(EMBED_COLORS.WARNING)

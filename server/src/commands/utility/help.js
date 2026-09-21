@@ -58,11 +58,6 @@ const modulesCatalog = {
         desc: "Guess the Pokémon by its artwork!",
       },
       {
-        name: "Guess the Logo",
-        cmd: "logo",
-        desc: "Guess the brand by its logo!",
-      },
-      {
         name: "Word Scramble",
         cmd: "scramble",
         desc: "Unscramble the word!",

@@ -88,15 +88,6 @@ export const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
-    trigger: "/logo",
-    alias: ".brand",
-    category: "games",
-    title: "Guess the Logo",
-    description: "Guess the brand by its logo!",
-    badge: "Games",
-    badgeColor: "text-ds-blurple bg-ds-blurple/10",
-  },
-  {
     trigger: "/scramble",
     alias: ".ws",
     category: "games",
