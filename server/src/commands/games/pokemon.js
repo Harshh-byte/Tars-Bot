@@ -396,7 +396,7 @@ async function startPokemonGame(
           return bInt
             .reply({
               content:
-                "<:Warning:1526228248458035381> **Maximum skips reached (5/5)!** You must guess this Pokémon or wait for the timer.",
+                "<:Warning:1526228248458035381> **Maximum skips reached!** You must guess this Pokémon or wait for the timer.",
               flags: 64,
             })
             .catch(() => null);
@@ -432,9 +432,10 @@ async function startPokemonGame(
       } else if (isCloseMatch(input, targetPokemon.aliases)) {
         if (!closeMatchUsers.has(m.author.id)) {
           closeMatchUsers.add(m.author.id);
-          await m
-            .reply({
-              content: `*You're so close! Check for typos!*`,
+          await m.channel
+            .send({
+              content: `<@${m.author.id}> You're so close! Check for typos!`,
+              allowedMentions: { users: [m.author.id], parse: ["users"] },
             })
             .catch(() => null);
         }
@@ -473,7 +474,7 @@ async function startPokemonGame(
                     type: 10,
                     content:
                       `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                      `Skips remaining: **${remainingSkips}/5**`,
+                      `-# Skips remaining: ${remainingSkips}/5`,
                   },
                 ],
               },
@@ -528,7 +529,7 @@ async function startPokemonGame(
                     content:
                       `${winnerMention} guessed it right!\n` +
                       `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                      `🏆 **+${pointsGained} Points** | **Total: ${scoreData.totalPoints}** Pts`,
+                      `🏆 **+${pointsGained} Points** • **Total: ${scoreData.totalPoints}** Pts`,
                   },
                 ],
               },

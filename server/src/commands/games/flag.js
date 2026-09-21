@@ -475,23 +475,22 @@ async function startFlagGame(
               spacing: 1,
             },
             {
-              type: 9,
-              components: [
+              type: 10,
+              content:
+                `**Difficulty:** ${diffBadge}\n` +
+                `**Country:** ${currentHint}\n\n` +
+                `-# You have 30 seconds to guess!\n` +
+                `-# Hint Penalty: -5 pts`,
+            },
+            {
+              type: 12,
+              items: [
                 {
-                  type: 10,
-                  content:
-                    `**Difficulty:** ${diffBadge}\n` +
-                    `**Country:** ${currentHint}\n\n` +
-                    `-# You have 30 seconds to guess!\n` +
-                    `-# Hint Penalty: -5 pts`,
+                  media: {
+                    url: flagUrl,
+                  },
                 },
               ],
-              accessory: {
-                type: 11,
-                media: {
-                  url: flagUrl,
-                },
-              },
             },
             {
               type: 14,
@@ -584,7 +583,7 @@ async function startFlagGame(
           return bInt
             .reply({
               content:
-                "<:Warning:1526228248458035381> **Maximum skips reached (5/5)!** You must guess this flag or wait for the timer.",
+                "<:Warning:1526228248458035381> **Maximum skips reached!** You must guess this flag or wait for the timer.",
               flags: 64,
             })
             .catch(() => null);
@@ -620,9 +619,10 @@ async function startFlagGame(
       } else if (isCloseMatch(input, targetCountry.aliases)) {
         if (!closeMatchUsers.has(m.author.id)) {
           closeMatchUsers.add(m.author.id);
-          await m
-            .reply({
-              content: `*You're so close! Check for typos!*`,
+          await m.channel
+            .send({
+              content: `<@${m.author.id}> You're so close! Check for typos!`,
+              allowedMentions: { users: [m.author.id], parse: ["users"] },
             })
             .catch(() => null);
         }
@@ -661,7 +661,7 @@ async function startFlagGame(
                     type: 10,
                     content:
                       `The country was **${targetCountry.name}** ${targetCountry.emoji}.\n\n` +
-                      `Skips remaining: **${remainingSkips}/5**`,
+                      `-# Skips remaining: ${remainingSkips}/5`,
                   },
                 ],
               },
@@ -716,7 +716,7 @@ async function startFlagGame(
                     content:
                       `${winnerMention} guessed it right!\n` +
                       `The country was **${targetCountry.name}** ${targetCountry.emoji}!\n\n` +
-                      `🏆 **+${pointsGained} Points** | **Total: ${scoreData.totalPoints}** Pts`,
+                      `🏆 **+${pointsGained} Points** • **Total: ${scoreData.totalPoints}** Pts`,
                   },
                 ],
               },
