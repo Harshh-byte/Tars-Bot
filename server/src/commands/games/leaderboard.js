@@ -3,11 +3,10 @@ import logger from "../../utils/logger.js";
 import {
   getTopFlagPlayers,
   getTopPokemonPlayers,
-  getTopLogoPlayers,
   getTopScramblePlayers,
 } from "../../services/database.js";
 
-export const aliases = ["flb", "plb", "blb", "logolb", "wslb", "lb"];
+export const aliases = ["flb", "plb", "wslb", "lb"];
 
 export const data = {
   name: "leaderboard",
@@ -22,7 +21,6 @@ export const data = {
       choices: [
         { name: "Flag", value: "flag" },
         { name: "Pokemon", value: "pokemon" },
-        { name: "Logo", value: "logo" },
         { name: "Word", value: "scramble" },
       ],
     },
@@ -69,14 +67,6 @@ export async function execute(interaction, client) {
   ) {
     lbCategory = "pokemon";
   } else if (
-    cmdName === "blb" ||
-    cmdName === "logolb" ||
-    rawArgs.includes("logo") ||
-    rawArgs.includes("brand") ||
-    rawArgs.includes("blb")
-  ) {
-    lbCategory = "logo";
-  } else if (
     cmdName === "wslb" ||
     rawArgs.includes("scramble") ||
     rawArgs.includes("wslb") ||
@@ -115,11 +105,9 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
   const rawPlayers =
     normalizedCat === "pokemon"
       ? await getTopPokemonPlayers(serverId, 100)
-      : normalizedCat === "logo"
-        ? await getTopLogoPlayers(serverId, 100)
-        : normalizedCat === "scramble"
-          ? await getTopScramblePlayers(serverId, 100)
-          : await getTopFlagPlayers(serverId, 100);
+      : normalizedCat === "scramble"
+        ? await getTopScramblePlayers(serverId, 100)
+        : await getTopFlagPlayers(serverId, 100);
 
   let activePlayers = [];
   let userRankInfo = null;
@@ -163,20 +151,16 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
   const categoryName =
     normalizedCat === "pokemon"
       ? "Pokémon"
-      : normalizedCat === "logo"
-        ? "Logo"
-        : normalizedCat === "scramble"
-          ? "Scramble"
-          : "Flag";
+      : normalizedCat === "scramble"
+        ? "Scramble"
+        : "Flag";
 
   const colorHex =
     normalizedCat === "pokemon"
       ? 0xffcc00
-      : normalizedCat === "logo"
-        ? 0x5865f2
-        : normalizedCat === "scramble"
-          ? 0x2ecc71
-          : 0xed4245;
+      : normalizedCat === "scramble"
+        ? 0x2ecc71
+        : 0xed4245;
 
   let bodyContent = "";
   if (!pagePlayers || pagePlayers.length === 0) {
@@ -280,13 +264,6 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
               },
               {
                 type: 2,
-                style: normalizedCat === "logo" ? 1 : 2,
-                custom_id: `show_lb_logo_${currentPage}`,
-                label: "Logo",
-                emoji: { name: "🏷️" },
-              },
-              {
-                type: 2,
                 style: normalizedCat === "scramble" ? 1 : 2,
                 custom_id: `show_lb_scramble_${currentPage}`,
                 label: "Word",
@@ -332,11 +309,6 @@ function attachLbToggleCollector(
         await showLeaderboard(btnInteraction, client, "flag", 1);
       } else if (customId.startsWith("show_lb_pokemon")) {
         await showLeaderboard(btnInteraction, client, "pokemon", 1);
-      } else if (
-        customId.startsWith("show_lb_logo") ||
-        customId.startsWith("show_lb_brand")
-      ) {
-        await showLeaderboard(btnInteraction, client, "logo", 1);
       } else if (customId.startsWith("show_lb_scramble")) {
         await showLeaderboard(btnInteraction, client, "scramble", 1);
       }
