@@ -14,7 +14,8 @@ export function createSlashNoticeEmbed(botName = "Tars") {
         `• **Currently:** Prefix commands still function but will occasionally trigger this reminder.\n` +
         `• **5th October 2026:** Standard prefix commands will be fully disabled.\n\n` +
         `**What stays**\n` +
-        `• @${botName} mentions will still work to invoke commands.`,
+        `• @${botName} mentions will still work to invoke commands.\n\n` +
+        `[Click here](https://discord.com/blog/welcome-to-the-new-era-of-discord-apps) to learn more about the changes.`,
     )
     .setColor(EMBED_COLORS.WARNING);
 }
