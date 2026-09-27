@@ -208,6 +208,28 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
   return startPokemonGame(interaction, client, false, genInput, buildAiReply);
 }
 
+const channelSessionWinsMap = new Map();
+const celebratedSessionsSet = new Set();
+
+function resetChannelSession(channelId) {
+  channelSkipsMap.set(channelId, 0);
+  for (const key of channelSessionScoresMap.keys()) {
+    if (key.startsWith(`${channelId}_`) || key === channelId) {
+      channelSessionScoresMap.delete(key);
+    }
+  }
+  for (const key of channelSessionWinsMap.keys()) {
+    if (key.startsWith(`${channelId}_`) || key === channelId) {
+      channelSessionWinsMap.delete(key);
+    }
+  }
+  for (const key of celebratedSessionsSet) {
+    if (key.startsWith(`${channelId}_`)) {
+      celebratedSessionsSet.delete(key);
+    }
+  }
+}
+
 async function startPokemonGame(
   interaction,
   client,
@@ -232,7 +254,7 @@ async function startPokemonGame(
     }
 
     if (!isFollowUp) {
-      channelSkipsMap.set(channelId, 0);
+      resetChannelSession(channelId);
     }
     const targetPokemon = await fetchRandomPokemon(genSelection, channelId);
 
@@ -495,17 +517,40 @@ async function startPokemonGame(
           const winnerId = winnerMessage.author.id;
           const serverId = interaction.guild?.id || "DM";
 
-          const pointsGained = targetPokemon.points;
+          const basePoints = targetPokemon.points;
+          const hintDeduction = hintClicks * 5;
+          const pointsGained = Math.max(1, basePoints - hintDeduction);
 
-          let scoreData = { totalPoints: pointsGained, totalWins: 1 };
+          const userKey = `${channelId}_${winnerId}`;
+          const currentSessionScore =
+            (channelSessionScoresMap.get(userKey) || 0) + pointsGained;
+          channelSessionScoresMap.set(userKey, currentSessionScore);
+
+          const currentSessionWins =
+            (channelSessionWinsMap.get(userKey) || 0) + 1;
+          channelSessionWinsMap.set(userKey, currentSessionWins);
+
+          let scoreData = {
+            highScore: currentSessionScore,
+            isNewHighScore: true,
+            highWins: currentSessionWins,
+          };
           if (serverId !== "DM") {
-            scoreData = await addPokemonScore(serverId, winnerId, pointsGained);
+            scoreData = await addPokemonScore(
+              serverId,
+              winnerId,
+              currentSessionScore,
+              currentSessionWins,
+            );
           }
 
           const winnerMention = `<@${winnerId}>`;
-          const currentSessionScore =
-            (channelSessionScoresMap.get(channelId) || 0) + pointsGained;
-          channelSessionScoresMap.set(channelId, currentSessionScore);
+          let showHighBadge = false;
+          if (scoreData.isNewHighScore && !celebratedSessionsSet.has(userKey)) {
+            celebratedSessionsSet.add(userKey);
+            showHighBadge = true;
+          }
+          const highBadge = showHighBadge ? "\n🎯 **New Personal Best!**" : "";
 
           await channel.send({
             flags: 32768,
@@ -530,7 +575,7 @@ async function startPokemonGame(
                     content:
                       `${winnerMention} guessed it right!\n` +
                       `The Pokémon was **${targetPokemon.name}**!\n\n` +
-                      `🏆 **+${pointsGained} Points** • **Total: ${scoreData.totalPoints}** Pts`,
+                      `🔥 **+${pointsGained} Points** • **Score: ${currentSessionScore} Pts**\n${highBadge}`,
                   },
                 ],
               },
@@ -547,8 +592,7 @@ async function startPokemonGame(
             );
           }, 1500);
         } else {
-          channelSkipsMap.set(channelId, 0);
-          channelSessionScoresMap.set(channelId, 0);
+          resetChannelSession(channelId);
 
           const resultMsg = await channel.send({
             flags: 32768,
@@ -657,8 +701,7 @@ function attachPokemonNextCollector(
           await btnInteraction.deferUpdate().catch(() => null);
         }
 
-        channelSkipsMap.set(channelId, 0);
-        channelSessionScoresMap.set(channelId, 0);
+        resetChannelSession(channelId);
 
         await startPokemonGame(
           btnInteraction,

@@ -15,6 +15,27 @@ let cachedFlagCountries = null;
 const recentFlagsMap = new Map();
 const channelSkipsMap = new Map();
 const channelSessionScoresMap = new Map();
+const channelSessionWinsMap = new Map();
+const celebratedSessionsSet = new Set();
+
+function resetChannelSession(channelId) {
+  channelSkipsMap.set(channelId, 0);
+  for (const key of channelSessionScoresMap.keys()) {
+    if (key.startsWith(`${channelId}_`) || key === channelId) {
+      channelSessionScoresMap.delete(key);
+    }
+  }
+  for (const key of channelSessionWinsMap.keys()) {
+    if (key.startsWith(`${channelId}_`) || key === channelId) {
+      channelSessionWinsMap.delete(key);
+    }
+  }
+  for (const key of celebratedSessionsSet) {
+    if (key.startsWith(`${channelId}_`)) {
+      celebratedSessionsSet.delete(key);
+    }
+  }
+}
 const activeCollectorsMap = new Map();
 const activeHintTimersMap = new Map();
 
@@ -407,7 +428,7 @@ async function startFlagGame(
     }
 
     if (!isFollowUp) {
-      channelSkipsMap.set(channelId, 0);
+      resetChannelSession(channelId);
     }
 
     let filteredCountries = allCountries;
@@ -527,7 +548,9 @@ async function startFlagGame(
       ],
     });
 
-    const payload = buildPromptPayload(getRevealedHint(targetCountry.name, revealedIndices));
+    const payload = buildPromptPayload(
+      getRevealedHint(targetCountry.name, revealedIndices),
+    );
 
     const channel = interaction.channel;
     if (!channel || typeof channel.createMessageCollector !== "function")
@@ -563,10 +586,15 @@ async function startFlagGame(
             .catch(() => null);
         }
 
-        const unrevealed = letterIndices.filter((idx) => !revealedIndices.has(idx));
+        const unrevealed = letterIndices.filter(
+          (idx) => !revealedIndices.has(idx),
+        );
         if (unrevealed.length > 0) {
           // Reveal 1 to 2 random unrevealed letters
-          const revealAmount = Math.min(unrevealed.length, Math.ceil(unrevealed.length * 0.4));
+          const revealAmount = Math.min(
+            unrevealed.length,
+            Math.ceil(unrevealed.length * 0.4),
+          );
           for (let i = 0; i < revealAmount; i++) {
             const randomIndex = Math.floor(Math.random() * unrevealed.length);
             const chosen = unrevealed.splice(randomIndex, 1)[0];
@@ -575,7 +603,10 @@ async function startFlagGame(
         }
         hintClicks++;
 
-        const updatedHint = getRevealedHint(targetCountry.name, revealedIndices);
+        const updatedHint = getRevealedHint(
+          targetCountry.name,
+          revealedIndices,
+        );
         await bInt.update(buildPromptPayload(updatedHint)).catch(() => null);
       } else if (bInt.customId === "flag_skip") {
         const currentSkips = channelSkipsMap.get(channelId) || 0;
@@ -681,17 +712,40 @@ async function startFlagGame(
           const winnerId = winnerMessage.author.id;
           const serverId = interaction.guild?.id || "DM";
 
-          const pointsGained = getBasePoints(targetCountry.difficulty);
+          const basePoints = getBasePoints(targetCountry.difficulty);
+          const hintDeduction = hintClicks * 5;
+          const pointsGained = Math.max(1, basePoints - hintDeduction);
 
-          let scoreData = { totalPoints: pointsGained, totalWins: 1 };
+          const userKey = `${channelId}_${winnerId}`;
+          const currentSessionScore =
+            (channelSessionScoresMap.get(userKey) || 0) + pointsGained;
+          channelSessionScoresMap.set(userKey, currentSessionScore);
+
+          const currentSessionWins =
+            (channelSessionWinsMap.get(userKey) || 0) + 1;
+          channelSessionWinsMap.set(userKey, currentSessionWins);
+
+          let scoreData = {
+            highScore: currentSessionScore,
+            isNewHighScore: true,
+            highWins: currentSessionWins,
+          };
           if (serverId !== "DM") {
-            scoreData = await addFlagScore(serverId, winnerId, pointsGained);
+            scoreData = await addFlagScore(
+              serverId,
+              winnerId,
+              currentSessionScore,
+              currentSessionWins,
+            );
           }
 
           const winnerMention = `<@${winnerId}>`;
-          const currentSessionScore =
-            (channelSessionScoresMap.get(channelId) || 0) + pointsGained;
-          channelSessionScoresMap.set(channelId, currentSessionScore);
+          let showHighBadge = false;
+          if (scoreData.isNewHighScore && !celebratedSessionsSet.has(userKey)) {
+            celebratedSessionsSet.add(userKey);
+            showHighBadge = true;
+          }
+          const highBadge = showHighBadge ? "\n🎯 **New Personal Best!**" : "";
 
           await channel.send({
             flags: 32768,
@@ -716,7 +770,7 @@ async function startFlagGame(
                     content:
                       `${winnerMention} guessed it right!\n` +
                       `The country was **${targetCountry.name}** ${targetCountry.emoji}!\n\n` +
-                      `🏆 **+${pointsGained} Points** • **Total: ${scoreData.totalPoints}** Pts`,
+                      `🔥 **+${pointsGained} Points** • **Score: ${currentSessionScore} Pts**\n${highBadge}`,
                   },
                 ],
               },
@@ -733,8 +787,7 @@ async function startFlagGame(
             );
           }, 1500);
         } else {
-          channelSkipsMap.set(channelId, 0);
-          channelSessionScoresMap.set(channelId, 0);
+          resetChannelSession(channelId);
 
           const resultMsg = await channel.send({
             flags: 32768,
@@ -843,8 +896,7 @@ function attachFlagNextCollector(
           await btnInteraction.deferUpdate().catch(() => null);
         }
 
-        channelSkipsMap.set(channelId, 0);
-        channelSessionScoresMap.set(channelId, 0);
+        resetChannelSession(channelId);
 
         await startFlagGame(
           btnInteraction,

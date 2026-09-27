@@ -2,6 +2,7 @@ import admin from "firebase-admin";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { readFileSync } from "fs";
 import cron from "node-cron";
+import logger from "../utils/logger.js";
 
 const serviceAccount = JSON.parse(
   readFileSync(new URL("../../serviceAccountKey.json", import.meta.url)),
@@ -154,34 +155,55 @@ export async function deleteServerData(serverId) {
   await db.recursiveDelete(serverDoc(serverId));
 }
 
-export async function addFlagScore(serverId, userId, pointsGained) {
+export async function addFlagScore(
+  serverId,
+  userId,
+  sessionScore,
+  sessionWins = 1,
+) {
   validateIds(serverId, userId);
   const ref = memberDoc(serverId, userId);
   try {
+    const snapshot = await ref.get();
+    const stats = snapshot.data()?.stats || {};
+    const existingHighScore = stats.flag_points || 0;
+    const existingWins = stats.flag_wins || 0;
+
+    const isNewHighScore = sessionScore > existingHighScore;
+    const newHighScore = isNewHighScore ? sessionScore : existingHighScore;
+    const newWins = isNewHighScore ? sessionWins : existingWins;
+
     await ref.set(
       {
         stats: {
-          flag_points: FieldValue.increment(pointsGained),
-          flag_wins: FieldValue.increment(1),
+          flag_points: newHighScore,
+          flag_wins: newWins,
         },
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },
     );
-    const snapshot = await ref.get();
-    const data = snapshot.data()?.stats || {};
+
     return {
-      totalPoints: data.flag_points || pointsGained,
-      totalWins: data.flag_wins || 1,
+      highScore: newHighScore,
+      isNewHighScore,
+      highWins: newWins,
     };
   } catch (err) {
     if (!global.memoryFlagScores) global.memoryFlagScores = new Map();
     const key = `${serverId}_${userId}`;
     const current = global.memoryFlagScores.get(key) || { points: 0, wins: 0 };
-    current.points += pointsGained;
-    current.wins += 1;
+    const isNewHighScore = sessionScore > current.points;
+    if (isNewHighScore) {
+      current.points = sessionScore;
+      current.wins = sessionWins;
+    }
     global.memoryFlagScores.set(key, current);
-    return { totalPoints: current.points, totalWins: current.wins };
+    return {
+      highScore: current.points,
+      isNewHighScore,
+      highWins: current.wins,
+    };
   }
 }
 
@@ -206,25 +228,39 @@ export async function getTopFlagPlayers(serverId, limitCount = 10) {
   }
 }
 
-export async function addPokemonScore(serverId, userId, pointsGained) {
+export async function addPokemonScore(
+  serverId,
+  userId,
+  sessionScore,
+  sessionWins = 1,
+) {
   validateIds(serverId, userId);
   const ref = memberDoc(serverId, userId);
   try {
+    const snapshot = await ref.get();
+    const stats = snapshot.data()?.stats || {};
+    const existingHighScore = stats.pokemon_points || 0;
+    const existingWins = stats.pokemon_wins || 0;
+
+    const isNewHighScore = sessionScore > existingHighScore;
+    const newHighScore = isNewHighScore ? sessionScore : existingHighScore;
+    const newWins = isNewHighScore ? sessionWins : existingWins;
+
     await ref.set(
       {
         stats: {
-          pokemon_points: FieldValue.increment(pointsGained),
-          pokemon_wins: FieldValue.increment(1),
+          pokemon_points: newHighScore,
+          pokemon_wins: newWins,
         },
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },
     );
-    const snapshot = await ref.get();
-    const data = snapshot.data()?.stats || {};
+
     return {
-      totalPoints: data.pokemon_points || pointsGained,
-      totalWins: data.pokemon_wins || 1,
+      highScore: newHighScore,
+      isNewHighScore,
+      highWins: newWins,
     };
   } catch (err) {
     if (!global.memoryPokemonScores) global.memoryPokemonScores = new Map();
@@ -233,10 +269,17 @@ export async function addPokemonScore(serverId, userId, pointsGained) {
       points: 0,
       wins: 0,
     };
-    current.points += pointsGained;
-    current.wins += 1;
+    const isNewHighScore = sessionScore > current.points;
+    if (isNewHighScore) {
+      current.points = sessionScore;
+      current.wins = sessionWins;
+    }
     global.memoryPokemonScores.set(key, current);
-    return { totalPoints: current.points, totalWins: current.wins };
+    return {
+      highScore: current.points,
+      isNewHighScore,
+      highWins: current.wins,
+    };
   }
 }
 
@@ -261,26 +304,39 @@ export async function getTopPokemonPlayers(serverId, limitCount = 10) {
   }
 }
 
-
-export async function addScrambleScore(serverId, userId, pointsGained) {
+export async function addScrambleScore(
+  serverId,
+  userId,
+  sessionScore,
+  sessionWins = 1,
+) {
   validateIds(serverId, userId);
   const ref = memberDoc(serverId, userId);
   try {
+    const snapshot = await ref.get();
+    const stats = snapshot.data()?.stats || {};
+    const existingHighScore = stats.scramble_points || 0;
+    const existingWins = stats.scramble_wins || 0;
+
+    const isNewHighScore = sessionScore > existingHighScore;
+    const newHighScore = isNewHighScore ? sessionScore : existingHighScore;
+    const newWins = isNewHighScore ? sessionWins : existingWins;
+
     await ref.set(
       {
         stats: {
-          scramble_points: FieldValue.increment(pointsGained),
-          scramble_wins: FieldValue.increment(1),
+          scramble_points: newHighScore,
+          scramble_wins: newWins,
         },
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },
     );
-    const snapshot = await ref.get();
-    const data = snapshot.data()?.stats || {};
+
     return {
-      totalPoints: data.scramble_points || pointsGained,
-      totalWins: data.scramble_wins || 1,
+      highScore: newHighScore,
+      isNewHighScore,
+      highWins: newWins,
     };
   } catch (err) {
     if (!global.memoryScrambleScores) global.memoryScrambleScores = new Map();
@@ -289,10 +345,17 @@ export async function addScrambleScore(serverId, userId, pointsGained) {
       points: 0,
       wins: 0,
     };
-    current.points += pointsGained;
-    current.wins += 1;
+    const isNewHighScore = sessionScore > current.points;
+    if (isNewHighScore) {
+      current.points = sessionScore;
+      current.wins = sessionWins;
+    }
     global.memoryScrambleScores.set(key, current);
-    return { totalPoints: current.points, totalWins: current.wins };
+    return {
+      highScore: current.points,
+      isNewHighScore,
+      highWins: current.wins,
+    };
   }
 }
 
@@ -360,7 +423,6 @@ export async function resetLeaderboards(serverId, category = "all") {
       await batch.commit();
     }
 
-
     const clearMemoryMap = (map) => {
       if (!map) return;
       const prefix = `${serverId}_`;
@@ -385,69 +447,35 @@ export async function resetLeaderboards(serverId, category = "all") {
   }
 }
 
-
 export async function getUserProfile(serverId, userId) {
-  const targetUserId =
-    typeof serverId === "string" && !userId ? serverId : userId;
-  const targetServerId =
-    typeof serverId === "string" && userId ? serverId : null;
-
-  if (!targetUserId) return null;
+  if (!serverId || !userId || serverId === "DM") return null;
   try {
-    if (targetServerId && targetServerId !== "DM") {
-      const memberSnapshot = await memberDoc(
-        targetServerId,
-        targetUserId,
-      ).get();
-      if (memberSnapshot.exists && memberSnapshot.data()?.stats?.gender) {
-        return memberSnapshot.data();
-      }
+    const memberSnapshot = await memberDoc(serverId, userId).get();
+    if (memberSnapshot.exists) {
+      return memberSnapshot.data();
     }
-    const snapshot = await userDoc(targetUserId).get();
-    if (!snapshot.exists) return null;
-    return snapshot.data();
+    return null;
   } catch (err) {
     return null;
   }
 }
 
 export async function setUserGender(serverId, userId, gender) {
-  let targetServerId = serverId;
-  let targetUserId = userId;
-  let targetGender = gender;
-
-  if (!gender && userId) {
-    targetGender = userId;
-    targetUserId = serverId;
-    targetServerId = null;
-  }
-
-  if (!targetUserId || !targetGender) return;
+  if (!serverId || !userId || !gender || serverId === "DM") return;
   try {
-    if (targetServerId && targetServerId !== "DM") {
-      await memberDoc(targetServerId, targetUserId).set(
-        {
-          stats: {
-            gender: targetGender,
-          },
-          gender: FieldValue.delete(),
-          updatedAt: FieldValue.serverTimestamp(),
-        },
-        { merge: true },
-      );
-    }
-    await userDoc(targetUserId).set(
+    await memberDoc(serverId, userId).set(
       {
-        userId: targetUserId,
         stats: {
-          gender: targetGender,
+          gender: gender,
         },
         gender: FieldValue.delete(),
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },
     );
-  } catch (err) {}
+  } catch (err) {
+    logger.error("Error setting user gender:", err);
+  }
 }
 
 export async function saveAutoMemeConfig(serverId, config) {

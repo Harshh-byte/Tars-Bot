@@ -3,7 +3,7 @@ import { EmbedBuilder } from "discord.js";
 import logger from "../utils/logger.js";
 import { getAutoMemeConfigs, saveAutoMemeConfig } from "./database.js";
 
-const SUBREDDITS = ["darkmemers", "dankmemes", "me_irl", "FingMemes"];
+const SUBREDDITS = ["darkmemers", "comics", "meirl", "FingMemes"];
 
 async function fetchMeme() {
   const subreddit = SUBREDDITS[Math.floor(Math.random() * SUBREDDITS.length)];
@@ -53,7 +53,7 @@ export function initAutoMemeService(client) {
               .setImage(meme.url)
               .setColor(randomColor)
               .setFooter({
-                text: `${meme.ups ? meme.ups.toLocaleString() : 0} ${meme.ups === 1 ? "upvote" : "upvotes"} • r/${meme.subreddit}`,
+                text: `AutoMeme • ${meme.ups ? meme.ups.toLocaleString() : 0} ${meme.ups === 1 ? "upvote" : "upvotes"} • r/${meme.subreddit}`,
                 iconURL:
                   "https://cdn.discordapp.com/emojis/1540698439594016778.png",
               });

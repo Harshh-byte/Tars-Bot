@@ -38,6 +38,29 @@ export const data = {
 };
 
 const activeGamesMap = new Map();
+const channelSkipsMap = new Map();
+const channelSessionScoresMap = new Map();
+const channelSessionWinsMap = new Map();
+const celebratedSessionsSet = new Set();
+
+function resetChannelSession(channelId) {
+  channelSkipsMap.set(channelId, 0);
+  for (const key of channelSessionScoresMap.keys()) {
+    if (key.startsWith(`${channelId}_`) || key === channelId) {
+      channelSessionScoresMap.delete(key);
+    }
+  }
+  for (const key of channelSessionWinsMap.keys()) {
+    if (key.startsWith(`${channelId}_`) || key === channelId) {
+      channelSessionWinsMap.delete(key);
+    }
+  }
+  for (const key of celebratedSessionsSet) {
+    if (key.startsWith(`${channelId}_`)) {
+      celebratedSessionsSet.delete(key);
+    }
+  }
+}
 
 function getBasePoints(difficulty, wordLength) {
   if (difficulty === "easy") return 10;
@@ -408,10 +431,35 @@ export async function execute(interaction) {
         const basePoints = getBasePoints(difficulty, originalWord.length);
         const pointsGained = hintGiven ? Math.max(5, basePoints - 5) : basePoints;
 
-        let scoreData = { totalPoints: pointsGained, totalWins: 1 };
+        const userKey = `${channel.id}_${winnerId}`;
+        const currentSessionScore =
+          (channelSessionScoresMap.get(userKey) || 0) + pointsGained;
+        channelSessionScoresMap.set(userKey, currentSessionScore);
+
+        const currentSessionWins =
+          (channelSessionWinsMap.get(userKey) || 0) + 1;
+        channelSessionWinsMap.set(userKey, currentSessionWins);
+
+        let scoreData = {
+          highScore: currentSessionScore,
+          isNewHighScore: true,
+          highWins: currentSessionWins,
+        };
         if (guildId && winnerId) {
-          scoreData = await addScrambleScore(guildId, winnerId, pointsGained);
+          scoreData = await addScrambleScore(
+            guildId,
+            winnerId,
+            currentSessionScore,
+            currentSessionWins,
+          );
         }
+
+        let showHighBadge = false;
+        if (scoreData.isNewHighScore && !celebratedSessionsSet.has(userKey)) {
+          celebratedSessionsSet.add(userKey);
+          showHighBadge = true;
+        }
+        const highBadge = showHighBadge ? "\n🎯 **New Personal Best!**" : "";
 
         await channel.send({
           flags: 32768,
@@ -436,7 +484,7 @@ export async function execute(interaction) {
                   content:
                     `<@${winnerId}> guessed it right!\n` +
                     `The word was **${originalWord}**!\n\n` +
-                    `🏆 **+${pointsGained} Points** | **Total: ${scoreData.totalPoints}** Pts`,
+                    `🔥 **+${pointsGained} Points** • **Score: ${currentSessionScore} Pts**\n${highBadge}`,
                 },
               ],
             },
@@ -448,6 +496,7 @@ export async function execute(interaction) {
     msgCollector.on("end", async (_, reason) => {
       activeGamesMap.delete(channel.id);
       if (!gameOver && reason !== "guessed" && reason !== "skipped") {
+        resetChannelSession(channel.id);
         await channel
           .send({
             flags: 32768,
