@@ -30,7 +30,7 @@ const ITEMS_PER_PAGE = 5;
 const modulesCatalog = {
   module_games: {
     title: "<:Games:1542645834808565821> Games Module",
-    description: "Interactive Discord games and decision tools.",
+    description: "Interactive games & scoreboards.",
     commands: [
       {
         name: "Rock, Paper, Scissors",
@@ -73,7 +73,7 @@ const modulesCatalog = {
   },
   module_fun: {
     title: "<:Fun:1542240014388170772> Fun Module",
-    description: "Entertaining Discord calculators, roasts, and memes.",
+    description: "Calculators, roasts, and memes.",
     commands: [
       {
         name: "Love Calculator",
@@ -127,7 +127,7 @@ const modulesCatalog = {
   },
   module_actions: {
     title: "<:Actions:1542647256782737559> Actions Module",
-    description: "Interactive server smoke and vape counters.",
+    description: "Smoke and vape counters.",
     commands: [
       { name: "Smoke", cmd: "smoke", desc: "Take a hit of smoke." },
       { name: "Vape", cmd: "vape", desc: "Hit the vape." },
@@ -135,7 +135,7 @@ const modulesCatalog = {
   },
   module_utility: {
     title: "<:Utility:1542239958612320306> Utility Module",
-    description: "Essential server diagnostics and configuration tools.",
+    description: "Server tools and utilities.",
     commands: [
       {
         name: "Server Info",
@@ -264,36 +264,35 @@ export async function execute(interaction, client) {
         .addOptions([
           {
             label: "Home",
-            description: "Bot system overview and general statistics.",
+            description: "Overview & bot stats.",
             value: "module_home",
             emoji: "<:Home:1542647191691071548>",
             default: defaultValue === "module_home",
           },
           {
             label: "Games",
-            description: "Interactive Discord games and decision tools.",
+            description: "Interactive games & scoreboards.",
             value: "module_games",
             emoji: "<:Games:1542645834808565821>",
             default: defaultValue === "module_games",
           },
           {
             label: "Fun",
-            description: "Entertaining Discord calculators, roasts, and memes.",
+            description: "Calculators, roasts & memes.",
             value: "module_fun",
             emoji: "<:Fun:1542240014388170772>",
             default: defaultValue === "module_fun",
           },
           {
             label: "Actions",
-            description: "Interactive server smoke and vape counters.",
+            description: "Smoke and vape counters.",
             value: "module_actions",
             emoji: "<:Actions:1542647256782737559>",
             default: defaultValue === "module_actions",
           },
           {
             label: "Utility",
-            description:
-              "Essential server diagnostics and configuration tools.",
+            description: "Server tools & utilities.",
             value: "module_utility",
             emoji: "<:Utility:1542239958612320306>",
             default: defaultValue === "module_utility",
@@ -334,35 +333,35 @@ export async function execute(interaction, client) {
       const menuOptions = [
         {
           label: "Home",
-          description: "Bot system overview and general statistics.",
+          description: "Overview & bot stats.",
           value: "module_home",
           emoji: { id: "1542647191691071548", name: "Home" },
           default: selectedModule === "module_home",
         },
         {
           label: "Games",
-          description: "Interactive Discord games and decision tools.",
+          description: "Interactive games & scoreboards.",
           value: "module_games",
           emoji: { id: "1542645834808565821", name: "Games" },
           default: selectedModule === "module_games",
         },
         {
           label: "Fun",
-          description: "Entertaining Discord calculators, roasts, and memes.",
+          description: "Calculators, roasts & memes.",
           value: "module_fun",
           emoji: { id: "1542240014388170772", name: "Fun" },
           default: selectedModule === "module_fun",
         },
         {
           label: "Actions",
-          description: "Interactive server smoke and vape counters.",
+          description: "Smoke and vape counters.",
           value: "module_actions",
           emoji: { id: "1542647256782737559", name: "Actions" },
           default: selectedModule === "module_actions",
         },
         {
           label: "Utility",
-          description: "Essential server diagnostics and configuration tools.",
+          description: "Server tools & utilities.",
           value: "module_utility",
           emoji: { id: "1542239958612320306", name: "Utility" },
           default: selectedModule === "module_utility",
