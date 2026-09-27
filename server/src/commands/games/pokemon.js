@@ -74,7 +74,7 @@ function getRevealedHint(name, revealedIndices = new Set()) {
     .join("   ");
 }
 
-async function fetchRandomPokemon(gen = "gen1", channelId = "default") {
+async function fetchRandomPokemon(gen = "all", channelId = "default") {
   let minId = 1;
   let maxId = 151;
 
@@ -192,7 +192,9 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
 
   let genInput = interaction.options?.getString("generation")?.toLowerCase();
   if (!genInput) {
-    if (rawArgs.includes("gen2") || rawArgs.includes("johto"))
+    if (rawArgs.includes("gen1") || rawArgs.includes("kanto"))
+      genInput = "gen1";
+    else if (rawArgs.includes("gen2") || rawArgs.includes("johto"))
       genInput = "gen2";
     else if (rawArgs.includes("gen3") || rawArgs.includes("hoenn"))
       genInput = "gen3";
@@ -200,8 +202,7 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       genInput = "gen4";
     else if (rawArgs.includes("gen5") || rawArgs.includes("unova"))
       genInput = "gen5";
-    else if (rawArgs.includes("all")) genInput = "all";
-    else genInput = "gen1";
+    else genInput = "all";
   }
 
   return startPokemonGame(interaction, client, false, genInput, buildAiReply);
@@ -211,7 +212,7 @@ async function startPokemonGame(
   interaction,
   client,
   isFollowUp = false,
-  genSelection = "gen1",
+  genSelection = "all",
   buildAiReply,
 ) {
   try {

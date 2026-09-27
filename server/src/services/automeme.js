@@ -53,7 +53,7 @@ export function initAutoMemeService(client) {
               .setImage(meme.url)
               .setColor(randomColor)
               .setFooter({
-                text: `AutoMeme • ${meme.ups ? meme.ups.toLocaleString() : 0} upvotes • r/${meme.subreddit}`,
+                text: `${meme.ups ? meme.ups.toLocaleString() : 0} ${meme.ups === 1 ? "upvote" : "upvotes"} • r/${meme.subreddit}`,
                 iconURL:
                   "https://cdn.discordapp.com/emojis/1540698439594016778.png",
               });
