@@ -162,12 +162,17 @@ client.resolveEmoji = function (emojiInput) {
 
 function replaceEmojiNamesWithTags(text, guild) {
   if (!text) return text;
-  return text.replace(/(?<!<a?):(\w+):(?!\d+>)/g, (match, emojiName) => {
-    const customEmoji = client.emojis.cache.find(
-      (e) => e.name.toLowerCase() === emojiName.toLowerCase(),
-    );
-    return customEmoji ? customEmoji.toString() : match;
-  });
+  let cleaned = text.replace(/:\s*@\s*:/g, "");
+  cleaned = cleaned.replace(
+    /(?<!<a?):([^:\s]+):(?!\d+>)/g,
+    (match, emojiName) => {
+      const customEmoji = client.emojis.cache.find(
+        (e) => e.name.toLowerCase() === emojiName.toLowerCase(),
+      );
+      return customEmoji ? customEmoji.toString() : "";
+    },
+  );
+  return cleaned.replace(/\s{2,}/g, " ").trim();
 }
 
 function validateEmojiTags(text) {
@@ -179,7 +184,7 @@ function validateEmojiTags(text) {
     const fallback = client.emojis.cache.find(
       (e) => e.name.toLowerCase() === name.toLowerCase(),
     );
-    return fallback ? fallback.toString() : `:${name}:`;
+    return fallback ? fallback.toString() : "";
   });
 }
 

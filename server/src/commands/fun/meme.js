@@ -13,26 +13,20 @@ export const data = {
       type: 3,
       required: false,
       choices: [
-        { name: "Dank Memes", value: "dankmemes" },
         { name: "Dark Memes", value: "darkmemers" },
         { name: "General Memes", value: "memes" },
-        { name: "Wholesome", value: "wholesomememes" },
-        { name: "Me_IRL", value: "me_irl" },
-        { name: "Programmer Humor", value: "programmerhumor" },
         { name: "Comics", value: "comics" },
+        { name: "Me IRL", value: "meirl" },
       ],
     },
   ],
 };
 
 const SUBREDDITS = [
-  "dankmemes",
   "darkmemers",
   "memes",
-  "wholesomememes",
-  "me_irl",
-  "programmerhumor",
   "comics",
+  "meirl",
 ];
 
 export async function execute(interaction, client) {
