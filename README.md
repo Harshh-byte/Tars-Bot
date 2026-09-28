@@ -1,6 +1,6 @@
-# Tars Bot 🤖
+# TARS Bot 🤖
 
-![Tars Bot Banner](./assets/ReadMe.png)
+![TARS Bot Banner](./assets/ReadMe.png)
 
 A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, **React (Vite Dashboard)**, and powered by **Google Gemini AI**. Designed for server engagement, interactive games, custom prefix management, and dynamic help interfaces.
 
@@ -21,13 +21,13 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 
 ## ⚡ Quick Command Reference
 
-| Category    | Commands                                                                                                                                                          | Description                                                                   |
-| :---------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
-| **Utility** | `.help`, `.prefix`, `.ping`, `.about`, `.ask`                                                                                                                     | Interactive menus, prefix control, diagnostics, bot info & AI question search |
-| **Actions** | `.hug`, `.kiss`, `.slap`, `.pat`, `.punch`, `.smoke`, `.vape`                                                                                 | Interactive reactions with stats                                              |
-| **Games**   | `.impostor`, `.imp`, `.guess`, `.leaderboard`, `.flag`, `.pokemon`, `.scramble`, `.ws`, `.flb`, `.plb`, `.tod`, `.wyr`, `.nhie`, `.rps`, `.ttt`, `.flip`, `.roll` | Interactive guessing mini-games, party games & decision tools                 |
-| **Fun**     | `.ship`, `.iq`, `.pp`, `.gay`, `.lesbian`, `.bitches`, `.autism`, `.roast`, `.wish`, `.meme`, `.automeme`                                                         | Calculators, AI roasts, wishes, Reddit memes & AutoMeme scheduler             |
-| **Admin**   | `/maintenance`, `/resetlb`                                                                                                                                        | Toggle bot maintenance mode & reset game leaderboards                         |
+| Category    | Commands                                                                                                                                                          | Description                                                                             |
+| :---------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------- |
+| **Utility** | `.help`, `.prefix`, `.ping`, `.about`, `.ask`, `.purge`                                                                                                           | Interactive menus, prefix control, diagnostics, message purging & bot memory management |
+| **Actions** | `.hug`, `.kiss`, `.slap`, `.pat`, `.punch`, `.smoke`, `.vape`                                                                                                     | Interactive reactions with stats                                                        |
+| **Games**   | `.impostor`, `.imp`, `.guess`, `.leaderboard`, `.flag`, `.pokemon`, `.scramble`, `.ws`, `.flb`, `.plb`, `.tod`, `.wyr`, `.nhie`, `.rps`, `.ttt`, `.flip`, `.roll` | Interactive guessing mini-games, party games & decision tools                           |
+| **Fun**     | `.ship`, `.iq`, `.pp`, `.gay`, `.lesbian`, `.bitches`, `.autism`, `.roast`, `.wish`, `.meme`, `.automeme`                                                         | Calculators, AI roasts, wishes, Reddit memes & AutoMeme scheduler                       |
+| **Admin**   | `/maintenance`, `/resetlb`                                                                                                                                        | Toggle bot maintenance mode & reset game leaderboards                                   |
 
 ---
 

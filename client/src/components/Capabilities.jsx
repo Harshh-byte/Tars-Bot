@@ -11,7 +11,7 @@ const capabilities = [
     icon: Flame,
     title: "Adaptive Roasts",
     description:
-      "Chill and witty by default. If provoked, Tars unleashes absolute verbal destruction with zero filter.",
+      "Chill and witty by default. If provoked, TARS unleashes absolute verbal destruction with zero filter.",
     iconColor: "text-ds-red",
     spotlightColor: "rgba(237, 66, 69, 0.15)",
     span: false,

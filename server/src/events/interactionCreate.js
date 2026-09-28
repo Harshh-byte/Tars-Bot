@@ -28,7 +28,7 @@ export async function execute(interaction, client, context) {
       .setColor(0xffa502)
       .setTitle("<:Updates:1526472917964030053> **System Maintenance**")
       .setDescription(
-        "Tars is currently undergoing scheduled maintenance and will be back online shortly.",
+        "TARS is currently undergoing scheduled maintenance and will be back online shortly.",
       )
       .setFooter({
         text: getFormattedMaintenanceTime(client.maintenanceStartTime),

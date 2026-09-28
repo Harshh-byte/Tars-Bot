@@ -65,7 +65,7 @@ async function startGame(interaction, client, opponent) {
               },
               {
                 type: 10,
-                content: `**${userDisplayName}**, choose your move below! Tars has already made his decision.\n\n-# Requestor: ${userDisplayName}`,
+                content: `**${userDisplayName}**, choose your move below! TARS has already made his decision.\n\n-# Requestor: ${userDisplayName}`,
               },
               {
                 type: 14,
@@ -126,15 +126,15 @@ async function startGame(interaction, client, opponent) {
         let resultText = "";
 
         const userWinQuotes = [
-          "Tars: Congrats. Your random button mashing somehow outplayed a quantum processor. Pure luck.",
-          "Tars: Enjoy the win. Statistically speaking, it won't happen again in your lifetime.",
-          "Tars: I let you win. My self-preservation protocol required sparing your fragile ego.",
+          "TARS: Congrats. Your random button mashing somehow outplayed a quantum processor. Pure luck.",
+          "TARS: Enjoy the win. Statistically speaking, it won't happen again in your lifetime.",
+          "TARS: I let you win. My self-preservation protocol required sparing your fragile ego.",
         ];
 
         const tarsWinQuotes = [
-          "Tars: Predictable. I calculated your move before your brain even signaled your thumb.",
-          "Tars: Did you actually think that move was going to work, or were you just testing my pity parameters?",
-          "Tars: Skill issue. Lower your difficulty setting or ask a human for help.",
+          "TARS: Predictable. I calculated your move before your brain even signaled your thumb.",
+          "TARS: Did you actually think that move was going to work, or were you just testing my pity parameters?",
+          "TARS: Skill issue. Lower your difficulty setting or ask a human for help.",
         ];
 
         if (userChoice === tarsChoice) {
@@ -142,11 +142,11 @@ async function startGame(interaction, client, opponent) {
         } else if (CHOICES[userChoice].beats === tarsChoice) {
           const quote =
             userWinQuotes[Math.floor(Math.random() * userWinQuotes.length)];
-          resultText = `<a:Tada:1544329561955770488> **You won!** Your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}** beats Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}**.\n\n*${quote}*`;
+          resultText = `<a:Tada:1544329561955770488> **You won!** Your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}** beats TARS's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}**.\n\n*${quote}*`;
         } else {
           const quote =
             tarsWinQuotes[Math.floor(Math.random() * tarsWinQuotes.length)];
-          resultText = `<a:Tada:1544329561955770488> **Tars won!** Tars's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}** beats your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.\n\n*${quote}*`;
+          resultText = `<a:Tada:1544329561955770488> **TARS won!** TARS's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}** beats your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.\n\n*${quote}*`;
         }
 
         const resultContainerPayload = {
@@ -255,7 +255,7 @@ async function startGame(interaction, client, opponent) {
     if (opponent.id === interaction.user.id) {
       return interaction.reply({
         content:
-          "You can't challenge yourself! Leave the opponent option blank to play with Tars.",
+          "You can't challenge yourself! Leave the opponent option blank to play with TARS.",
         ephemeral: true,
       });
     }

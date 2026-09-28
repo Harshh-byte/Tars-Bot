@@ -162,7 +162,8 @@ const modulesCatalog = {
       { name: "Ping", cmd: "ping", desc: "Check bot latency." },
       { name: "About", cmd: "about", desc: "View information about the bot." },
       { name: "Remind", cmd: "remind", desc: "Set a smart reminder." },
-      { name: "Ask", cmd: "ask", desc: "Ask Tars anything." },
+      { name: "Ask", cmd: "ask", desc: "Ask TARS anything." },
+      { name: "Purge", cmd: "purge", desc: "Purge messages from the channel." },
       { name: "Help", cmd: "help", desc: "View command list or help." },
     ],
   },
@@ -242,7 +243,7 @@ export async function execute(interaction, client) {
     const bookNotice = `<:Book:1542647324570816532> Use \`${prefix}help (command)\` for details on a specific command`;
 
     const mainEmbed = new EmbedBuilder()
-      .setTitle("Tars Help")
+      .setTitle("TARS Help")
       .setDescription(
         "-# Experience the ultimate Discord bot designed for seamless management and community engagement.",
       )
@@ -290,7 +291,7 @@ export async function execute(interaction, client) {
           },
           {
             label: "Actions",
-            description: "Smoke and vape counters.",
+            description: "Interactive commands & animations.",
             value: "module_actions",
             emoji: "<:Actions:1542647256782737559>",
             default: defaultValue === "module_actions",
@@ -391,7 +392,7 @@ export async function execute(interaction, client) {
 
       if (selectedModule === "module_home") {
         titleText =
-          `## Tars Help\n` +
+          `## TARS Help\n` +
           `-# Experience the ultimate Discord bot designed for seamless management and community engagement.`;
         bodyText =
           `<:Prefix:1542236764465274910> **Prefix** \`${prefix}\`\n` +

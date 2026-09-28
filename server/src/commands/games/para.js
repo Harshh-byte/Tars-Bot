@@ -12,8 +12,6 @@ const FALLBACK_PARANOIA = [
   "Who is the biggest closet nerd in this channel?",
 ];
 
-export const aliases = ["paranoia", "para"];
-
 export const data = {
   name: "para",
   description: "Play Paranoia.",
@@ -21,7 +19,7 @@ export const data = {
   options: [
     {
       name: "rating",
-      description: "Filter rating",
+      description: "Filter rating.",
       type: 3,
       required: false,
       choices: [
@@ -121,7 +119,7 @@ async function sendParaMessage(
             type: 10,
             content:
               `${question}` +
-              (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "") +
+              (aiCommentary ? `\n\n*TARS: ${aiCommentary}*` : "") +
               `\n\n-# Rating: ${rating} • Requestor: ${requestorName}`,
           },
           {

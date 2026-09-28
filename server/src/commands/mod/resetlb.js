@@ -79,7 +79,11 @@ export async function execute(interaction) {
       category = "flag";
     } else if (rawInput.includes("poke") || rawInput.includes("pokemon")) {
       category = "pokemon";
-    } else if (rawInput.includes("scramble") || rawInput.includes("word") || rawInput.includes("ws")) {
+    } else if (
+      rawInput.includes("scramble") ||
+      rawInput.includes("word") ||
+      rawInput.includes("ws")
+    ) {
       category = "scramble";
     } else if (rawInput.includes("all")) {
       category = "all";
@@ -173,7 +177,7 @@ export async function execute(interaction) {
         const sEmbed = new EmbedBuilder()
           .setColor(EMBED_COLORS.SUCCESS)
           .setDescription(
-            `<:Success:1526228339910643793> Reset **${catTitle}** leaderboard!`,
+            `<:Success:1526228339910643793> Successfully reset the **${catTitle}** leaderboard!`,
           );
 
         await btnInteraction.update({

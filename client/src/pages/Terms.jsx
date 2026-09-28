@@ -13,7 +13,7 @@ export default function Terms() {
     <div className="min-h-screen bg-ds-bg text-ds-text font-mono flex flex-col">
       <SEO
         title="Terms of Service"
-        description="Rules, guidelines, and permitted usage policies for Tars Bot."
+        description="Rules, guidelines, and permitted usage policies for TARS Bot."
       />
       <header className="border-b-3 border-ds-border py-4 px-6 bg-ds-card/85 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -25,11 +25,11 @@ export default function Terms() {
             >
               <img
                 src="/Icon.png"
-                alt="Tars Logo"
+                alt="TARS Logo"
                 className="w-8 h-8 rounded-none bg-black border border-ds-text p-0.5"
               />
               <span className="font-display font-extrabold tracking-wider text-ds-text text-lg">
-                Tars<span className="text-ds-blurple">.</span>
+                TARS<span className="text-ds-blurple">.</span>
               </span>
             </Link>
             <div className="h-5 w-0.5 bg-ds-border/40" />
@@ -61,7 +61,7 @@ export default function Terms() {
               <span className="text-ds-blurple">01.</span> Acceptance of Terms
             </h2>
             <p className="text-ds-muted">
-              By inviting Tars to your Discord server or using its commands, you
+              By inviting TARS to your Discord server or using its commands, you
               agree to comply with this network license and all applicable
               boundaries set by the Discord Terms of Service. If you do not
               accept these policies, do not invite or execute the bot.
@@ -73,7 +73,7 @@ export default function Terms() {
               <span className="text-ds-blurple">02.</span> Permitted Usage
             </h2>
             <p className="text-ds-muted mb-4">
-              Tars is designed for interactive entertainment.
+              TARS is designed for interactive entertainment.
               Users must not:
             </p>
             <ul className="list-none pl-4 space-y-2 text-sm">
@@ -111,10 +111,10 @@ export default function Terms() {
               <span className="text-ds-blurple">03.</span> Liability Boundaries
             </h2>
             <p className="text-ds-muted">
-              Tars' responses are dynamically generated and designed with a high
+              TARS' responses are dynamically generated and designed with a high
               level of sarcasm. The bot operators accept absolutely zero
               liability for any output, sarcastic content, or
-              misunderstandings caused by Tars' sarcasm index.
+              misunderstandings caused by TARS' sarcasm index.
               Use under server moderation oversight.
             </p>
           </section>

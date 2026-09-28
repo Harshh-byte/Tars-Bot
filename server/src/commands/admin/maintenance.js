@@ -1,5 +1,5 @@
 import { MessageFlags, PermissionFlagsBits } from "discord.js";
-import { errorEmbed } from "../../utils/embeds.js";
+import { accessDeniedEmbed } from "../../utils/embeds.js";
 import fs from "fs";
 
 export const data = {
@@ -24,12 +24,7 @@ export const data = {
 export async function execute(interaction, client) {
   if (interaction.user.id !== process.env.OWNER_ID) {
     return interaction.reply({
-      embeds: [
-        errorEmbed({
-          title: "Access Denied",
-          description: "Only the bot owner can use this command.",
-        }),
-      ],
+      embeds: [accessDeniedEmbed()],
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -89,7 +84,7 @@ export async function execute(interaction, client) {
 
       return interaction.reply({
         content:
-          "<a:Maintenance:1526290002974343308> **Tars is now under maintenance mode.**",
+          "<a:Maintenance:1526290002974343308> **TARS is now under maintenance mode.**",
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {
@@ -144,7 +139,7 @@ export async function execute(interaction, client) {
               {
                 type: 10,
                 content:
-                  "Tars update completed successfully. All features, commands, and systems are now fully operational!\n\n-# Status: Online",
+                  "TARS update completed successfully. All features, commands, and systems are now fully operational!\n\n-# Status: Online",
               },
             ],
           },
@@ -171,7 +166,7 @@ export async function execute(interaction, client) {
 
       return interaction.reply({
         content:
-          "<a:Complete:1526291398863880293> **Tars maintenance mode completed!**",
+          "<a:Complete:1526291398863880293> **TARS maintenance mode completed!**",
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {

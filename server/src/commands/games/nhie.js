@@ -12,8 +12,6 @@ const FALLBACK_NHIE = [
   "Never have I ever gotten lost in my own hometown.",
 ];
 
-export const aliases = ["nhie"];
-
 export const data = {
   name: "nhie",
   description: "Play Never Have I Ever.",
@@ -21,7 +19,7 @@ export const data = {
   options: [
     {
       name: "rating",
-      description: "Filter rating",
+      description: "Filter rating.",
       type: 3,
       required: false,
       choices: [
@@ -119,7 +117,7 @@ async function sendNhieMessage(
             type: 10,
             content:
               `${question}` +
-              (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "") +
+              (aiCommentary ? `\n\n*TARS: ${aiCommentary}*` : "") +
               `\n\n-# Rating: ${rating} • Requestor: ${requestorName}`,
           },
           {

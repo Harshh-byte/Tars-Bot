@@ -39,11 +39,11 @@ export default function Navbar() {
           <a href="#home" className="flex items-center gap-3 group">
             <img
               src="/Icon.png"
-              alt="Tars Logo"
+              alt="TARS Logo"
               className="w-10 h-10 rounded-none bg-black border border-ds-text p-0.5"
             />
             <span className="font-display font-extrabold text-xl tracking-wider text-ds-text">
-              Tars<span className="text-ds-blurple">.</span>
+              TARS<span className="text-ds-blurple">.</span>
             </span>
           </a>
 

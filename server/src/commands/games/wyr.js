@@ -12,8 +12,6 @@ const FALLBACK_WYR = [
   "Would you rather always have bad Wi-Fi or always have 1% phone battery?",
 ];
 
-export const aliases = ["wyr"];
-
 export const data = {
   name: "wyr",
   description: "Play Would You Rather.",
@@ -21,7 +19,7 @@ export const data = {
   options: [
     {
       name: "rating",
-      description: "Filter rating",
+      description: "Filter rating.",
       type: 3,
       required: false,
       choices: [
@@ -119,7 +117,7 @@ async function sendWyrMessage(
             type: 10,
             content:
               `${question}` +
-              (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "") +
+              (aiCommentary ? `\n\n*TARS: ${aiCommentary}*` : "") +
               `\n\n-# Rating: ${rating} • Requestor: ${requestorName}`,
           },
           {

@@ -49,7 +49,7 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       .setDescription(
         `${userMention} flipped a coin...\n\n` +
           `🪙 Result: **${result}**\n\n` +
-          `*Tars: ${aiCommentary}*`,
+          `*TARS: ${aiCommentary}*`,
       )
       .setColor(Math.floor(Math.random() * 16777215));
 

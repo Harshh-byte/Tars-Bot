@@ -5,7 +5,7 @@ export const aliases = ["ask"];
 
 export const data = {
   name: "ask",
-  description: "Ask Tars anything.",
+  description: "Ask TARS anything.",
   dm_permission: false,
   options: [
     {

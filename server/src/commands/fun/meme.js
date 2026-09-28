@@ -9,7 +9,7 @@ export const data = {
   options: [
     {
       name: "type",
-      description: "Meme type",
+      description: "Meme type.",
       type: 3,
       required: false,
       choices: [

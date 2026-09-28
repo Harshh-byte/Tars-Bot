@@ -56,7 +56,7 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       .setDescription(
         `${userMention} rolled a dice...\n\n` +
           `🎲 Result: **${emoji} ${roll}**\n\n` +
-          `*Tars: ${aiCommentary}*`,
+          `*TARS: ${aiCommentary}*`,
       )
       .setColor(Math.floor(Math.random() * 16777215));
 

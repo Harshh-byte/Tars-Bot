@@ -64,7 +64,7 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
         .setColor(0xffa502)
         .setTitle("<:Updates:1526472917964030053> **System Maintenance**")
         .setDescription(
-          "Tars is currently undergoing scheduled maintenance and will be back online shortly.",
+          "TARS is currently undergoing scheduled maintenance and will be back online shortly.",
         )
         .setFooter({
           text: getFormattedMaintenanceTime(client.maintenanceStartTime),
@@ -205,7 +205,7 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
           message.guild?.id && message.guild.id === EXEMPT_GUILD_ID;
         if (!isExemptGuild && shouldSendSlashNotice(message.author.id, 15, 600000)) {
           setTimeout(async () => {
-            const noticeEmbed = createSlashNoticeEmbed(client.user?.username || "Tars");
+            const noticeEmbed = createSlashNoticeEmbed(client.user?.username || "TARS");
             await message.channel.send({ embeds: [noticeEmbed] }).catch(() => null);
           }, 1000);
         }

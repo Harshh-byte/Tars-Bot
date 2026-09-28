@@ -79,7 +79,7 @@ export default function Parameters() {
             Bot <span className="text-gradient">Parameters</span>
           </h2>
           <p className="text-ds-muted text-base md:text-lg leading-relaxed max-w-xl font-medium">
-            The core behavioral levels tuned into Tars' personality.
+            The core behavioral levels tuned into TARS' personality.
           </p>
         </div>
 

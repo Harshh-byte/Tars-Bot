@@ -14,7 +14,7 @@ const FALLBACK_TRUTHS = [
 
 const FALLBACK_DARES = [
   "Send the 5th image in your gallery into this chat with zero context.",
-  "Change your server nickname to 'Tars's Loyal Servant' for 24 hours.",
+  "Change your server nickname to 'TARS's Loyal Servant' for 24 hours.",
   "Voice call the last person you texted and sing them Happy Birthday.",
   "Send a message to your crush or ex saying 'I miss you' and show proof.",
   "Type your next 5 messages in this server using only your nose.",
@@ -22,7 +22,7 @@ const FALLBACK_DARES = [
   "Let the channel pick your profile picture for the next 12 hours.",
 ];
 
-export const aliases = ["truth", "dare", "tod"];
+export const aliases = ["truth", "dare", "random"];
 
 export const data = {
   name: "tod",
@@ -31,7 +31,7 @@ export const data = {
   options: [
     {
       name: "type",
-      description: "Choose Truth, Dare, or Random",
+      description: "Choose Truth, Dare, or Random.",
       type: 3,
       required: false,
       choices: [
@@ -135,7 +135,7 @@ function buildV2Payload(
             type: 10,
             content:
               `${question}` +
-              (aiCommentary ? `\n\n*Tars: ${aiCommentary}*` : "") +
+              (aiCommentary ? `\n\n*TARS: ${aiCommentary}*` : "") +
               `\n\n-# Rating: ${rating} • Requestor: ${requestorName}`,
           },
           {

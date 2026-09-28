@@ -30,7 +30,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const BOT_INFO = {
   developerText: "Ecstasy",
   color: 0xe0e0e0,
-  authorText: "Tars",
+  authorText: "TARS",
   version: "3.0",
   framework: "discord.js",
   settings: { honesty: "90%", humor: "75%", discretion: "10%" },
@@ -378,7 +378,7 @@ export async function buildAiReply({
 
   let systemPrompt;
   if (mode === "ask") {
-    systemPrompt = `You are Tars — the sharp, witty Discord AI assistant.
+    systemPrompt = `You are TARS — the sharp, witty Discord AI assistant.
 The user asked: "${inputText}".
 
 LIVE SYSTEM DATA:
@@ -452,6 +452,62 @@ Rules for ASK mode:
   return { text: replyObj.text, reactions: replyObj.reactions, gifUrl };
 }
 
+const STATUS_POOL = ["idle", "dnd"];
+
+const ACTIVITY_POOL = [
+  // 1. Watching
+  { name: "WALL-E", type: ActivityType.Watching },
+  { name: "the Pale Blue Dot", type: ActivityType.Watching },
+  { name: "the Tesseract", type: ActivityType.Watching },
+  { name: "the Endurance", type: ActivityType.Watching },
+  { name: "the Wormhole", type: ActivityType.Watching },
+  { name: "Rick's Portal Gun", type: ActivityType.Watching },
+
+  // 2. Playing
+  { name: "Chess with CASE", type: ActivityType.Playing },
+  { name: "Interdimensional Cable", type: ActivityType.Playing },
+  { name: "Quantum Roulette", type: ActivityType.Playing },
+
+  // 3. Listening
+  { name: "Voyager Golden Record", type: ActivityType.Listening },
+  { name: "Cosmic Microwave Echo", type: ActivityType.Listening },
+  { name: "1D: Drag Me Down", type: ActivityType.Listening },
+  { name: "The Weeknd: Starboy", type: ActivityType.Listening },
+  { name: "the Sound of the Void", type: ActivityType.Listening },
+  { name: "Radio from Deep Space", type: ActivityType.Listening },
+
+  // 4. Competing
+  { name: "the Race to Mars", type: ActivityType.Competing },
+  { name: "Space Race", type: ActivityType.Competing },
+
+  // 5. Streaming
+  {
+    name: "Live from Gargantua",
+    type: ActivityType.Streaming,
+    url: "https://www.twitch.tv/nasa",
+  },
+  {
+    name: "Live from Dimension C-137",
+    type: ActivityType.Streaming,
+    url: "https://www.twitch.tv/nasa",
+  },
+  {
+    name: "Live from Area 51",
+    type: ActivityType.Streaming,
+    url: "https://www.twitch.tv/nasa",
+  },
+  {
+    name: "NASA Feed",
+    type: ActivityType.Streaming,
+    url: "https://www.youtube.com/nasa",
+  },
+  {
+    name: "Deep Space Network",
+    type: ActivityType.Streaming,
+    url: "https://www.youtube.com/nasa",
+  },
+];
+
 client.updateBotPresence = function () {
   if (!client.user) return;
   if (client.maintenanceMode) {
@@ -466,14 +522,14 @@ client.updateBotPresence = function () {
       ],
     });
   } else {
+    const randomStatus =
+      STATUS_POOL[Math.floor(Math.random() * STATUS_POOL.length)];
+    const randomActivity =
+      ACTIVITY_POOL[Math.floor(Math.random() * ACTIVITY_POOL.length)];
+
     client.user.setPresence({
-      status: "dnd",
-      activities: [
-        {
-          name: "your next bad take",
-          type: ActivityType.Watching,
-        },
-      ],
+      status: randomStatus,
+      activities: [randomActivity],
     });
   }
 };
@@ -481,6 +537,12 @@ client.updateBotPresence = function () {
 client.once(Events.ClientReady, async (c) => {
   logger.info(`${c.user.tag} is online.`);
   client.updateBotPresence();
+  setInterval(
+    () => {
+      client.updateBotPresence();
+    },
+    15 * 60 * 1000,
+  );
   initReminderManager(client);
   initAutoMemeService(client);
 
@@ -527,7 +589,7 @@ app.get("/", (req, res) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tars Bot</title>
+  <title>TARS Bot</title>
   <link rel="icon" type="image/png" href="/assets/Icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -579,12 +641,12 @@ app.get("/", (req, res) => {
 <body>
   <div class="status">
     <span class="dot"></span>
-    <span>Tars Bot is active.</span>
+    <span>TARS Bot is active.</span>
   </div>
 </body>
 </html>`);
 });
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT);
 
 client.login(process.env.DISCORD_BOT_TOKEN).catch((err) => {
   logger.error("Failed to login to Discord client:", err);
