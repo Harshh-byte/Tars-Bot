@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { EMBED_COLORS, errorEmbed } from "../../utils/embeds.js";
+import { EMBED_COLORS} from "../../utils/embeds.js";
 
 export const aliases = ["si", "server", "guildinfo"];
 

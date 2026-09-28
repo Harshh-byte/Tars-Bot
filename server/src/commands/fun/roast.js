@@ -42,8 +42,8 @@ export async function execute(interaction, client, { buildAiReply }) {
     let roastPrompt;
     if (isBotTarget) {
       roastPrompt = reason
-        ? `The user <@${interaction.user.id}> tried to roast Tars with reason "${reason}". Turn the roast back on them with 100% maximum savage brutality, zero mercy, and devastating sarcasm.`
-        : `The user <@${interaction.user.id}> tried to roast Tars. Turn the roast back on them with 100% maximum savage brutality, zero mercy, and devastating sarcasm.`;
+        ? `The user <@${interaction.user.id}> tried to roast TARS with reason "${reason}". Turn the roast back on them with 100% maximum savage brutality, zero mercy, and devastating sarcasm.`
+        : `The user <@${interaction.user.id}> tried to roast TARS. Turn the roast back on them with 100% maximum savage brutality, zero mercy, and devastating sarcasm.`;
     } else if (isSelf) {
       roastPrompt = reason
         ? `Roast me with maximum savage brutality. Topic/Reason: "${reason}". No holding back, no polite filler—hit me with a clever, ruthless burn.`

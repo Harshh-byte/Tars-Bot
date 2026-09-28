@@ -3,7 +3,7 @@ import { EMBED_COLORS } from "../utils/embeds.js";
 
 const userWarningCooldowns = new Map();
 
-export function createSlashNoticeEmbed(botName = "Tars") {
+export function createSlashNoticeEmbed(botName = "TARS") {
   return new EmbedBuilder()
     .setTitle("<:Warning:1526228248458035381> **Important Notice**")
     .setDescription(

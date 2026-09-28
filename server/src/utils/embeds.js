@@ -66,3 +66,12 @@ export function warningEmbed({ title = "Warning", description, author }) {
   if (description) embed.setDescription(description);
   return embed;
 }
+
+export function accessDeniedEmbed(
+  description = "Only the bot owner can execute this command.",
+) {
+  return errorEmbed({
+    title: "Access Denied",
+    description,
+  });
+}

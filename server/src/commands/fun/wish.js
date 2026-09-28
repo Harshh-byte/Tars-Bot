@@ -36,7 +36,7 @@ export async function execute(interaction, client, { buildAiReply }) {
     const targetName = targetUser.displayName || targetUser.username;
     let wishPrompt;
     if (isBotTarget) {
-      wishPrompt = `The user <@${interaction.user.id}> sent Tars a wish for ${event}. Respond as Tars with a smooth, charismatic, stylish, and witty appreciation message thanking <@${interaction.user.id}> while maintaining Tars's cool 100% humor personality.`;
+      wishPrompt = `The user <@${interaction.user.id}> sent TARS a wish for ${event}. Respond as TARS with a smooth, charismatic, stylish, and witty appreciation message thanking <@${interaction.user.id}> while maintaining TARS's cool 100% humor personality.`;
     } else if (isSelf) {
       wishPrompt = `Give me a smooth, charismatic, premium, and deeply memorable wish for ${event}. Make it uplifting, stylish, and personal with zero toxicity or backhanded compliments.`;
     } else {

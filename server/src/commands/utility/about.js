@@ -12,7 +12,7 @@ export const data = {
 
 export async function execute(interaction, client, context = {}) {
   const BOT_INFO = context?.BOT_INFO || {
-    authorText: "Tars",
+    authorText: "TARS",
     version: "4.0",
     framework: "discord.js",
   };
@@ -36,7 +36,7 @@ export async function execute(interaction, client, context = {}) {
     0,
   );
 
-  const inviteUrl = `https://discord.com/oauth2/authorize?client_id=${client.user.id}&permissions=2415938560&integration_type=0&scope=bot+applications.commands`;
+  const inviteUrl = `https://discord.com/oauth2/authorize?client_id=${client.user.id}&permissions=277025778752&integration_type=0&scope=bot+applications.commands`;
 
   const headerSection = {
     type: 9,
@@ -44,9 +44,9 @@ export async function execute(interaction, client, context = {}) {
       {
         type: 10,
         content:
-          `## About Tars\n` +
+          `## About TARS\n` +
           `-# ᴘʟᴇɴᴛʏ ᴏꜰ ʜᴜᴍᴀɴꜱ ᴏᴜᴛ ᴛʜᴇʀᴇ, ʙᴜᴛ ᴅᴏᴡɴ ʜᴇʀᴇ ɪᴛ'ꜱ ᴊᴜꜱᴛ ᴜꜱ.\n\n` +
-          `Hey, I'm **Tars**!\n` +
+          `Hey, I'm **TARS**!\n` +
           `*A sarcasm-packed AI companion ready to chat, entertain, and assist on demand.*`,
       },
     ],
@@ -74,7 +74,7 @@ export async function execute(interaction, client, context = {}) {
       {
         type: 2,
         style: 5,
-        label: "Invite Tars",
+        label: "Invite TARS",
         url: inviteUrl,
       },
       {
@@ -132,7 +132,7 @@ export async function execute(interaction, client, context = {}) {
       },
       description:
         "ᴘʟᴇɴᴛʏ ᴏꜰ ʜᴜᴍᴀɴꜱ ᴏᴜᴛ ᴛʜᴇʀᴇ, ʙᴜᴛ ᴅᴏᴡɴ ʜᴇʀᴇ ɪᴛ'ꜱ ᴊᴜꜱᴛ ᴜꜱ.\n\n" +
-        "Hey, I'm **Tars**!\n" +
+        "Hey, I'm **TARS**!\n" +
         "*A sarcasm-packed Discord companion ready to chat, entertain, and assist on demand.*",
       thumbnail: botAvatar,
       footer: `v${BOT_INFO.version} • Built with discord.js`,
@@ -150,7 +150,7 @@ export async function execute(interaction, client, context = {}) {
 
     const legacyRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setLabel("Invite Tars")
+        .setLabel("Invite TARS")
         .setStyle(ButtonStyle.Link)
         .setURL(inviteUrl),
       new ButtonBuilder()

@@ -21,7 +21,7 @@ export const data = {
   options: [
     {
       name: "user",
-      description: "User to slap",
+      description: "User to slap.",
       type: 6,
       required: true,
     },

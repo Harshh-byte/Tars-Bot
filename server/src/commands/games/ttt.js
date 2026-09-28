@@ -206,7 +206,7 @@ async function startGame(interaction, client, opponent) {
       interaction.user.displayName ||
       interaction.user.username;
     const playerOName = isVsTars
-      ? "Tars"
+      ? "TARS"
       : interaction.guild?.members.cache.get(opponent.id)?.displayName ||
         opponent.displayName ||
         opponent.username;
@@ -233,10 +233,10 @@ async function startGame(interaction, client, opponent) {
       if (winner === "X") {
         winnerText = `<a:Tada:1544329561955770488> **<@${playerX.id}> won the match!**`;
       } else if (winner === "O") {
-        const winnerMention = isVsTars ? "**Tars**" : `<@${playerO.id}>`;
+        const winnerMention = isVsTars ? "**TARS**" : `<@${playerO.id}>`;
         winnerText =
           `<a:Tada:1544329561955770488> **${winnerMention} won the match!**` +
-          (isVsTars ? `\n\n*Tars: Predictable outcome.*` : "");
+          (isVsTars ? `\n\n*TARS: Predictable outcome.*` : "");
       } else if (winner === "TIE") {
         winnerText = `🫱🏻‍🫲🏿 **It's a Tie Game!**`;
       }

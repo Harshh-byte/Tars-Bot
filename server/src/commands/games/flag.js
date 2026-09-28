@@ -1,5 +1,4 @@
 import {
-  EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
@@ -351,7 +350,7 @@ export const data = {
   options: [
     {
       name: "difficulty",
-      description: "Difficulty",
+      description: "Difficulty.",
       type: 3,
       required: false,
       choices: [

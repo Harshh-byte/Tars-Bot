@@ -253,7 +253,7 @@ export async function execute(interaction) {
               .catch(() => null);
           }
 
-          const botNames = ["Tars", "Case"];
+          const botNames = ["TARS", "CASE"];
           let needed = 3 - players.length;
           for (let i = 0; i < needed; i++) {
             players.push({

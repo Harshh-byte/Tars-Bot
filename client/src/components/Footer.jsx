@@ -16,11 +16,11 @@ export default function Footer() {
           >
             <img
               src="/Icon.png"
-              alt="Tars Logo"
+              alt="TARS Logo"
               className="h-10 w-10 border border-ds-text bg-black p-0.5"
             />
             <span className="font-display text-xl font-extrabold tracking-wider text-ds-text">
-              Tars<span className="text-ds-blurple">.</span>
+              TARS<span className="text-ds-blurple">.</span>
             </span>
           </a>
 
@@ -48,7 +48,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-4 pt-8 text-center text-xs text-ds-muted sm:flex-row">
-          <span>&copy; {currentYear} Tars. All logic is brutal.</span>
+          <span>&copy; {currentYear} TARS. All logic is brutal.</span>
 
           <span>
             Built with{" "}

@@ -7,8 +7,6 @@ import {
 } from "../../services/database.js";
 import { EMBED_COLORS } from "../../utils/embeds.js";
 
-export const aliases = ["automeme"];
-
 export const data = {
   name: "automeme",
   description: "Schedule automated Reddit memes in the channel.",
@@ -145,7 +143,7 @@ export async function execute(interaction, client) {
     const confirmEmbed = new EmbedBuilder()
       .setTitle("AutoMeme Enabled!")
       .setDescription(
-        `Tars will now post fresh Reddit memes in ${targetChannel} every **${intervalLabel}**!`,
+        `TARS will now post fresh Reddit memes in ${targetChannel} every **${intervalLabel}**!`,
       )
       .addFields({
         name: "<:Timer:1542147643021725796> Next Meme Scheduled",

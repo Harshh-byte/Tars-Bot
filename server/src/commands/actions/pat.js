@@ -23,7 +23,7 @@ export const data = {
   options: [
     {
       name: "user",
-      description: "User to pat",
+      description: "User to pat.",
       type: 6,
       required: true,
     },

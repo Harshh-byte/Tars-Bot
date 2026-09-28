@@ -15,7 +15,7 @@ export const data = {
   options: [
     {
       name: "category",
-      description: "Select a game category",
+      description: "Select a game category.",
       type: 3,
       required: true,
       choices: [
