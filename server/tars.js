@@ -541,7 +541,7 @@ client.once(Events.ClientReady, async (c) => {
     () => {
       client.updateBotPresence();
     },
-    15 * 60 * 1000,
+    60 * 60 * 1000,
   );
   initReminderManager(client);
   initAutoMemeService(client);
