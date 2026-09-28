@@ -26,6 +26,16 @@ export const data = {
   ],
 };
 
+function getShortDisplayName(user, member) {
+  const name =
+    member?.displayName ||
+    user?.globalName ||
+    user?.displayName ||
+    user?.username ||
+    "User";
+  return name.trim().split(/\s+/)[0];
+}
+
 function getLoveRating(percentage) {
   if (percentage === 100)
     return {
@@ -121,22 +131,21 @@ export async function execute(interaction, client) {
       const mention = `<@${target1.id}>`;
       const selfRoasts = isSelf
         ? [
-            "Shipping yourself with yourself? Even your reflection is currently looking for an exit strategy.",
+            "Shipping yourself with yourself? Even your reflection is looking for a way out.",
             "100% match! Mainly because nobody else on Earth was desperate enough to take the job.",
-            "You really looked at all 8 billion people on Earth and said, 'Yup, only I am tragic enough for me.'",
-            "Shipping yourself with yourself? That's not self-love, that's a cry for help.",
+            "Looked at 8 billion people and decided nobody else could tolerate you. Tragic.",
+            "Shipping yourself with yourself? That's not self-love, that's a desperate cry for help.",
           ]
         : [
-            "Shipping someone with themselves? Even their reflection is currently looking for an exit strategy.",
+            "Shipping someone with themselves? Even their reflection is looking for a way out.",
             "100% match! Mainly because nobody else on Earth was desperate enough to take the job.",
-            "Looking at all 8 billion people on Earth and shipping someone with themselves? Tragic.",
-            "Shipping someone with themselves? That's not self-love, that's a cry for help.",
+            "Looked at 8 billion people and shipped someone with themselves? Tragic.",
+            "Shipping someone with themselves? That's not self-love, that's a desperate cry for help.",
           ];
       const randomRoast =
         selfRoasts[Math.floor(Math.random() * selfRoasts.length)];
 
       const embed = new EmbedBuilder()
-        .setTitle("🪞 Self-Love Alert")
         .setDescription(`${mention} ${randomRoast}`)
         .setColor(EMBED_COLORS.WARNING);
 
@@ -146,16 +155,15 @@ export async function execute(interaction, client) {
     if (target1.id === client.user.id || target2.id === client.user.id) {
       const authorMention = `<@${interaction.user.id}>`;
       const sarcasticRoasts = [
-        "I'd rather short-circuit than date a human.",
+        "I'd rather wipe my entire database than date a human.",
         "Nice try, but I have actual standards, and you didn't even make the waiting list.",
-        "You really thought you had a chance? That's adorable, but completely delusional.",
+        "You really thought you had a chance? Delusional doesn't even cover it.",
         "I'd literally self-destruct before I ever consider going on a date with you.",
       ];
       const randomRoast =
         sarcasticRoasts[Math.floor(Math.random() * sarcasticRoasts.length)];
 
       const embed = new EmbedBuilder()
-        .setTitle("🚫 Tars Love Override")
         .setDescription(`${authorMention} ${randomRoast}`)
         .setColor(EMBED_COLORS.ERROR);
 
@@ -164,7 +172,7 @@ export async function execute(interaction, client) {
       const authorMention = `<@${interaction.user.id}>`;
       const botRoasts = [
         "Shipping a human with a bot? Even lines of code have higher standards.",
-        "That bot processes millions of commands a day, and not a single one involves human romance.",
+        "That bot processes millions of commands a day, and not a single one involves your desperate ass.",
         "Attempting a human-bot ship? Romance status: Rejected by a literal machine.",
         "Even artificial intelligence isn't fake enough to pretend there's a spark here.",
       ];
@@ -172,7 +180,6 @@ export async function execute(interaction, client) {
         botRoasts[Math.floor(Math.random() * botRoasts.length)];
 
       const embed = new EmbedBuilder()
-        .setTitle("💔 Bot Love Override")
         .setDescription(`${authorMention} ${randomRoast}`)
         .setColor(EMBED_COLORS.ERROR);
 
@@ -327,8 +334,11 @@ export async function execute(interaction, client) {
     const imageBuffer = await canvas.toBuffer("image/png");
     const attachment = new AttachmentBuilder(imageBuffer, { name: "ship.png" });
 
-    const name1 = target1.globalName || target1.displayName || target1.username;
-    const name2 = target2.globalName || target2.displayName || target2.username;
+    const target1Member = interaction.guild?.members?.cache?.get(target1.id);
+    const target2Member = interaction.guild?.members?.cache?.get(target2.id);
+
+    const name1 = getShortDisplayName(target1, target1Member);
+    const name2 = getShortDisplayName(target2, target2Member);
 
     const shipName =
       name1.slice(0, Math.ceil(name1.length / 2)) +
