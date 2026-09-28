@@ -3,13 +3,18 @@ import { EmbedBuilder } from "discord.js";
 export const EMBED_COLORS = {
   INFO: 0x5865f2,
   SUCCESS: 0x2ecc71,
-  ERROR: 0xff4757,
+  ERROR: 0xff0055,
   WARNING: 0xffa502,
   GREY: 0x2b2d31,
   WHITE: 0xffffff,
   TIMEOUT: 0x2b2d31,
   DAYBREAK: 0xffb703,
   IMPOSTOR_WIN: 0xdc2626,
+  PINK: 0xff69b4,
+  RED: 0xff0055,
+  ORANGE: 0xff6600,
+  LIGHT_BLUE: 0x00ccff,
+  DARK_RED: 0x990000,
 };
 
 export function infoEmbed({

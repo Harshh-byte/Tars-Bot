@@ -11,7 +11,7 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 - **🧠 AI & Search Engine:** Powered by `@google/genai` for roasts, wishes, `.ask` AI question search, and conversational responses.
 - **⚙️ Dynamic Prefix Manager:** Per-server prefix configuration (`.prefix`) backed by Firebase Firestore.
 - **📖 Interactive Help System:** Module selection menus, 5-item pagination, and detailed command inspectors (`.help`).
-- **🚬 Server Action Trackers:** Persistent hit counters for `.smoke` and `.vape` commands per server.
+- **🎭 Interactive Social Actions:** Persistent stats and reaction GIFs for `.hug`, `.kiss`, `.slap`, `.pat`, `.punch`, `.smoke`, and `.vape`.
 - **🛠️ System Maintenance Mode:** Owner-controlled maintenance mode (`/maintenance`) with custom presence updates.
 - **🎮 Interactive Party Games:** Impostor (`.impostor`), Truth or Dare (`.tod`), Would You Rather (`.wyr`), Never Have I Ever (`.nhie`), RPS (`.rps`), and Tic-Tac-Toe (`.ttt`).
 - **📊 Fun Calculators:** IQ, PP size, Gay/Lesbian ratings, Bitches count, and Autism ratings.
@@ -21,13 +21,13 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 
 ## ⚡ Quick Command Reference
 
-| Category    | Commands                                                                                                                                     | Description                                                                   |
-| :---------- | :------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
-| **Utility** | `.help`, `.prefix`, `.ping`, `.about`, `.ask`                                                                                                | Interactive menus, prefix control, diagnostics, bot info & AI question search |
-| **Actions** | `.smoke`, `.vape`                                                                                                                            | Per-server hit counters with animated emojis                                  |
+| Category    | Commands                                                                                                                                                          | Description                                                                   |
+| :---------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
+| **Utility** | `.help`, `.prefix`, `.ping`, `.about`, `.ask`                                                                                                                     | Interactive menus, prefix control, diagnostics, bot info & AI question search |
+| **Actions** | `.hug`, `.kiss`, `.slap`, `.pat`, `.punch`, `.smoke`, `.vape`                                                                                 | Interactive reactions with stats                                              |
 | **Games**   | `.impostor`, `.imp`, `.guess`, `.leaderboard`, `.flag`, `.pokemon`, `.scramble`, `.ws`, `.flb`, `.plb`, `.tod`, `.wyr`, `.nhie`, `.rps`, `.ttt`, `.flip`, `.roll` | Interactive guessing mini-games, party games & decision tools                 |
-| **Fun**     | `.ship`, `.iq`, `.pp`, `.gay`, `.lesbian`, `.bitches`, `.autism`, `.roast`, `.wish`, `.meme`, `.automeme`                                    | Calculators, AI roasts, wishes, Reddit memes & AutoMeme scheduler             |
-| **Admin**   | `/maintenance`, `/resetlb`                                                                                                                   | Toggle bot maintenance mode & reset game leaderboards                         |
+| **Fun**     | `.ship`, `.iq`, `.pp`, `.gay`, `.lesbian`, `.bitches`, `.autism`, `.roast`, `.wish`, `.meme`, `.automeme`                                                         | Calculators, AI roasts, wishes, Reddit memes & AutoMeme scheduler             |
+| **Admin**   | `/maintenance`, `/resetlb`                                                                                                                                        | Toggle bot maintenance mode & reset game leaderboards                         |
 
 ---
 
@@ -57,6 +57,9 @@ Create `server/.env`:
 ```env
 DISCORD_BOT_TOKEN=your_bot_token
 GEMINI_API_KEY=your_gemini_key
+GIPHY_API_KEY=your_giphy_key
+KLIPY_API_KEY=your_klipy_key
+SENTRY_DSN=your_sentry_dsn
 EXEMPT_GUILD_ID=your_guild_id
 PORT=3000
 ```

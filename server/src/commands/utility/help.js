@@ -127,10 +127,15 @@ const modulesCatalog = {
   },
   module_actions: {
     title: "<:Actions:1542647256782737559> Actions Module",
-    description: "Smoke and vape counters.",
+    description: "Interactive social actions.",
     commands: [
       { name: "Smoke", cmd: "smoke", desc: "Take a hit of smoke." },
       { name: "Vape", cmd: "vape", desc: "Hit the vape." },
+      { name: "Hug", cmd: "hug", desc: "Hug someone." },
+      { name: "Kiss", cmd: "kiss", desc: "Kiss someone." },
+      { name: "Slap", cmd: "slap", desc: "Slap someone." },
+      { name: "Pat", cmd: "pat", desc: "Pat someone." },
+      { name: "Punch", cmd: "punch", desc: "Punch someone." },
     ],
   },
   module_utility: {
