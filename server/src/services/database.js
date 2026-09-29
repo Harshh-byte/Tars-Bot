@@ -20,14 +20,12 @@ db.settings({
 });
 
 const serversRef = db.collection("servers");
-const usersRef = db.collection("users");
 const MAX_MESSAGES = 10;
 const DELETE_BATCH_SIZE = 500;
 const DATA_RETENTION_MS = 1000 * 60 * 60 * 24 * 30 * 2;
 const serverDoc = (serverId) => serversRef.doc(serverId);
 const memberDoc = (serverId, userId) =>
   serverDoc(serverId).collection("members").doc(userId);
-const userDoc = (userId) => usersRef.doc(userId);
 
 function validateIds(serverId, userId) {
   if (!serverId) throw new Error("serverId is required.");
@@ -95,34 +93,6 @@ export async function incrementUserStat(serverId, userId, statKey) {
     const key = `${serverId}_${userId}_${cleanKey}`;
     const current = (global.memoryStatsCache.get(key) || 0) + 1;
     global.memoryStatsCache.set(key, current);
-    return current;
-  }
-}
-
-export async function incrementGlobalUserStat(userId, statKey) {
-  if (!userId) throw new Error("userId is required.");
-  const ref = userDoc(userId);
-  const cleanKey = statKey.replace(/^stats\./, "");
-  try {
-    await ref.set(
-      {
-        userId,
-        stats: {
-          [cleanKey]: FieldValue.increment(1),
-        },
-        updatedAt: FieldValue.serverTimestamp(),
-      },
-      { merge: true },
-    );
-    const snapshot = await ref.get();
-    const data = snapshot.data();
-    return data?.stats?.[cleanKey] ?? 1;
-  } catch (err) {
-    if (!global.memoryGlobalStatsCache)
-      global.memoryGlobalStatsCache = new Map();
-    const key = `${userId}_${cleanKey}`;
-    const current = (global.memoryGlobalStatsCache.get(key) || 0) + 1;
-    global.memoryGlobalStatsCache.set(key, current);
     return current;
   }
 }

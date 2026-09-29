@@ -8,10 +8,7 @@ import {
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import {
-  incrementUserStat,
-  incrementGlobalUserStat,
-} from "../../services/database.js";
+import { incrementUserStat } from "../../services/database.js";
 import { fetchAnimeGif } from "../../utils/gif.js";
 
 export const aliases = ["headpat"];
@@ -120,12 +117,9 @@ export async function execute(interaction, client) {
       return interaction.reply({ embeds: [botEmbed] });
     }
 
-    let count;
+    let count = 0;
     if (serverId !== "DM") {
       count = await incrementUserStat(serverId, sender.id, "patCount");
-      incrementGlobalUserStat(sender.id, "patCount").catch(() => null);
-    } else {
-      count = await incrementGlobalUserStat(serverId, sender.id, "patCount");
     }
 
     const senderShortName = getShortDisplayName(sender, senderMember);
@@ -139,7 +133,9 @@ export async function execute(interaction, client) {
         `**${senderShortName}** patted **${targetShortName}** on the ${location}!`,
       )
       .setColor(EMBED_COLORS.LIGHT_BLUE)
-      .setFooter({ text: `Total Pats given by ${senderShortName}: ${count}` });
+      .setFooter({
+        text: `-# Total Pats given by ${senderShortName}: ${count}`,
+      });
 
     if (gifUrl) {
       embed.setImage(gifUrl);
@@ -182,12 +178,9 @@ export async function execute(interaction, client) {
       const patterMember = i.member;
       const patterId = patterUser.id;
 
-      let newCount;
+      let newCount = 0;
       if (serverId !== "DM") {
         newCount = await incrementUserStat(serverId, patterId, "patCount");
-        incrementGlobalUserStat(patterId, "patCount").catch(() => null);
-      } else {
-        newCount = await incrementGlobalUserStat(patterId, "patCount");
       }
 
       const patterShortName = getShortDisplayName(patterUser, patterMember);
@@ -200,7 +193,7 @@ export async function execute(interaction, client) {
         )
         .setColor(EMBED_COLORS.LIGHT_BLUE)
         .setFooter({
-          text: `Total Pats given by ${patterShortName}: ${newCount}`,
+          text: `-# Total Pats given by ${patterShortName}: ${newCount}`,
         });
 
       if (newGif) {

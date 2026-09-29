@@ -8,10 +8,7 @@ import {
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import {
-  incrementUserStat,
-  incrementGlobalUserStat,
-} from "../../services/database.js";
+import { incrementUserStat } from "../../services/database.js";
 import { fetchAnimeGif } from "../../utils/gif.js";
 
 export const data = {
@@ -118,12 +115,9 @@ export async function execute(interaction, client) {
       return interaction.reply({ embeds: [botEmbed] });
     }
 
-    let count;
+    let count = 0;
     if (serverId !== "DM") {
       count = await incrementUserStat(serverId, sender.id, "punchCount");
-      incrementGlobalUserStat(sender.id, "punchCount").catch(() => null);
-    } else {
-      count = await incrementGlobalUserStat(sender.id, "punchCount");
     }
 
     const senderShortName = getShortDisplayName(sender, senderMember);
@@ -138,7 +132,7 @@ export async function execute(interaction, client) {
       )
       .setColor(EMBED_COLORS.DARK_RED)
       .setFooter({
-        text: `Total Punches given by ${senderShortName}: ${count}`,
+        text: `-# Total Punches given by ${senderShortName}: ${count}`,
       });
 
     if (gifUrl) {
@@ -182,12 +176,9 @@ export async function execute(interaction, client) {
       const puncherMember = i.member;
       const puncherId = puncherUser.id;
 
-      let newCount;
+      let newCount = 0;
       if (serverId !== "DM") {
         newCount = await incrementUserStat(serverId, puncherId, "punchCount");
-        incrementGlobalUserStat(puncherId, "punchCount").catch(() => null);
-      } else {
-        newCount = await incrementGlobalUserStat(puncherId, "punchCount");
       }
 
       const puncherShortName = getShortDisplayName(puncherUser, puncherMember);
@@ -200,7 +191,7 @@ export async function execute(interaction, client) {
         )
         .setColor(EMBED_COLORS.DARK_RED)
         .setFooter({
-          text: `Total Punches given by ${puncherShortName}: ${newCount}`,
+          text: `-# Total Punches given by ${puncherShortName}: ${newCount}`,
         });
 
       if (newGif) {

@@ -2,10 +2,7 @@ import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import {
-  incrementUserStat,
-  incrementGlobalUserStat,
-} from "../../services/database.js";
+import { incrementUserStat } from "../../services/database.js";
 
 export const aliases = ["cigar"];
 
@@ -28,12 +25,9 @@ export async function execute(interaction, client) {
     const userId = interaction.user.id;
     const serverId = interaction.guild.id;
 
-    let count;
+    let count = 0;
     if (serverId !== "DM") {
       count = await incrementUserStat(serverId, userId, "smokeCount");
-      incrementGlobalUserStat(userId, "smokeCount").catch(() => null);
-    } else {
-      count = await incrementGlobalUserStat(userId, "smokeCount");
     }
 
     const getDisplayName = (targetInteraction) =>
@@ -108,12 +102,9 @@ export async function execute(interaction, client) {
 
       await i.deferUpdate();
 
-      let newCount;
+      let newCount = 0;
       if (serverId !== "DM") {
         newCount = await incrementUserStat(serverId, userId, "smokeCount");
-        incrementGlobalUserStat(userId, "smokeCount").catch(() => null);
-      } else {
-        newCount = await incrementGlobalUserStat(userId, "smokeCount");
       }
 
       await sendAndFetchReply(i, buildPayload(newCount, getDisplayName(i)));

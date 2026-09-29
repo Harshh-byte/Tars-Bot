@@ -8,10 +8,7 @@ import {
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import {
-  incrementUserStat,
-  incrementGlobalUserStat,
-} from "../../services/database.js";
+import { incrementUserStat } from "../../services/database.js";
 import { fetchAnimeGif } from "../../utils/gif.js";
 
 export const data = {
@@ -118,12 +115,9 @@ export async function execute(interaction, client) {
       return interaction.reply({ embeds: [botEmbed] });
     }
 
-    let count;
+    let count = 0;
     if (serverId !== "DM") {
       count = await incrementUserStat(serverId, sender.id, "slapCount");
-      incrementGlobalUserStat(sender.id, "slapCount").catch(() => null);
-    } else {
-      count = await incrementGlobalUserStat(serverId, sender.id, "slapCount");
     }
 
     const senderShortName = getShortDisplayName(sender, senderMember);
@@ -137,7 +131,9 @@ export async function execute(interaction, client) {
         `**${senderShortName}** slapped **${targetShortName}** across the ${location}!`,
       )
       .setColor(EMBED_COLORS.ORANGE)
-      .setFooter({ text: `Total Slaps given by ${senderShortName}: ${count}` });
+      .setFooter({
+        text: `-# Total Slaps given by ${senderShortName}: ${count}`,
+      });
 
     if (gifUrl) {
       embed.setImage(gifUrl);
@@ -180,12 +176,9 @@ export async function execute(interaction, client) {
       const slapperMember = i.member;
       const slapperId = slapperUser.id;
 
-      let newCount;
+      let newCount = 0;
       if (serverId !== "DM") {
         newCount = await incrementUserStat(serverId, slapperId, "slapCount");
-        incrementGlobalUserStat(slapperId, "slapCount").catch(() => null);
-      } else {
-        newCount = await incrementGlobalUserStat(slapperId, "slapCount");
       }
 
       const slapperShortName = getShortDisplayName(slapperUser, slapperMember);
@@ -198,7 +191,7 @@ export async function execute(interaction, client) {
         )
         .setColor(EMBED_COLORS.ORANGE)
         .setFooter({
-          text: `Total Slaps given by ${slapperShortName}: ${newCount}`,
+          text: `-# Total Slaps given by ${slapperShortName}: ${newCount}`,
         });
 
       if (newGif) {

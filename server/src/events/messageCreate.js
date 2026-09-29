@@ -50,7 +50,7 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
       isReplyToBot = original?.author?.id === client.user.id;
       referencedAuthor = original?.author || null;
 
-      if (isReplyToBot && original.embeds && original.embeds.length > 0) {
+      if (isReplyToBot && original?.embeds && original.embeds.length > 0) {
         const footerText = original.embeds[0].footer?.text || "";
         if (footerText.startsWith("AutoMeme")) {
           isReplyToAutoMeme = true;

@@ -8,10 +8,7 @@ import {
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import {
-  incrementUserStat,
-  incrementGlobalUserStat,
-} from "../../services/database.js";
+import { incrementUserStat } from "../../services/database.js";
 import { fetchAnimeGif } from "../../utils/gif.js";
 
 export const aliases = ["smooch"];
@@ -126,12 +123,9 @@ export async function execute(interaction, client) {
       return interaction.reply({ embeds: [botEmbed] });
     }
 
-    let count;
+    let count = 0;
     if (serverId !== "DM") {
       count = await incrementUserStat(serverId, sender.id, "kissCount");
-      incrementGlobalUserStat(sender.id, "kissCount").catch(() => null);
-    } else {
-      count = await incrementGlobalUserStat(sender.id, "kissCount");
     }
 
     const senderShortName = getShortDisplayName(sender, senderMember);
@@ -146,7 +140,7 @@ export async function execute(interaction, client) {
       )
       .setColor(EMBED_COLORS.RED)
       .setFooter({
-        text: `Total Kisses given by ${senderShortName}: ${count}`,
+        text: `-# Total Kisses given by ${senderShortName}: ${count}`,
       });
 
     if (gifUrl) {
@@ -190,12 +184,9 @@ export async function execute(interaction, client) {
       const kisserMember = i.member;
       const kisserId = kisserUser.id;
 
-      let newCount;
+      let newCount = 0;
       if (serverId !== "DM") {
         newCount = await incrementUserStat(serverId, kisserId, "kissCount");
-        incrementGlobalUserStat(kisserId, "kissCount").catch(() => null);
-      } else {
-        newCount = await incrementGlobalUserStat(kisserId, "kissCount");
       }
 
       const kisserShortName = getShortDisplayName(kisserUser, kisserMember);
@@ -208,7 +199,7 @@ export async function execute(interaction, client) {
         )
         .setColor(EMBED_COLORS.RED)
         .setFooter({
-          text: `Total Kisses given by ${kisserShortName}: ${newCount}`,
+          text: `-# Total Kisses given by ${kisserShortName}: ${newCount}`,
         });
 
       if (newGif) {
