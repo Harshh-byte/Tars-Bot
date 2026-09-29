@@ -118,11 +118,6 @@ const modulesCatalog = {
         cmd: "meme",
         desc: "Display a trending meme from Reddit!",
       },
-      {
-        name: "AutoMeme",
-        cmd: "automeme",
-        desc: "Automated scheduled memes.",
-      },
     ],
   },
   module_actions: {
@@ -164,6 +159,11 @@ const modulesCatalog = {
       { name: "Remind", cmd: "remind", desc: "Set a smart reminder." },
       { name: "Ask", cmd: "ask", desc: "Ask TARS anything." },
       { name: "Purge", cmd: "purge", desc: "Purge messages from the channel." },
+      {
+        name: "AutoMeme",
+        cmd: "automeme",
+        desc: "Automated scheduled memes.",
+      },
       { name: "Help", cmd: "help", desc: "View command list or help." },
     ],
   },

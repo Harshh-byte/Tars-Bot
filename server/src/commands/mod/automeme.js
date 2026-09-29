@@ -1,4 +1,9 @@
-import { EmbedBuilder, PermissionFlagsBits, ChannelType } from "discord.js";
+import {
+  EmbedBuilder,
+  PermissionFlagsBits,
+  ChannelType,
+  MessageFlags,
+} from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import {
@@ -9,7 +14,7 @@ import { EMBED_COLORS } from "../../utils/embeds.js";
 
 export const data = {
   name: "automeme",
-  description: "Schedule automated Reddit memes in the channel.",
+  description: "Schedule automated Reddit memes.",
   dm_permission: false,
   options: [
     {
@@ -23,6 +28,13 @@ export const data = {
         { name: "Daily (24 Hours)", value: "daily" },
         { name: "Disable", value: "off" },
       ],
+    },
+    {
+      name: "channel",
+      description: "Specify channel for memes.",
+      type: 7,
+      required: false,
+      channel_types: [ChannelType.GuildText],
     },
   ],
 };
@@ -48,12 +60,18 @@ export async function execute(interaction, client) {
       isOwner || member?.permissions?.has(PermissionFlagsBits.Administrator);
 
     if (!hasPerms) {
-      const permsRes = {
-        content:
-          "You need `Manage Channels` or `Administrator` permission to configure AutoMeme!",
-        ephemeral: true,
-      };
-      return interaction.reply ? interaction.reply(permsRes) : null;
+      const deniedEmbed = new EmbedBuilder()
+        .setColor(EMBED_COLORS.ERROR)
+        .setDescription(
+          "You need the `Manage Channels` or `Administrator` permission to configure AutoMeme.",
+        );
+
+      return interaction.reply
+        ? interaction.reply({
+            embeds: [deniedEmbed],
+            flags: MessageFlags.Ephemeral,
+          })
+        : null;
     }
 
     const rawString =
@@ -96,8 +114,7 @@ export async function execute(interaction, client) {
     }
 
     if (!intervalInput) {
-      const usageMsg =
-        "Please specify a frequency! Options: `hourly`, `quarterly`, `daily`, or `off`.\nExample: `.automeme hourly`";
+      const usageMsg = "Please specify an interval!";
       return interaction.reply
         ? interaction.reply({ content: usageMsg })
         : null;
@@ -106,8 +123,10 @@ export async function execute(interaction, client) {
     if (intervalInput === "off") {
       await deleteAutoMemeConfig(guild.id);
       const disableEmbed = new EmbedBuilder()
-        .setTitle("🛑 AutoMeme Disabled")
-        .setDescription("Meme delivery has been turned off for the server.")
+        .setTitle("🛑 **AutoMeme Disabled**")
+        .setDescription(
+          "-# Automated Reddit meme delivery has been turned off for the server.",
+        )
         .setColor(EMBED_COLORS.ERROR);
       return interaction.reply
         ? interaction.reply({ embeds: [disableEmbed] })
@@ -115,15 +134,43 @@ export async function execute(interaction, client) {
     }
 
     const hours = INTERVAL_HOURS_MAP[intervalInput] || 1;
-    const targetChannel = interaction.channel;
+    const targetChannel =
+      interaction.options?.getChannel?.("channel") || interaction.channel;
 
     if (!targetChannel || targetChannel.type !== ChannelType.GuildText) {
       return interaction.reply
         ? interaction.reply({
-            content: "Please select a valid text channel for memes!",
-            ephemeral: true,
+            content: "Please select a text channel!",
+            flags: MessageFlags.Ephemeral,
           })
         : null;
+    }
+
+    const botMember = guild?.members?.me;
+    if (botMember && targetChannel.permissionsFor) {
+      const perms = targetChannel.permissionsFor(botMember);
+      const missing = [];
+      if (!perms.has(PermissionFlagsBits.ViewChannel))
+        missing.push("`View Channel`");
+      if (!perms.has(PermissionFlagsBits.SendMessages))
+        missing.push("`Send Messages`");
+      if (!perms.has(PermissionFlagsBits.EmbedLinks))
+        missing.push("`Embed Links`");
+
+      if (missing.length > 0) {
+        const botDeniedEmbed = new EmbedBuilder()
+          .setColor(EMBED_COLORS.ERROR)
+          .setDescription(
+            `<:Failed:1526228290413658184> I don't have permission to post in ${targetChannel}! Missing permissions: ${missing.join(", ")}.`,
+          );
+
+        return interaction.reply
+          ? interaction.reply({
+              embeds: [botDeniedEmbed],
+              flags: MessageFlags.Ephemeral,
+            })
+          : null;
+      }
     }
 
     const now = Date.now();
@@ -141,9 +188,9 @@ export async function execute(interaction, client) {
     const intervalLabel = INTERVAL_LABELS[intervalInput] || `${hours} hours`;
 
     const confirmEmbed = new EmbedBuilder()
-      .setTitle("AutoMeme Enabled!")
+      .setTitle("**AutoMeme Enabled!**")
       .setDescription(
-        `TARS will now post fresh Reddit memes in ${targetChannel} every **${intervalLabel}**!`,
+        `TARS will now post memes in ${targetChannel} every *${intervalLabel}*.`,
       )
       .addFields({
         name: "<:Timer:1542147643021725796> Next Meme Scheduled",
@@ -159,7 +206,7 @@ export async function execute(interaction, client) {
     Sentry.captureException(err);
     const errRes = {
       content: "An error occurred while configuring AutoMeme.",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     };
     return interaction.reply ? interaction.reply(errRes) : null;
   }
