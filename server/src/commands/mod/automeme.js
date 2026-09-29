@@ -14,7 +14,7 @@ import { EMBED_COLORS } from "../../utils/embeds.js";
 
 export const data = {
   name: "automeme",
-  description: "Schedule automated Reddit memes.",
+  description: "Schedule automated memes.",
   dm_permission: false,
   options: [
     {
@@ -23,9 +23,9 @@ export const data = {
       type: 3,
       required: true,
       choices: [
-        { name: "Hourly (1 Hour)", value: "hourly" },
-        { name: "Quarterly (6 Hours)", value: "quarterly" },
-        { name: "Daily (24 Hours)", value: "daily" },
+        { name: "Hourly", value: "hourly" },
+        { name: "Quarterly", value: "quarterly" },
+        { name: "Daily", value: "daily" },
         { name: "Disable", value: "off" },
       ],
     },
@@ -46,9 +46,9 @@ const INTERVAL_HOURS_MAP = {
 };
 
 const INTERVAL_LABELS = {
-  hourly: "hourly",
-  quarterly: "quarterly (every 6 hours)",
-  daily: "daily (every 24 hours)",
+  hourly: "1 hour",
+  quarterly: "6 hours",
+  daily: "24 hours",
 };
 
 export async function execute(interaction, client) {
@@ -125,7 +125,7 @@ export async function execute(interaction, client) {
       const disableEmbed = new EmbedBuilder()
         .setTitle("🛑 **AutoMeme Disabled**")
         .setDescription(
-          "-# Automated Reddit meme delivery has been turned off for the server.",
+          "-# Automated meme delivery has been turned off for the server.",
         )
         .setColor(EMBED_COLORS.ERROR);
       return interaction.reply
@@ -133,7 +133,7 @@ export async function execute(interaction, client) {
         : null;
     }
 
-    const hours = INTERVAL_HOURS_MAP[intervalInput] || 1;
+    const hours = INTERVAL_HOURS_MAP[intervalInput];
     const targetChannel =
       interaction.options?.getChannel?.("channel") || interaction.channel;
 
@@ -185,12 +185,10 @@ export async function execute(interaction, client) {
       configuredBy: interaction.user.id,
     });
 
-    const intervalLabel = INTERVAL_LABELS[intervalInput] || `${hours} hours`;
-
     const confirmEmbed = new EmbedBuilder()
       .setTitle("**AutoMeme Enabled!**")
       .setDescription(
-        `TARS will now post memes in ${targetChannel} every *${intervalLabel}*.`,
+        `TARS will now post memes in ${targetChannel} every *${INTERVAL_LABELS[intervalInput]}*.`,
       )
       .addFields({
         name: "<:Timer:1542147643021725796> Next Meme Scheduled",
