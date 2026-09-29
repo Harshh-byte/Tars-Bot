@@ -452,10 +452,9 @@ Rules for ASK mode:
   return { text: replyObj.text, reactions: replyObj.reactions, gifUrl };
 }
 
-const STATUS_POOL = ["idle", "dnd"];
+const STATUS_POOL = ["online", "idle", "dnd"];
 
 const ACTIVITY_POOL = [
-  // 1. Watching
   { name: "WALL-E", type: ActivityType.Watching },
   { name: "the Pale Blue Dot", type: ActivityType.Watching },
   { name: "the Tesseract", type: ActivityType.Watching },
@@ -463,12 +462,10 @@ const ACTIVITY_POOL = [
   { name: "the Wormhole", type: ActivityType.Watching },
   { name: "Rick's Portal Gun", type: ActivityType.Watching },
 
-  // 2. Playing
   { name: "Chess with CASE", type: ActivityType.Playing },
   { name: "Interdimensional Cable", type: ActivityType.Playing },
   { name: "Quantum Roulette", type: ActivityType.Playing },
 
-  // 3. Listening
   { name: "Voyager Golden Record", type: ActivityType.Listening },
   { name: "Cosmic Microwave Background", type: ActivityType.Listening },
   { name: "1D: Drag Me Down", type: ActivityType.Listening },
@@ -476,11 +473,9 @@ const ACTIVITY_POOL = [
   { name: "the Sound of the Void", type: ActivityType.Listening },
   { name: "Radio from Deep Space", type: ActivityType.Listening },
 
-  // 4. Competing
   { name: "the Race to Mars", type: ActivityType.Competing },
   { name: "Space Race", type: ActivityType.Competing },
 
-  // 5. Streaming
   {
     name: "Live from Gargantua",
     type: ActivityType.Streaming,
