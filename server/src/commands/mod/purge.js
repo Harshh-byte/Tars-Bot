@@ -108,7 +108,7 @@ export async function execute(interaction, client) {
     const deniedEmbed = new EmbedBuilder()
       .setColor(EMBED_COLORS.ERROR)
       .setDescription(
-        `<:Failed:1526228290413658184> You need the **Manage Messages** permission to use this command.`,
+        "You need the `Manage Messages` permission to use this command.",
       );
 
     return sendResponse(
@@ -119,26 +119,29 @@ export async function execute(interaction, client) {
   }
 
   const botMember = interaction.guild?.members?.me;
-  if (
-    botMember &&
-    !interaction.channel
-      .permissionsFor(botMember)
-      ?.has([
-        PermissionFlagsBits.ManageMessages,
-        PermissionFlagsBits.ReadMessageHistory,
-      ])
-  ) {
-    const botDeniedEmbed = new EmbedBuilder()
-      .setColor(EMBED_COLORS.ERROR)
-      .setDescription(
-        `<:Failed:1526228290413658184> I require **Manage Messages** and **Read Message History** permissions in this channel.`,
-      );
+  if (botMember && interaction.channel.permissionsFor) {
+    const perms = interaction.channel.permissionsFor(botMember);
+    const missing = [];
+    if (!perms.has(PermissionFlagsBits.ViewChannel))
+      missing.push("`View Channel`");
+    if (!perms.has(PermissionFlagsBits.ManageMessages))
+      missing.push("`Manage Messages`");
+    if (!perms.has(PermissionFlagsBits.ReadMessageHistory))
+      missing.push("`Read Message History`");
 
-    return sendResponse(
-      interaction,
-      { embeds: [botDeniedEmbed], flags: MessageFlags.Ephemeral },
-      5000,
-    );
+    if (missing.length > 0) {
+      const botDeniedEmbed = new EmbedBuilder()
+        .setColor(EMBED_COLORS.ERROR)
+        .setDescription(
+          `<:Failed:1526228290413658184> I don't have permission to purge messages in ${interaction.channel}! Missing permissions: ${missing.join(", ")}.`,
+        );
+
+      return sendResponse(
+        interaction,
+        { embeds: [botDeniedEmbed], flags: MessageFlags.Ephemeral },
+        5000,
+      );
+    }
   }
 
   let count = null;
@@ -250,6 +253,11 @@ export async function execute(interaction, client) {
       }
     }
 
+    const fourteenDaysAgo = Date.now() - 14 * 24 * 60 * 60 * 1000;
+    messagesToDelete = messagesToDelete.filter(
+      (m) => m.createdTimestamp > fourteenDaysAgo,
+    );
+
     messagesToDelete = messagesToDelete.slice(0, count);
 
     if (messagesToDelete.length === 0) {
@@ -260,7 +268,7 @@ export async function execute(interaction, client) {
       const emptyEmbed = new EmbedBuilder()
         .setColor(EMBED_COLORS.WARNING)
         .setDescription(
-          `<:Warning:1526228248458035381> No matching messages found to delete.`,
+          `<:Warning:1526228248458035381> No messages found eligible for purge.`,
         );
 
       return sendResponse(
@@ -301,7 +309,7 @@ export async function execute(interaction, client) {
     const errorEmbed = new EmbedBuilder()
       .setColor(EMBED_COLORS.ERROR)
       .setDescription(
-        `<:Failed:1526228290413658184> Failed to purge messages. Messages older than 14 days cannot be deleted.`,
+        `<:Failed:1526228290413658184> Failed to purge messages.`,
       );
 
     return sendResponse(
