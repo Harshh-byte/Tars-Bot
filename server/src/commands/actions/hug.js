@@ -8,10 +8,7 @@ import {
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import {
-  incrementUserStat,
-  incrementGlobalUserStat,
-} from "../../services/database.js";
+import { incrementUserStat } from "../../services/database.js";
 import { fetchAnimeGif } from "../../utils/gif.js";
 
 export const data = {
@@ -118,12 +115,9 @@ export async function execute(interaction, client) {
       return interaction.reply({ embeds: [botEmbed] });
     }
 
-    let count;
+    let count = 0;
     if (serverId !== "DM") {
       count = await incrementUserStat(serverId, sender.id, "hugCount");
-      incrementGlobalUserStat(sender.id, "hugCount").catch(() => null);
-    } else {
-      count = await incrementGlobalUserStat(sender.id, "hugCount");
     }
 
     const senderShortName = getShortDisplayName(sender, senderMember);
@@ -137,7 +131,9 @@ export async function execute(interaction, client) {
         `**${senderShortName}** hugged **${targetShortName}** ${style}!`,
       )
       .setColor(EMBED_COLORS.PINK)
-      .setFooter({ text: `Total Hugs given by ${senderShortName}: ${count}` });
+      .setFooter({
+        text: `-# Total Hugs given by ${senderShortName}: ${count}`,
+      });
 
     if (gifUrl) {
       embed.setImage(gifUrl);
@@ -180,15 +176,12 @@ export async function execute(interaction, client) {
       const huggerMember = i.member;
       const huggerId = huggerUser.id;
 
-      let newCount;
+      let newCount = 0;
       if (serverId !== "DM") {
         newCount = await incrementUserStat(serverId, huggerId, "hugCount");
-        incrementGlobalUserStat(huggerId, "hugCount").catch(() => null);
-      } else {
-        newCount = await incrementGlobalUserStat(huggerId, "hugCount");
       }
 
-      const huggerShortName = getShortDisplayName(huggerUser, huggerMember);
+      const huggerShortName = getShortDisplayName(huggersUser, huggerMember);
       const newStyle = getRandomItem(LOCATIONS);
       const newGif = await fetchAnimeGif("hug");
 
@@ -198,7 +191,7 @@ export async function execute(interaction, client) {
         )
         .setColor(EMBED_COLORS.PINK)
         .setFooter({
-          text: `Total Hugs given by ${huggerShortName}: ${newCount}`,
+          text: `-# Total Hugs given by ${huggerShortName}: ${newCount}`,
         });
 
       if (newGif) {
