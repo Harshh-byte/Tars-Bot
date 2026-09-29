@@ -41,6 +41,7 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
 
   const isMentioned = message.mentions.has(client.user);
   let isReplyToBot = false;
+  let isReplyToAutoMeme = false;
   let referencedAuthor = null;
 
   if (message.reference?.messageId) {
@@ -48,6 +49,13 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
       const original = await message.fetchReference();
       isReplyToBot = original?.author?.id === client.user.id;
       referencedAuthor = original?.author || null;
+
+      if (isReplyToBot && original.embeds && original.embeds.length > 0) {
+        const footerText = original.embeds[0].footer?.text || "";
+        if (footerText.startsWith("AutoMeme")) {
+          isReplyToAutoMeme = true;
+        }
+      }
     } catch {
       isReplyToBot = false;
     }
@@ -203,10 +211,17 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
 
         const isExemptGuild =
           message.guild?.id && message.guild.id === EXEMPT_GUILD_ID;
-        if (!isExemptGuild && shouldSendSlashNotice(message.author.id, 15, 600000)) {
+        if (
+          !isExemptGuild &&
+          shouldSendSlashNotice(message.author.id, 15, 600000)
+        ) {
           setTimeout(async () => {
-            const noticeEmbed = createSlashNoticeEmbed(client.user?.username || "TARS");
-            await message.channel.send({ embeds: [noticeEmbed] }).catch(() => null);
+            const noticeEmbed = createSlashNoticeEmbed(
+              client.user?.username || "TARS",
+            );
+            await message.channel
+              .send({ embeds: [noticeEmbed] })
+              .catch(() => null);
           }, 1000);
         }
       } catch (err) {
@@ -217,7 +232,7 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
     }
   }
 
-  if (!isMentioned && !isReplyToBot) return;
+  if ((!isMentioned && !isReplyToBot) || isReplyToAutoMeme) return;
 
   try {
     const replyData = await buildAiReply({
