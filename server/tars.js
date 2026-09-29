@@ -470,7 +470,7 @@ const ACTIVITY_POOL = [
 
   // 3. Listening
   { name: "Voyager Golden Record", type: ActivityType.Listening },
-  { name: "Cosmic Microwave Echo", type: ActivityType.Listening },
+  { name: "Cosmic Microwave Background", type: ActivityType.Listening },
   { name: "1D: Drag Me Down", type: ActivityType.Listening },
   { name: "The Weeknd: Starboy", type: ActivityType.Listening },
   { name: "the Sound of the Void", type: ActivityType.Listening },
