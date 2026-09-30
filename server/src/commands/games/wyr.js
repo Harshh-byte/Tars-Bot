@@ -97,7 +97,7 @@ async function sendWyrMessage(
     interaction.user.displayName ||
     interaction.user.username;
 
-  const v2WyrPayload = {
+  const wyrPayload = {
     flags: 32768,
     components: [
       {
@@ -141,7 +141,7 @@ async function sendWyrMessage(
     ],
   };
 
-  const response = await sendAndFetchReply(interaction, v2WyrPayload);
+  const response = await sendAndFetchReply(interaction, wyrPayload);
 
   if (
     !response ||

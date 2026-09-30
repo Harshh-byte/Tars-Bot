@@ -25,7 +25,13 @@ export const data = {
   ],
 };
 
-const LOCATIONS = ["tightly", "warmly", "lovingly", "from behind", "gently"];
+const LOCATIONS = [
+  "tightly",
+  "warmly",
+  "from behind",
+  "gently",
+  "around the waist",
+];
 
 function getRandomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -45,8 +51,8 @@ async function sendAndFetchReply(interaction, payload) {
   if (interaction.replied || interaction.deferred) {
     return await interaction.followUp(payload);
   }
-  const res = await interaction.reply({ ...payload, fetchReply: true });
-  return res;
+  const response = await interaction.reply({ ...payload, withResponse: true });
+  return response.resource?.message || response;
 }
 
 export async function execute(interaction, client) {
@@ -128,12 +134,9 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `**${senderShortName}** hugged **${targetShortName}** ${style}!`,
+        `**${senderShortName}** hugged **${targetShortName}** ${style}!\n\n-# Total Hugs: ${count}`,
       )
-      .setColor(EMBED_COLORS.PINK)
-      .setFooter({
-        text: `-# Total Hugs given by ${senderShortName}: ${count}`,
-      });
+      .setColor(EMBED_COLORS.PINK);
 
     if (gifUrl) {
       embed.setImage(gifUrl);
@@ -181,18 +184,21 @@ export async function execute(interaction, client) {
         newCount = await incrementUserStat(serverId, huggerId, "hugCount");
       }
 
-      const huggerShortName = getShortDisplayName(huggersUser, huggerMember);
-      const newStyle = getRandomItem(LOCATIONS);
-      const newGif = await fetchAnimeGif("hug");
+      const huggerShortName = getShortDisplayName(huggerUser, huggerMember);
+      const newStyle = getRandomItem(
+        LOCATIONS.filter((l) => l !== style),
+      ) || getRandomItem(LOCATIONS);
+
+      let newGif = await fetchAnimeGif("hug");
+      if (newGif && newGif === gifUrl) {
+        newGif = (await fetchAnimeGif("hug")) || newGif;
+      }
 
       const replyEmbed = new EmbedBuilder()
         .setDescription(
-          `**${huggerShortName}** hugged **${senderShortName}** back ${newStyle}!`,
+          `**${huggerShortName}** hugged **${senderShortName}** back ${newStyle}!\n\n-# Total Hugs: ${newCount}`,
         )
-        .setColor(EMBED_COLORS.PINK)
-        .setFooter({
-          text: `-# Total Hugs given by ${huggerShortName}: ${newCount}`,
-        });
+        .setColor(EMBED_COLORS.PINK);
 
       if (newGif) {
         replyEmbed.setImage(newGif);

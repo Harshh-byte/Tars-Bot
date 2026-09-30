@@ -27,7 +27,13 @@ export const data = {
   ],
 };
 
-const LOCATIONS = ["head", "hair", "softly on the head"];
+const LOCATIONS = [
+  "head",
+  "hair",
+  "softly on the head",
+  "back",
+  "shoulder",
+];
 
 function getRandomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -47,8 +53,8 @@ async function sendAndFetchReply(interaction, payload) {
   if (interaction.replied || interaction.deferred) {
     return await interaction.followUp(payload);
   }
-  const res = await interaction.reply({ ...payload, fetchReply: true });
-  return res;
+  const response = await interaction.reply({ ...payload, withResponse: true });
+  return response.resource?.message || response;
 }
 
 export async function execute(interaction, client) {
@@ -130,12 +136,9 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `**${senderShortName}** patted **${targetShortName}** on the ${location}!`,
+        `**${senderShortName}** patted **${targetShortName}** on the ${location}!\n\n-# Total Pats: ${count}`,
       )
-      .setColor(EMBED_COLORS.LIGHT_BLUE)
-      .setFooter({
-        text: `-# Total Pats given by ${senderShortName}: ${count}`,
-      });
+      .setColor(EMBED_COLORS.LIGHT_BLUE);
 
     if (gifUrl) {
       embed.setImage(gifUrl);
@@ -184,17 +187,20 @@ export async function execute(interaction, client) {
       }
 
       const patterShortName = getShortDisplayName(patterUser, patterMember);
-      const newLoc = getRandomItem(LOCATIONS);
-      const newGif = await fetchAnimeGif("pat");
+      const newLoc = getRandomItem(
+        LOCATIONS.filter((l) => l !== location),
+      ) || getRandomItem(LOCATIONS);
+
+      let newGif = await fetchAnimeGif("pat");
+      if (newGif && newGif === gifUrl) {
+        newGif = (await fetchAnimeGif("pat")) || newGif;
+      }
 
       const replyEmbed = new EmbedBuilder()
         .setDescription(
-          `**${patterShortName}** patted **${senderShortName}** back on the ${newLoc}`,
+          `**${patterShortName}** patted **${senderShortName}** back on the ${newLoc}!\n\n-# Total Pats: ${newCount}`,
         )
-        .setColor(EMBED_COLORS.LIGHT_BLUE)
-        .setFooter({
-          text: `-# Total Pats given by ${patterShortName}: ${newCount}`,
-        });
+        .setColor(EMBED_COLORS.LIGHT_BLUE);
 
       if (newGif) {
         replyEmbed.setImage(newGif);

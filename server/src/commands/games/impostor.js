@@ -29,8 +29,11 @@ async function sendAndFetchReply(interaction, payload) {
     }
   }
   if (typeof interaction.reply === "function") {
-    const res = await interaction.reply({ ...fullPayload, fetchReply: true });
-    return res;
+    const response = await interaction.reply({
+      ...fullPayload,
+      withResponse: true,
+    });
+    return response.resource?.message || response;
   }
   return null;
 }
@@ -60,7 +63,7 @@ export async function execute(interaction) {
 
     let gameStarted = false;
 
-    const buildLobbyV2 = () => {
+    const buildLobby = () => {
       const playerListStr = players
         .map((p, idx) => `${idx + 1}. ${p.displayName} (<@${p.id}>)`)
         .join("\n");
@@ -87,7 +90,7 @@ export async function execute(interaction) {
                 type: 10,
                 content:
                   `**Host:** ${hostDisplayName} (<@${host.id}>)\n\n` +
-                  `**Current Players (${players.length}/10):**\n${playerListStr}\n\n` +
+                  `**Current Players (${players.length}/15):**\n${playerListStr}\n\n` +
                   `Click **Join** to participate! Host can click **Start** once ready.`,
               },
               {
@@ -131,7 +134,7 @@ export async function execute(interaction) {
               },
               {
                 type: 10,
-                content: "-# Min 3 players required.",
+                content: "-# Min 3 players required. Max 15 players.",
               },
             ],
           },
@@ -139,7 +142,7 @@ export async function execute(interaction) {
       };
     };
 
-    const msg = await sendAndFetchReply(interaction, buildLobbyV2());
+    const msg = await sendAndFetchReply(interaction, buildLobby());
 
     if (!msg) return;
 
@@ -163,10 +166,10 @@ export async function execute(interaction) {
             })
             .catch(() => null);
         }
-        if (players.length >= 10) {
+        if (players.length >= 15) {
           return btnInt
             .reply({
-              content: "The lobby is full (Max 10 players)!",
+              content: "The lobby is full (Max 15 players)! Cannot join.",
               flags: 64,
             })
             .catch(() => null);
@@ -180,7 +183,7 @@ export async function execute(interaction) {
           alive: true,
           hasShot: false,
         });
-        await btnInt.update(buildLobbyV2()).catch(() => null);
+        await btnInt.update(buildLobby()).catch(() => null);
       } else if (btnInt.customId === "imp_leave") {
         if (!players.some((p) => p.id === clicker.id)) {
           return btnInt
@@ -200,7 +203,7 @@ export async function execute(interaction) {
             .catch(() => null);
         }
         players = players.filter((p) => p.id !== clicker.id);
-        await btnInt.update(buildLobbyV2()).catch(() => null);
+        await btnInt.update(buildLobby()).catch(() => null);
       } else if (btnInt.customId === "imp_cancel") {
         if (clicker.id !== host.id) {
           return btnInt
@@ -288,8 +291,7 @@ export async function execute(interaction) {
                 components: [
                   {
                     type: 10,
-                    content:
-                      "<:Timer:1542147643021725796> **Lobby expired due to inactivity.**",
+                    content: "Lobby expired due to inactivity.",
                   },
                 ],
               },
@@ -307,7 +309,16 @@ export async function execute(interaction) {
 async function runGameLoop(channel, players) {
   try {
     const total = players.length;
-    let roles = ["IMPOSTOR"];
+    let roles = [];
+
+    let impostorCount = 1;
+    if (total >= 15) impostorCount = 3;
+    else if (total >= 7) impostorCount = 2;
+
+    for (let i = 0; i < impostorCount; i++) {
+      roles.push("IMPOSTOR");
+    }
+
     if (total >= 3) roles.push("SHERIFF");
     if (total >= 4) roles.push("DOCTOR");
     if (total >= 5) roles.push("DETECTIVE");
@@ -335,7 +346,7 @@ async function runGameLoop(channel, players) {
         "🧑🏻‍🚀 **CREWMATE**: Work together with the crew to identify & eject the Impostor!",
     };
 
-    const announceV2 = {
+    const announcePayload = {
       flags: 32768,
       components: [
         {
@@ -378,7 +389,7 @@ async function runGameLoop(channel, players) {
       ],
     };
 
-    const announceMsg = await channel.send(announceV2);
+    const announceMsg = await channel.send(announcePayload);
 
     const roleCollector = announceMsg.createMessageComponentCollector({
       time: 300000,
@@ -504,7 +515,7 @@ async function runGameLoop(channel, players) {
         break;
       }
 
-      const nightV2 = {
+      const nightPayload = {
         flags: 32768,
         components: [
           {
@@ -513,7 +524,7 @@ async function runGameLoop(channel, players) {
             components: [
               {
                 type: 10,
-                content: "### 🌃 Night Phase",
+                content: "### 🌃 Night Phase Falls!",
               },
               {
                 type: 14,
@@ -529,7 +540,7 @@ async function runGameLoop(channel, players) {
         ],
       };
 
-      await channel.send(nightV2);
+      await channel.send(nightPayload);
 
       let nightKilledId = null;
       let nightSavedId = null;
@@ -562,7 +573,7 @@ async function runGameLoop(channel, players) {
       );
 
       if (humanSpecialRoles.length > 0) {
-        const actionV2 = {
+        const actionPayload = {
           flags: 32768,
           components: [
             {
@@ -599,7 +610,7 @@ async function runGameLoop(channel, players) {
           ],
         };
 
-        const menuMsg = await channel.send(actionV2);
+        const menuMsg = await channel.send(actionPayload);
 
         const menuCollector = menuMsg.createMessageComponentCollector({
           time: 18000,
@@ -715,7 +726,7 @@ async function runGameLoop(channel, players) {
         }
       }
 
-      const daybreakV2 = {
+      const daybreakPayload = {
         flags: 32768,
         components: [
           {
@@ -743,7 +754,7 @@ async function runGameLoop(channel, players) {
         ],
       };
 
-      await channel.send(daybreakV2);
+      await channel.send(daybreakPayload);
 
       const postNightAlive = players.filter((p) => p.alive);
       const postNightImpostors = postNightAlive.filter(
@@ -754,6 +765,25 @@ async function runGameLoop(channel, players) {
       const postNightTotalImpostorsInGame = players.filter(
         (p) => p.role === "IMPOSTOR",
       ).length;
+
+      const getRoleSummary = () => {
+        const formatPlayer = (p) => p.displayName;
+        const imps = players
+          .filter((p) => p.role === "IMPOSTOR")
+          .map(formatPlayer)
+          .join(", ");
+        const doc = players.find((p) => p.role === "DOCTOR");
+        const shf = players.find((p) => p.role === "SHERIFF");
+        const det = players.find((p) => p.role === "DETECTIVE");
+        const jst = players.find((p) => p.role === "JESTER");
+
+        const lines = [`- **Impostor(s):** ${imps || "None"}`];
+        if (doc) lines.push(`- **Doctor:** ${formatPlayer(doc)}`);
+        if (shf) lines.push(`- **Sheriff:** ${formatPlayer(shf)}`);
+        if (det) lines.push(`- **Detective:** ${formatPlayer(det)}`);
+        if (jst) lines.push(`- **Jester:** ${formatPlayer(jst)}`);
+        return lines.join("\n");
+      };
 
       if (postNightImpostors.length === 0) {
         const elimText =
@@ -778,7 +808,7 @@ async function runGameLoop(channel, players) {
                 },
                 {
                   type: 10,
-                  content: elimText,
+                  content: `${elimText}\n\n**Role Summary:**\n${getRoleSummary()}`,
                 },
               ],
             },
@@ -815,7 +845,7 @@ async function runGameLoop(channel, players) {
                 },
                 {
                   type: 10,
-                  content: winContent,
+                  content: `${winContent}\n\n**Role Summary:**\n${getRoleSummary()}`,
                 },
               ],
             },
@@ -846,14 +876,14 @@ async function runGameLoop(channel, players) {
         }
       }
 
-      const buildVoteV2 = () => {
+      const buildVotePayload = () => {
         const totalVoters = postNightAlive.length;
         const currentVotes = votes.size;
         const bar = getProgressBar(currentVotes, totalVoters, 10);
         const playerStatusList = postNightAlive
           .map((p) => {
             const hasVoted = votes.has(p.id);
-            return `• ${p.displayName} ${hasVoted ? "<:Picked:1542151058929746090> *(Voted)*" : "<:Timer:1542147643021725796> *(Thinking...)*"}`;
+            return `• ${p.displayName} ${hasVoted ? "<:Success:1526228339910643793> *(Voted)*" : "<:Timer:1554945799308443748> *(Thinking...)*"}`;
           })
           .join("\n");
 
@@ -903,7 +933,7 @@ async function runGameLoop(channel, players) {
         };
       };
 
-      const voteMsg = await channel.send(buildVoteV2());
+      const voteMsg = await channel.send(buildVotePayload());
 
       const voteCollector = voteMsg.createMessageComponentCollector({
         time: 25000,
@@ -935,7 +965,7 @@ async function runGameLoop(channel, players) {
           })
           .catch(() => null);
 
-        await voteMsg.edit(buildVoteV2()).catch(() => null);
+        await voteMsg.edit(buildVotePayload()).catch(() => null);
       });
 
       await new Promise((resolve) => setTimeout(resolve, 26000));
@@ -1013,7 +1043,8 @@ async function runGameLoop(channel, players) {
                       type: 10,
                       content:
                         `**${ejectedPlayer.displayName}** fooled everyone into voting them out!\n\n` +
-                        `🤡 **The Jester wins the game!**`,
+                        `🤡 **The Jester wins the game!**\n\n` +
+                        `**Role Summary:**\n${getRoleSummary()}`,
                     },
                   ],
                 },

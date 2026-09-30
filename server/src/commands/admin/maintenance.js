@@ -33,7 +33,7 @@ export async function execute(interaction, client) {
 
   if (subcommand === "start") {
     try {
-      const v2StartContainerPayload = {
+      const startContainerPayload = {
         flags: 32768,
         components: [
           {
@@ -60,7 +60,7 @@ export async function execute(interaction, client) {
         ],
       };
 
-      const startMsg = await interaction.channel.send(v2StartContainerPayload);
+      const startMsg = await interaction.channel.send(startContainerPayload);
 
       const startTime = Date.now();
       client.maintenanceMode = true;
@@ -119,7 +119,7 @@ export async function execute(interaction, client) {
         JSON.stringify({ active: false }, null, 2),
       );
 
-      const v2CompleteContainerPayload = {
+      const completeContainerPayload = {
         flags: 32768,
         components: [
           {
@@ -153,7 +153,7 @@ export async function execute(interaction, client) {
           if (targetChannel) {
             const startMsg = await targetChannel.messages.fetch(messageId);
             if (startMsg) {
-              await startMsg.reply(v2CompleteContainerPayload);
+              await startMsg.reply(completeContainerPayload);
               repliedToStart = true;
             }
           }
@@ -161,7 +161,7 @@ export async function execute(interaction, client) {
       }
 
       if (!repliedToStart) {
-        await interaction.channel.send(v2CompleteContainerPayload);
+        await interaction.channel.send(completeContainerPayload);
       }
 
       return interaction.reply({
