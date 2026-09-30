@@ -102,7 +102,7 @@ async function fetchQuestion(type, rating = "pg") {
   };
 }
 
-function buildV2Payload(
+function buildTodPayload(
   promptType,
   question,
   rating,
@@ -230,7 +230,7 @@ export async function execute(interaction, client, { buildAiReply } = {}) {
       interaction.user.displayName ||
       interaction.user.username;
 
-    const payload = buildV2Payload(
+    const payload = buildTodPayload(
       promptType,
       question,
       rating,
@@ -285,7 +285,7 @@ function attachTodCollector(message, ratingInput, buildAiReply) {
         btnInteraction.user.displayName ||
         btnInteraction.user.username;
 
-      const payload = buildV2Payload(
+      const payload = buildTodPayload(
         nextPrompt.type,
         nextPrompt.question,
         nextPrompt.rating,

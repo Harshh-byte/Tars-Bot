@@ -25,7 +25,13 @@ export const data = {
   ],
 };
 
-const LOCATIONS = ["right cheek", "left cheek", "face", "forehead"];
+const LOCATIONS = [
+  "right cheek",
+  "left cheek",
+  "face",
+  "forehead",
+  "back of the head",
+];
 
 function getRandomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -45,8 +51,8 @@ async function sendAndFetchReply(interaction, payload) {
   if (interaction.replied || interaction.deferred) {
     return await interaction.followUp(payload);
   }
-  const res = await interaction.reply({ ...payload, fetchReply: true });
-  return res;
+  const response = await interaction.reply({ ...payload, withResponse: true });
+  return response.resource?.message || response;
 }
 
 export async function execute(interaction, client) {
@@ -128,12 +134,9 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `**${senderShortName}** slapped **${targetShortName}** across the ${location}!`,
+        `**${senderShortName}** slapped **${targetShortName}** across the ${location}!\n\n-# Total Slaps: ${count}`,
       )
-      .setColor(EMBED_COLORS.ORANGE)
-      .setFooter({
-        text: `-# Total Slaps given by ${senderShortName}: ${count}`,
-      });
+      .setColor(EMBED_COLORS.ORANGE);
 
     if (gifUrl) {
       embed.setImage(gifUrl);
@@ -182,17 +185,20 @@ export async function execute(interaction, client) {
       }
 
       const slapperShortName = getShortDisplayName(slapperUser, slapperMember);
-      const newLoc = getRandomItem(LOCATIONS);
-      const newGif = await fetchAnimeGif("slap");
+      const newLoc =
+        getRandomItem(LOCATIONS.filter((l) => l !== location)) ||
+        getRandomItem(LOCATIONS);
+
+      let newGif = await fetchAnimeGif("slap");
+      if (newGif && newGif === gifUrl) {
+        newGif = (await fetchAnimeGif("slap")) || newGif;
+      }
 
       const replyEmbed = new EmbedBuilder()
         .setDescription(
-          `**${slapperShortName}** slapped **${senderShortName}** back across the ${newLoc}!`,
+          `**${slapperShortName}** slapped **${senderShortName}** back across the ${newLoc}!\n\n-# Total Slaps: ${newCount}`,
         )
-        .setColor(EMBED_COLORS.ORANGE)
-        .setFooter({
-          text: `-# Total Slaps given by ${slapperShortName}: ${newCount}`,
-        });
+        .setColor(EMBED_COLORS.ORANGE);
 
       if (newGif) {
         replyEmbed.setImage(newGif);

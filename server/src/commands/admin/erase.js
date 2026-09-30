@@ -91,7 +91,7 @@ async function handleEraseUser(interaction, targetUser) {
   try {
     await deleteUserData(guildId, targetUser.id);
 
-    const successV2 = {
+    const successPayload = {
       flags: MessageFlags.Ephemeral,
       components: [
         {
@@ -112,7 +112,7 @@ async function handleEraseUser(interaction, targetUser) {
       ],
     };
 
-    return sendResponse(interaction, successV2);
+    return sendResponse(interaction, successPayload);
   } catch (error) {
     logger.error("Error erasing user data:", error);
     const errorPayload = {

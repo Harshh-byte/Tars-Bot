@@ -25,7 +25,13 @@ export const data = {
   ],
 };
 
-const LOCATIONS = ["shoulder", "arm", "stomach", "face"];
+const LOCATIONS = [
+  "face",
+  "jaw",
+  "stomach",
+  "ribs",
+  "nose",
+];
 
 function getRandomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -45,8 +51,8 @@ async function sendAndFetchReply(interaction, payload) {
   if (interaction.replied || interaction.deferred) {
     return await interaction.followUp(payload);
   }
-  const res = await interaction.reply({ ...payload, fetchReply: true });
-  return res;
+  const response = await interaction.reply({ ...payload, withResponse: true });
+  return response.resource?.message || response;
 }
 
 export async function execute(interaction, client) {
@@ -128,12 +134,9 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `**${senderShortName}** punched **${targetShortName}** in the ${location}!`,
+        `**${senderShortName}** punched **${targetShortName}** in the ${location}!\n\n-# Total Punches: ${count}`,
       )
-      .setColor(EMBED_COLORS.DARK_RED)
-      .setFooter({
-        text: `-# Total Punches given by ${senderShortName}: ${count}`,
-      });
+      .setColor(EMBED_COLORS.DARK_RED);
 
     if (gifUrl) {
       embed.setImage(gifUrl);
@@ -182,17 +185,20 @@ export async function execute(interaction, client) {
       }
 
       const puncherShortName = getShortDisplayName(puncherUser, puncherMember);
-      const newLoc = getRandomItem(LOCATIONS);
-      const newGif = await fetchAnimeGif("punch");
+      const newLoc = getRandomItem(
+        LOCATIONS.filter((l) => l !== location),
+      ) || getRandomItem(LOCATIONS);
+
+      let newGif = await fetchAnimeGif("punch");
+      if (newGif && newGif === gifUrl) {
+        newGif = (await fetchAnimeGif("punch")) || newGif;
+      }
 
       const replyEmbed = new EmbedBuilder()
         .setDescription(
-          `**${puncherShortName}** punched **${senderShortName}** back in the ${newLoc}!`,
+          `**${puncherShortName}** punched **${senderShortName}** back in the ${newLoc}!\n\n-# Total Punches: ${newCount}`,
         )
-        .setColor(EMBED_COLORS.DARK_RED)
-        .setFooter({
-          text: `-# Total Punches given by ${puncherShortName}: ${newCount}`,
-        });
+        .setColor(EMBED_COLORS.DARK_RED);
 
       if (newGif) {
         replyEmbed.setImage(newGif);

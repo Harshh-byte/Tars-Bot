@@ -1,4 +1,4 @@
-import { ComponentType } from "discord.js";
+import { ComponentType, MessageFlags } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 
@@ -47,7 +47,7 @@ async function startGame(interaction, client, opponent) {
         interaction.user.displayName ||
         interaction.user.username;
 
-      const v2StartPayload = {
+      const startPayload = {
         flags: 32768,
         components: [
           {
@@ -56,7 +56,7 @@ async function startGame(interaction, client, opponent) {
             components: [
               {
                 type: 10,
-                content: "### <:RPS:1545074718174875718> ROCK, PAPER, SCISSORS",
+                content: "### 🎯 ROCK, PAPER, SCISSORS",
               },
               {
                 type: 14,
@@ -103,7 +103,7 @@ async function startGame(interaction, client, opponent) {
         ],
       };
 
-      const response = await sendAndFetchReply(interaction, v2StartPayload);
+      const response = await sendAndFetchReply(interaction, startPayload);
 
       const collector = response.createMessageComponentCollector({
         componentType: ComponentType.Button,
@@ -114,7 +114,7 @@ async function startGame(interaction, client, opponent) {
         if (i.user.id !== interaction.user.id) {
           return i.reply({
             content: "Start your own game with `/rps`!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
@@ -159,7 +159,7 @@ async function startGame(interaction, client, opponent) {
                 {
                   type: 10,
                   content:
-                    "### <:RPS:1545074718174875718> ROCK, PAPER, SCISSORS",
+                    "### 🎯 ROCK, PAPER, SCISSORS",
                 },
                 {
                   type: 14,
@@ -204,7 +204,7 @@ async function startGame(interaction, client, opponent) {
             if (paInteraction.user.id !== interaction.user.id) {
               return paInteraction.reply({
                 content: "Start your own game with `/rps`!",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               });
             }
             playAgainCollector.stop("restarted");
@@ -248,7 +248,7 @@ async function startGame(interaction, client, opponent) {
     if (opponent.bot) {
       return interaction.reply({
         content: "You cannot challenge other bots to Rock, Paper, Scissors!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -256,7 +256,7 @@ async function startGame(interaction, client, opponent) {
       return interaction.reply({
         content:
           "You can't challenge yourself! Leave the opponent option blank to play with TARS.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -280,7 +280,7 @@ async function startGame(interaction, client, opponent) {
           components: [
             {
               type: 10,
-              content: "### <:RPS:1545074718174875718> ROCK, PAPER, SCISSORS",
+              content: "### 🎯 ROCK, PAPER, SCISSORS",
             },
             {
               type: 14,
@@ -289,7 +289,7 @@ async function startGame(interaction, client, opponent) {
             },
             {
               type: 10,
-              content: `**${userDisplayName}** vs **${opponentDisplayName}**!\n\nBoth players, click your moves below. Choices are hidden until both respond!\n\n-# Requestor: ${userDisplayName}`,
+              content: `<@${interaction.user.id}> vs <@${opponent.id}>\n\nBoth players, click your moves below. Choices are hidden until both respond!\n\n-# Requestor: ${userDisplayName}`,
             },
             {
               type: 14,
@@ -341,7 +341,7 @@ async function startGame(interaction, client, opponent) {
       if (i.user.id !== interaction.user.id && i.user.id !== opponent.id) {
         return i.reply({
           content: "You are not part of this match!",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -350,15 +350,15 @@ async function startGame(interaction, client, opponent) {
 
       await i.reply({
         content: `You picked ${CHOICES[choice].emoji} **${CHOICES[choice].name}**! Waiting for opponent...`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
       const p1Choice = playerChoices[interaction.user.id]
-        ? "<:Picked:1542151058929746090> Picked"
-        : "<:Timer:1542147643021725796> Waiting...";
+        ? "<:Success:1526228339910643793> Picked"
+        : "<:Timer:1554945799308443748> Waiting...";
       const p2Choice = playerChoices[opponent.id]
-        ? "<:Picked:1542151058929746090> Picked"
-        : "<:Timer:1542147643021725796> Waiting...";
+        ? "<:Success:1526228339910643793> Picked"
+        : "<:Timer:1554945799308443748> Waiting...";
 
       const updatedContainer = {
         flags: 32768,
@@ -369,7 +369,7 @@ async function startGame(interaction, client, opponent) {
             components: [
               {
                 type: 10,
-                content: "### <:RPS:1545074718174875718> ROCK, PAPER, SCISSORS",
+                content: "### 🎯 ROCK, PAPER, SCISSORS",
               },
               {
                 type: 14,
@@ -378,7 +378,7 @@ async function startGame(interaction, client, opponent) {
               },
               {
                 type: 10,
-                content: `**${userDisplayName}**: ${p1Choice}\n**${opponentDisplayName}**: ${p2Choice}\n\n-# Requestor: ${userDisplayName}`,
+                content: `<@${interaction.user.id}>: ${p1Choice}\n\n<@${opponent.id}>: ${p2Choice}\n\n-# Requestor: ${userDisplayName}`,
               },
               {
                 type: 14,
@@ -433,9 +433,9 @@ async function startGame(interaction, client, opponent) {
         if (c1 === c2) {
           resultMsg = `🫱🏻‍🫲🏿 **It's a tie!** Both players picked ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
         } else if (CHOICES[c1].beats === c2) {
-          resultMsg = `<a:Tada:1544329561955770488> **${userDisplayName} wins!**\n${CHOICES[c1].emoji} **${CHOICES[c1].name}** beats ${CHOICES[c2].emoji} **${CHOICES[c2].name}**.`;
+          resultMsg = `<a:Tada:1544329561955770488> **<@${interaction.user.id}> wins!**\n${CHOICES[c1].emoji} **${CHOICES[c1].name}** beats ${CHOICES[c2].emoji} **${CHOICES[c2].name}**.`;
         } else {
-          resultMsg = `<a:Tada:1544329561955770488> **${opponentDisplayName} wins!**\n${CHOICES[c2].emoji} **${CHOICES[c2].name}** beats ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
+          resultMsg = `<a:Tada:1544329561955770488> **<@${opponent.id}> wins!**\n${CHOICES[c2].emoji} **${CHOICES[c2].name}** beats ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
         }
 
         const pvpContainerPayload = {
@@ -447,7 +447,7 @@ async function startGame(interaction, client, opponent) {
               components: [
                 {
                   type: 10,
-                  content: "### <:RPS:1545074718174875718> MATCH RESULTS",
+                  content: "### 🎯 MATCH RESULTS",
                 },
                 {
                   type: 14,
@@ -494,7 +494,7 @@ async function startGame(interaction, client, opponent) {
             ) {
               return paInteraction.reply({
                 content: "You were not part of this game!",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               });
             }
             pvpPlayAgainCollector.stop("restarted");
@@ -508,6 +508,13 @@ async function startGame(interaction, client, opponent) {
           }
         });
       } else {
+        const p1Status = playerChoices[interaction.user.id]
+          ? "<:Success:1526228339910643793> Picked"
+          : "<:Failed:1526228290413658184> Timed out!";
+        const p2Status = playerChoices[opponent.id]
+          ? "<:Success:1526228339910643793> Picked"
+          : "<:Failed:1526228290413658184> Timed out!";
+
         const timeoutContainer = {
           flags: 32768,
           components: [
@@ -517,19 +524,17 @@ async function startGame(interaction, client, opponent) {
               components: [
                 {
                   type: 10,
-                  content:
-                    "### ⌛ Match Timed Out",
+                  content: "### ⌛ Match Timed Out",
                 },
-              {
-                type: 14,
-                divider: true,
-                spacing: 1,
-              },
-              
-              {
-                type: 10,
-                content: `One of the players failed to make a move in time!`,
-              },
+                {
+                  type: 14,
+                  divider: true,
+                  spacing: 1,
+                },
+                {
+                  type: 10,
+                  content: `<@${interaction.user.id}>: ${p1Status}\n\n<@${opponent.id}>: ${p2Status}\n\n-# Requestor: ${userDisplayName}`,
+                },
               ],
             },
           ],

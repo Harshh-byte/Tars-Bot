@@ -127,7 +127,7 @@ function getBestTarsMove(board) {
   return openSpots[Math.floor(Math.random() * openSpots.length)];
 }
 
-function buildV2GridPayload(
+function buildGridPayload(
   board,
   turnUserId,
   playerXName,
@@ -211,7 +211,7 @@ async function startGame(interaction, client, opponent) {
         opponent.displayName ||
         opponent.username;
 
-    const initialPayload = buildV2GridPayload(
+    const initialPayload = buildGridPayload(
       board,
       turnUserId,
       playerXName,
@@ -241,7 +241,7 @@ async function startGame(interaction, client, opponent) {
         winnerText = `🫱🏻‍🫲🏿 **It's a Tie Game!**`;
       }
 
-      const v2EndPayload = {
+      const endPayload = {
         flags: 32768,
         components: [
           {
@@ -282,7 +282,7 @@ async function startGame(interaction, client, opponent) {
         ],
       };
 
-      await lastInteraction.update(v2EndPayload);
+      await lastInteraction.update(endPayload);
 
       const playAgainCollector = response.createMessageComponentCollector({
         componentType: ComponentType.Button,
@@ -350,7 +350,7 @@ async function startGame(interaction, client, opponent) {
       }
 
       await i.update(
-        buildV2GridPayload(
+        buildGridPayload(
           board,
           turnUserId,
           playerXName,

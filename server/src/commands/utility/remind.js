@@ -134,7 +134,7 @@ export async function execute(interaction, client) {
             {
               type: 10,
               content:
-                `### <:Timer:1542147643021725796> Reminder Scheduled\n` +
+                `### <:Timer:1554945799308443748> Reminder Scheduled\n` +
                 `\`-\` **${parsed.task}**`,
             },
             {

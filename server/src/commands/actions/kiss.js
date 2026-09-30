@@ -53,8 +53,8 @@ async function sendAndFetchReply(interaction, payload) {
   if (interaction.replied || interaction.deferred) {
     return await interaction.followUp(payload);
   }
-  const res = await interaction.reply({ ...payload, fetchReply: true });
-  return res;
+  const response = await interaction.reply({ ...payload, withResponse: true });
+  return response.resource?.message || response;
 }
 
 export async function execute(interaction, client) {
@@ -136,12 +136,9 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `**${senderShortName}** kissed **${targetShortName}** on ${location}!`,
+        `**${senderShortName}** kissed **${targetShortName}** on ${location}!\n\n-# Total Kisses: ${count}`,
       )
-      .setColor(EMBED_COLORS.RED)
-      .setFooter({
-        text: `-# Total Kisses given by ${senderShortName}: ${count}`,
-      });
+      .setColor(EMBED_COLORS.RED);
 
     if (gifUrl) {
       embed.setImage(gifUrl);
@@ -190,17 +187,20 @@ export async function execute(interaction, client) {
       }
 
       const kisserShortName = getShortDisplayName(kisserUser, kisserMember);
-      const newLoc = getRandomItem(LOCATIONS);
-      const newGif = await fetchAnimeGif("kiss");
+      const newLoc = getRandomItem(
+        LOCATIONS.filter((l) => l !== location),
+      ) || getRandomItem(LOCATIONS);
+
+      let newGif = await fetchAnimeGif("kiss");
+      if (newGif && newGif === gifUrl) {
+        newGif = (await fetchAnimeGif("kiss")) || newGif;
+      }
 
       const replyEmbed = new EmbedBuilder()
         .setDescription(
-          `**${kisserShortName}** kissed **${senderShortName}** back on ${newLoc}!`,
+          `**${kisserShortName}** kissed **${senderShortName}** back on ${newLoc}!\n\n-# Total Kisses: ${newCount}`,
         )
-        .setColor(EMBED_COLORS.RED)
-        .setFooter({
-          text: `-# Total Kisses given by ${kisserShortName}: ${newCount}`,
-        });
+        .setColor(EMBED_COLORS.RED);
 
       if (newGif) {
         replyEmbed.setImage(newGif);
