@@ -338,6 +338,15 @@ export const commands = [
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },
+  {
+    trigger: "/remind",
+    alias: ".timer",
+    category: "util",
+    title: "Remind",
+    description: "Set a reminder.",
+    badge: "Utility",
+    badgeColor: "text-ds-green bg-ds-green/10",
+  },
 ];
 
 export const categories = [

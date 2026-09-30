@@ -27,15 +27,6 @@ import { initAutoMemeService } from "./src/services/automeme.js";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const BOT_INFO = {
-  developerText: "Ecstasy",
-  color: 0xe0e0e0,
-  authorText: "TARS",
-  version: "3.0",
-  framework: "discord.js",
-  settings: { honesty: "90%", humor: "75%", discretion: "10%" },
-};
-
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -557,11 +548,10 @@ client.once(Events.ClientReady, async (c) => {
 client.on(Events.InteractionCreate, (interaction) =>
   interactionCreateEvent.execute(interaction, client, {
     buildAiReply,
-    BOT_INFO,
   }),
 );
 client.on(Events.MessageCreate, (message) =>
-  messageCreateEvent.execute(message, client, { buildAiReply, BOT_INFO }),
+  messageCreateEvent.execute(message, client, { buildAiReply }),
 );
 client.on(Events.GuildMemberRemove, async (member) => {
   try {

@@ -13,7 +13,7 @@ export const aliases = ["h"];
 
 export const data = {
   name: "help",
-  description: "View command list or help.",
+  description: "View command list.",
   dm_permission: false,
   options: [
     {
@@ -122,7 +122,7 @@ const modulesCatalog = {
   },
   module_actions: {
     title: "<:Actions:1542647256782737559> Actions Module",
-    description: "Interactive social actions.",
+    description: "Roleplay & social interactions.",
     commands: [
       { name: "Smoke", cmd: "smoke", desc: "Take a hit of smoke." },
       { name: "Vape", cmd: "vape", desc: "Hit the vape." },
@@ -156,7 +156,7 @@ const modulesCatalog = {
       },
       { name: "Ping", cmd: "ping", desc: "Check bot latency." },
       { name: "About", cmd: "about", desc: "View information about the bot." },
-      { name: "Remind", cmd: "remind", desc: "Set a smart reminder." },
+      { name: "Remind", cmd: "remind", desc: "Set a reminder." },
       { name: "Ask", cmd: "ask", desc: "Ask TARS anything." },
       { name: "Purge", cmd: "purge", desc: "Purge messages from the channel." },
       {
@@ -360,7 +360,7 @@ export async function execute(interaction, client) {
         },
         {
           label: "Actions",
-          description: "Smoke and vape counters.",
+          description: "Roleplay & social interactions.",
           value: "module_actions",
           emoji: { id: "1542647256782737559", name: "Actions" },
           default: selectedModule === "module_actions",
@@ -404,7 +404,7 @@ export async function execute(interaction, client) {
           return buildPayload("module_home", 0);
         }
 
-        const totalPages = Math.ceil(mod.commands.length / ITEMS_PER_PAGE) || 1;
+        const totalPages = Math.ceil(mod.commands.length / ITEMS_PER_PAGE);
         const validPage = Math.max(0, Math.min(page, totalPages - 1));
         const startIndex = validPage * ITEMS_PER_PAGE;
         const pageCommands = mod.commands.slice(
@@ -513,111 +513,27 @@ export async function execute(interaction, client) {
       };
     };
 
-    const buildFallbackPayload = (selectedModule, page = 0) => {
-      if (selectedModule === "module_home") {
-        return {
-          embeds: [mainEmbed],
-          components: [buildMenu("module_home")],
-        };
-      }
-
-      const mod = modulesCatalog[selectedModule];
-      if (!mod) {
-        return {
-          embeds: [mainEmbed],
-          components: [buildMenu("module_home")],
-        };
-      }
-
-      const totalPages = Math.ceil(mod.commands.length / ITEMS_PER_PAGE) || 1;
-      const validPage = Math.max(0, Math.min(page, totalPages - 1));
-
-      const startIndex = validPage * ITEMS_PER_PAGE;
-      const pageCommands = mod.commands.slice(
-        startIndex,
-        startIndex + ITEMS_PER_PAGE,
-      );
-
-      const fields = pageCommands.map((c, idx) => ({
-        name: `${startIndex + idx + 1}. ${c.name}`,
-        value: `\`${prefix}${c.cmd}\` - ${c.desc}`,
-      }));
-
-      fields.push({ name: "\u200b", value: bookNotice });
-
-      const categoryEmbed = new EmbedBuilder()
-        .setTitle(mod.title)
-        .setDescription(`${mod.description}`)
-        .setThumbnail(botAvatar)
-        .addFields(fields)
-        .setColor(EMBED_COLORS.WHITE);
-
-      const components = [buildMenu(selectedModule)];
-      const pageRow = buildPaginationButtons(validPage, totalPages);
-      if (pageRow) {
-        components.push(pageRow);
-      }
-
-      return {
-        embeds: [categoryEmbed],
-        components,
-      };
-    };
-
-    let initialPayload;
-    try {
-      initialPayload = buildPayload("module_home", 0);
-    } catch {
-      initialPayload = buildFallbackPayload("module_home", 0);
-    }
+    const initialPayload = buildPayload("module_home", 0);
 
     let response;
-    try {
-      if (
-        typeof interaction.isStringSelectMenu === "function" &&
-        interaction.isStringSelectMenu()
-      ) {
-        await interaction.update(initialPayload);
-        response =
-          typeof interaction.fetchReply === "function"
-            ? await interaction.fetchReply()
-            : interaction.message;
-      } else if (interaction.deferred || interaction.replied) {
-        response = await interaction.editReply(initialPayload);
-      } else {
-        response = await interaction.reply({
-          ...initialPayload,
-          fetchReply: true,
-        });
-        if (!response && typeof interaction.fetchReply === "function") {
-          response = await interaction.fetchReply();
-        }
-      }
-    } catch (v2Error) {
-      logger.warn(
-        "V2 Components payload failed, falling back to V1 embed:",
-        v2Error,
-      );
-      const fallbackPayload = buildFallbackPayload("module_home", 0);
-      if (
-        typeof interaction.isStringSelectMenu === "function" &&
-        interaction.isStringSelectMenu()
-      ) {
-        await interaction.update(fallbackPayload);
-        response =
-          typeof interaction.fetchReply === "function"
-            ? await interaction.fetchReply()
-            : interaction.message;
-      } else if (interaction.deferred || interaction.replied) {
-        response = await interaction.editReply(fallbackPayload);
-      } else {
-        response = await interaction.reply({
-          ...fallbackPayload,
-          fetchReply: true,
-        });
-        if (!response && typeof interaction.fetchReply === "function") {
-          response = await interaction.fetchReply();
-        }
+    if (
+      typeof interaction.isStringSelectMenu === "function" &&
+      interaction.isStringSelectMenu()
+    ) {
+      await interaction.update(initialPayload);
+      response =
+        typeof interaction.fetchReply === "function"
+          ? await interaction.fetchReply()
+          : interaction.message;
+    } else if (interaction.deferred || interaction.replied) {
+      response = await interaction.editReply(initialPayload);
+    } else {
+      response = await interaction.reply({
+        ...initialPayload,
+        fetchReply: true,
+      });
+      if (!response && typeof interaction.fetchReply === "function") {
+        response = await interaction.fetchReply();
       }
     }
 
@@ -642,16 +558,8 @@ export async function execute(interaction, client) {
         }
       }
 
-      try {
-        const newPayload = buildPayload(currentSelectedModule, currentPage);
-        await i.update(newPayload);
-      } catch {
-        const fallbackPayload = buildFallbackPayload(
-          currentSelectedModule,
-          currentPage,
-        );
-        await i.update(fallbackPayload);
-      }
+      const newPayload = buildPayload(currentSelectedModule, currentPage);
+      await i.update(newPayload);
     });
   } catch (err) {
     logger.error("Error in Help command handler:", err);

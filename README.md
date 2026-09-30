@@ -8,26 +8,27 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 
 ## ✨ Features
 
-- **🧠 AI & Search Engine:** Powered by `@google/genai` for roasts, wishes, `.ask` AI question search, and conversational responses.
-- **⚙️ Dynamic Prefix Manager:** Per-server prefix configuration (`.prefix`) backed by Firebase Firestore.
-- **📖 Interactive Help System:** Module selection menus, 5-item pagination, and detailed command inspectors (`.help`).
-- **🎭 Interactive Social Actions:** Persistent stats and reaction GIFs for `.hug`, `.kiss`, `.slap`, `.pat`, `.punch`, `.smoke`, and `.vape`.
-- **🛠️ System Maintenance Mode:** Owner-controlled maintenance mode (`/maintenance`) with custom presence updates.
-- **🎮 Interactive Party Games:** Impostor (`.impostor`), Truth or Dare (`.tod`), Would You Rather (`.wyr`), Never Have I Ever (`.nhie`), RPS (`.rps`), and Tic-Tac-Toe (`.ttt`).
-- **📊 Fun Calculators:** IQ, PP size, Gay/Lesbian ratings, Bitches count, and Autism ratings.
-- **🌐 Web Dashboard:** Sleek React + Vite landing page displaying real-time command reference and system stats.
+- **🧠 Conversational AI Engine:** Smart AI-powered chat, contextual roasts, personalized wishes, and instant Q&A powered by `@google/genai`.
+- **⚙️ Dynamic Server Settings:** Per-server custom prefix configuration and automated database cleanup backed by Firebase Firestore.
+- **📖 Next-Gen Help & Navigation:** Rich Discord component menus, paginated command catalogs, and category inspectors.
+- **🎭 Social & Roleplay Interactions:** Interactive user reactions with animated media, custom counters, and persistent action stats.
+- **🛠️ Administrative & Server Controls:** Fine-grained owner controls including system maintenance toggles, custom bot presence, and memory management.
+- **🎮 Interactive Party & Mini-Games:** Comprehensive collection of multiplayer party games, decision tools, guessing games, and global leaderboards.
+- **📊 Entertainment & Utilities:** Fun user rating calculators, automated Reddit meme feed, custom reminders, and server diagnostics.
+- **🌐 Web Dashboard:** Modern React + Vite web dashboard displaying real-time command documentation and bot metrics.
 
 ---
 
 ## ⚡ Quick Command Reference
 
-| Category    | Commands                                                                                                                                                          | Description                                                                             |
-| :---------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------- |
-| **Utility** | `.help`, `.prefix`, `.ping`, `.about`, `.ask`, `.purge`                                                                                                           | Interactive menus, prefix control, diagnostics, message purging & bot memory management |
-| **Actions** | `.hug`, `.kiss`, `.slap`, `.pat`, `.punch`, `.smoke`, `.vape`                                                                                                     | Interactive reactions with stats                                                        |
-| **Games**   | `.impostor`, `.imp`, `.guess`, `.leaderboard`, `.flag`, `.pokemon`, `.scramble`, `.ws`, `.flb`, `.plb`, `.tod`, `.wyr`, `.nhie`, `.rps`, `.ttt`, `.flip`, `.roll` | Interactive guessing mini-games, party games & decision tools                           |
-| **Fun**     | `.ship`, `.iq`, `.pp`, `.gay`, `.lesbian`, `.bitches`, `.autism`, `.roast`, `.wish`, `.meme`, `.automeme`                                                         | Calculators, AI roasts, wishes, Reddit memes & AutoMeme scheduler                       |
-| **Admin**   | `/maintenance`, `/resetlb`                                                                                                                                        | Toggle bot maintenance mode & reset game leaderboards                                   |
+| Category    | Commands                                                                                                                          | Description                                                   |
+| :---------- | :-------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------ |
+| **Utility** | `/about`, `/ask`, `/avatar`, `/help`, `/ping`, `/prefix`, `/remind`, `/serverinfo`, `/userinfo`                                   | Server tools and utilities                                    |
+| **Actions** | `/hug`, `/kiss`, `/pat`, `/punch`, `/slap`, `/smoke`, `/vape`                                                                     | Roleplay & social interactions                                |
+| **Games**   | `/flag`, `/flip`, `/impostor`, `/leaderboard`, `/nhie`, `/para`, `/pokemon`, `/roll`, `/rps`, `/scramble`, `/tod`, `/ttt`, `/wyr` | Interactive games & scoreboards |
+| **Fun**     | `/autism`, `/bitches`, `/gay`, `/iq`, `/lesbian`, `/meme`, `/pp`, `/roast`, `/ship`, `/simp`, `/wish`                             | Calculators, roasts, and memes                                |
+| **Mod**     | `/automeme`, `/purge`, `/resetlb`                                                                                                 | Server moderation and management                              |
+| **Admin**   | `/erase`, `/maintenance`                                                                                                          | Owner-only administrative tools                               |
 
 ---
 
@@ -57,6 +58,7 @@ Create `server/.env`:
 ```env
 DISCORD_BOT_TOKEN=your_bot_token
 GEMINI_API_KEY=your_gemini_key
+OWNER_ID=your_owner_id
 GIPHY_API_KEY=your_giphy_key
 KLIPY_API_KEY=your_klipy_key
 SENTRY_DSN=your_sentry_dsn

@@ -43,19 +43,11 @@ export const data = {
   ],
 };
 
-async function sendResponse(interaction, payload, fallbackPayload) {
-  try {
-    if (interaction.deferred || interaction.replied) {
-      return await interaction.editReply(payload);
-    }
-    return await interaction.reply(payload);
-  } catch (err) {
-    logger.warn("V2 payload failed in erase, using fallback:", err);
-    if (interaction.deferred || interaction.replied) {
-      return await interaction.editReply(fallbackPayload);
-    }
-    return await interaction.reply(fallbackPayload);
+async function sendResponse(interaction, payload) {
+  if (interaction.deferred || interaction.replied) {
+    return await interaction.editReply(payload);
   }
+  return await interaction.reply(payload);
 }
 
 export async function execute(interaction, client) {
@@ -120,38 +112,15 @@ async function handleEraseUser(interaction, targetUser) {
       ],
     };
 
-    const successV1 = {
-      embeds: [
-        successEmbed({
-          title: "Memory Erased",
-          description: `Successfully erased all stored memory for **${targetUser.tag}**.`,
-          fields: [
-            {
-              name: "Deleted Data",
-              value:
-                "• Conversation history\n• Saved profile\n• AI context & memory",
-            },
-            {
-              name: "Requested By",
-              value: `<@${interaction.user.id}>`,
-              inline: true,
-            },
-            { name: "User", value: `<@${targetUser.id}>`, inline: true },
-          ],
-        }),
-      ],
-      flags: MessageFlags.Ephemeral,
-    };
-
-    return sendResponse(interaction, successV2, successV1);
+    return sendResponse(interaction, successV2);
   } catch (error) {
     logger.error("Error erasing user data:", error);
-    const errorV2 = {
+    const errorPayload = {
       flags: MessageFlags.Ephemeral,
       components: [
         {
           type: 17,
-          accent_color: EMBED_COLORS.ERROR || 0xef4444,
+          accent_color: EMBED_COLORS.ERROR,
           components: [
             {
               type: 10,
@@ -164,30 +133,19 @@ async function handleEraseUser(interaction, targetUser) {
       ],
     };
 
-    const errorV1 = {
-      embeds: [
-        errorEmbed({
-          title: "Erase Failed",
-          description:
-            "I couldn't delete this user's stored memory. Please try again later.",
-        }),
-      ],
-      flags: MessageFlags.Ephemeral,
-    };
-
-    return sendResponse(interaction, errorV2, errorV1);
+    return sendResponse(interaction, errorPayload);
   }
 }
 
 async function handleEraseServer(interaction) {
-  const guildName = interaction.guild?.name || "this server";
+  const guildName = interaction.guild?.name;
 
-  const confirmV2 = {
+  const confirmPayload = {
     flags: MessageFlags.Ephemeral,
     components: [
       {
         type: 17,
-        accent_color: EMBED_COLORS.WARNING || 0xf59e0b,
+        accent_color: EMBED_COLORS.WARNING,
         components: [
           {
             type: 10,
@@ -224,31 +182,7 @@ async function handleEraseServer(interaction) {
     ],
   };
 
-  const confirmV1 = {
-    embeds: [
-      warningEmbed({
-        title: "Delete Server Memory?",
-        description:
-          "This will permanently delete every stored memory for this server. This action cannot be undone.",
-      }),
-    ],
-    components: [
-      new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId("erase_confirm")
-          .setLabel("Delete")
-          .setEmoji("1526228290413658184")
-          .setStyle(ButtonStyle.Danger),
-        new ButtonBuilder()
-          .setCustomId("erase_cancel")
-          .setLabel("Cancel")
-          .setStyle(ButtonStyle.Secondary),
-      ),
-    ],
-    flags: MessageFlags.Ephemeral,
-  };
-
-  const response = await sendResponse(interaction, confirmV2, confirmV1);
+  const response = await sendResponse(interaction, confirmPayload);
   if (!response) return;
 
   try {
@@ -259,11 +193,11 @@ async function handleEraseServer(interaction) {
     });
 
     if (button.customId === "erase_cancel") {
-      const cancelV2 = {
+      const cancelPayload = {
         components: [
           {
             type: 17,
-            accent_color: EMBED_COLORS.WARNING || 0xf59e0b,
+            accent_color: EMBED_COLORS.WARNING,
             components: [
               {
                 type: 10,
@@ -276,30 +210,16 @@ async function handleEraseServer(interaction) {
         ],
       };
 
-      const cancelV1 = {
-        embeds: [
-          warningEmbed({
-            title: "Cancelled",
-            description: "The server memory erase has been cancelled.",
-          }),
-        ],
-        components: [],
-      };
-
-      try {
-        return await button.update(cancelV2);
-      } catch {
-        return await button.update(cancelV1);
-      }
+      return await button.update(cancelPayload);
     }
 
     await deleteServerData(interaction.guild.id);
 
-    const successV2 = {
+    const successPayload = {
       components: [
         {
           type: 17,
-          accent_color: EMBED_COLORS.SUCCESS || 0x22c55e,
+          accent_color: EMBED_COLORS.SUCCESS,
           components: [
             {
               type: 10,
@@ -314,39 +234,13 @@ async function handleEraseServer(interaction) {
       ],
     };
 
-    const successV1 = {
-      embeds: [
-        successEmbed({
-          title: "Server Memory Erased",
-          description: `Successfully deleted all stored memory for **${guildName}**.`,
-          fields: [
-            {
-              name: "Deleted Data",
-              value:
-                "• All conversation history\n• All member profiles\n• Memory\n• Server settings",
-            },
-            {
-              name: "Requested By",
-              value: `<@${interaction.user.id}>`,
-              inline: true,
-            },
-          ],
-        }),
-      ],
-      components: [],
-    };
-
-    try {
-      return await button.update(successV2);
-    } catch {
-      return await button.update(successV1);
-    }
+    return await button.update(successPayload);
   } catch {
-    const timeoutV2 = {
+    const timeoutPayload = {
       components: [
         {
           type: 17,
-          accent_color: EMBED_COLORS.WARNING || 0xf59e0b,
+          accent_color: EMBED_COLORS.WARNING,
           components: [
             {
               type: 10,
@@ -359,21 +253,6 @@ async function handleEraseServer(interaction) {
       ],
     };
 
-    const timeoutV1 = {
-      embeds: [
-        warningEmbed({
-          title: "Confirmation Expired",
-          description:
-            "No response was received within 30 seconds. The erase operation has been cancelled.",
-        }),
-      ],
-      components: [],
-    };
-
-    try {
-      return await interaction.editReply(timeoutV2);
-    } catch {
-      return await interaction.editReply(timeoutV1);
-    }
+    return await interaction.editReply(timeoutPayload);
   }
 }

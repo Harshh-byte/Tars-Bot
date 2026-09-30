@@ -99,7 +99,7 @@ async function sendParaMessage(
     interaction.user.displayName ||
     interaction.user.username;
 
-  const v2Payload = {
+  const payload = {
     flags: 32768,
     components: [
       {
@@ -143,7 +143,7 @@ async function sendParaMessage(
     ],
   };
 
-  const response = await sendAndFetchReply(interaction, v2Payload);
+  const response = await sendAndFetchReply(interaction, payload);
 
   if (
     !response ||

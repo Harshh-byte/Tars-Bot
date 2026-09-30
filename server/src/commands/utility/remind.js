@@ -10,12 +10,18 @@ export const aliases = ["timer"];
 
 export const data = {
   name: "remind",
-  description: "Set a smart reminder.",
+  description: "Set a reminder.",
   dm_permission: false,
   options: [
     {
-      name: "task",
-      description: "Reminder details.",
+      name: "about",
+      description: "About what?",
+      type: 3,
+      required: true,
+    },
+    {
+      name: "when",
+      description: "When to remind?",
       type: 3,
       required: true,
     },
@@ -24,10 +30,18 @@ export const data = {
 
 export async function execute(interaction, client) {
   try {
-    let inputText =
-      interaction.options?.getString?.("task") ||
-      interaction.options?.getString?.() ||
-      "";
+    const aboutArg = interaction.options?.getString?.("about");
+    const whenArg = interaction.options?.getString?.("when");
+
+    let inputText = "";
+
+    if (aboutArg && whenArg) {
+      inputText = `${aboutArg} in ${whenArg}`;
+    } else if (aboutArg) {
+      inputText = aboutArg;
+    } else if (interaction.options?.getString?.()) {
+      inputText = interaction.options.getString();
+    }
 
     if (!inputText && interaction.message?.content) {
       const parts = interaction.message.content.trim().split(/ +/);
@@ -35,12 +49,12 @@ export async function execute(interaction, client) {
     }
 
     if (!inputText || inputText.trim() === "") {
-      const usagePayloadV2 = {
+      const usagePayload = {
         flags: MessageFlags.Ephemeral,
         components: [
           {
             type: 17,
-            accent_color: EMBED_COLORS.ERROR || 0xef4444,
+            accent_color: EMBED_COLORS.ERROR,
             components: [
               {
                 type: 10,
@@ -53,7 +67,7 @@ export async function execute(interaction, client) {
         ],
       };
 
-      return interaction.reply(usagePayloadV2);
+      return interaction.reply(usagePayload);
     }
 
     if (typeof interaction.deferReply === "function") {
@@ -63,11 +77,11 @@ export async function execute(interaction, client) {
     const parsed = await parseReminderInput(inputText);
 
     if (!parsed || !parsed.delayMs || parsed.delayMs <= 0) {
-      const invalidV2 = {
+      const invalidPayload = {
         components: [
           {
             type: 17,
-            accent_color: EMBED_COLORS.ERROR || 0xef4444,
+            accent_color: EMBED_COLORS.ERROR,
             components: [
               {
                 type: 10,
@@ -82,9 +96,9 @@ export async function execute(interaction, client) {
       };
 
       if (interaction.deferred || interaction.replied) {
-        return interaction.editReply(invalidV2);
+        return interaction.editReply(invalidPayload);
       }
-      return interaction.reply(invalidV2);
+      return interaction.reply(invalidPayload);
     }
 
     const triggerAt = Date.now() + parsed.delayMs;
@@ -110,18 +124,18 @@ export async function execute(interaction, client) {
       year: "numeric",
     });
 
-    const confirmV2 = {
+    const payload = {
       flags: 32768,
       components: [
         {
           type: 17,
-          accent_color: EMBED_COLORS.WHITE || 0xffffff,
+          accent_color: EMBED_COLORS.WHITE,
           components: [
             {
               type: 10,
               content:
                 `### <:Timer:1542147643021725796> Reminder Scheduled\n` +
-                `> **${parsed.task}**`,
+                `\`-\` **${parsed.task}**`,
             },
             {
               type: 14,
@@ -130,30 +144,17 @@ export async function execute(interaction, client) {
             },
             {
               type: 10,
-              content:
-                `• **Trigger Time:** ${dayDateString} (<t:${unixSeconds}:R>)\n\n` +
-                `-# *I'll send you a DM notification as soon as the timer ends.*`,
+              content: `• I'll remind you in <t:${unixSeconds}:R>`,
             },
           ],
         },
       ],
     };
 
-    const confirmV1 = {
-      content: `<:Timer:1542147643021725796> **Reminder Scheduled:** **${parsed.task}** <t:${unixSeconds}:R> (via DM)`,
-    };
-
-    try {
-      if (interaction.deferred || interaction.replied) {
-        return await interaction.editReply(confirmV2);
-      }
-      return await interaction.reply(confirmV2);
-    } catch {
-      if (interaction.deferred || interaction.replied) {
-        return await interaction.editReply(confirmV1);
-      }
-      return await interaction.reply(confirmV1);
+    if (interaction.deferred || interaction.replied) {
+      return await interaction.editReply(payload);
     }
+    return await interaction.reply(payload);
   } catch (err) {
     logger.error("Error in remind command handler:", err);
   }
