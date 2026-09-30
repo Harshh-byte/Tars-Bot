@@ -21,7 +21,7 @@ function getFormattedMaintenanceTime(startTime) {
   return `Today at ${timeStr}`;
 }
 
-export async function execute(message, client, { buildAiReply, BOT_INFO }) {
+export async function execute(message, client, { buildAiReply }) {
   if (message.author.bot) return;
 
   if (!client.prefixCache) client.prefixCache = new Map();
@@ -206,7 +206,6 @@ export async function execute(message, client, { buildAiReply, BOT_INFO }) {
       try {
         await command.execute(mockInteraction, client, {
           buildAiReply,
-          BOT_INFO,
         });
 
         const isExemptGuild =

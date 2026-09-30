@@ -171,21 +171,18 @@ export async function deliverReminder(client, reminder) {
       await remindersRef.doc(reminder.id).delete();
     } catch (_) {}
 
-    const user = await client.users.fetch(reminder.userId).catch(() => null);
-    if (!user) return;
-
-    const dmPayloadV2 = {
+    const reminderPayload = {
       flags: 32768,
       components: [
         {
           type: 17,
-          accent_color: 0x7c3aed,
+          accent_color: 0x7583ff,
           components: [
             {
               type: 10,
               content:
-                `## <:Timer:1542147643021725796> Reminder Notification\n` +
-                `Hey <@${reminder.userId}>! Here is your scheduled reminder:`,
+                `## <:Timer:1542147643021725796> Reminder\n` +
+                `Hey <@${reminder.userId}>! You asked to be reminded of:`,
             },
             {
               type: 14,
@@ -203,45 +200,24 @@ export async function deliverReminder(client, reminder) {
             },
             {
               type: 10,
-              content:
-                `-# Set <t:${Math.floor(reminder.createdAt / 1000)}:R>` +
-                (reminder.guildName ? ` in **${reminder.guildName}**` : ""),
+              content: `-# Set <t:${Math.floor(reminder.createdAt / 1000)}:R>`,
             },
           ],
         },
       ],
     };
 
-    const dmPayloadV1 = {
-      content: `<:Timer:1542147643021725796> **Reminder:** <@${reminder.userId}>! ${reminder.task}`,
-    };
-
-    let sent = false;
-    try {
-      await user.send(dmPayloadV2);
-      sent = true;
-    } catch (v2Err) {
-      try {
-        await user.send(dmPayloadV1);
-        sent = true;
-      } catch (dmErr) {
-        logger.warn(
-          `Could not send DM to user ${reminder.userId}:`,
-          dmErr.message,
-        );
-      }
-    }
-
-    if (!sent && reminder.channelId) {
+    if (reminder.channelId) {
       const channel = await client.channels
         .fetch(reminder.channelId)
         .catch(() => null);
       if (channel && typeof channel.send === "function") {
-        await channel
-          .send({
-            content: `⏰ <@${reminder.userId}> (Could not DM you): **${reminder.task}**`,
-          })
-          .catch(() => null);
+        await channel.send(reminderPayload).catch((chanErr) => {
+          logger.warn(
+            `Could not send reminder to channel ${reminder.channelId}:`,
+            chanErr.message,
+          );
+        });
       }
     }
   } catch (err) {
