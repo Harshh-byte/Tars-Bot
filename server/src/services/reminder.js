@@ -181,7 +181,7 @@ export async function deliverReminder(client, reminder) {
             {
               type: 10,
               content:
-                `## <:Timer:1542147643021725796> Reminder\n` +
+                `## <:Timer:1554945799308443748> Reminder\n` +
                 `Hey <@${reminder.userId}>! You asked to be reminded of:`,
             },
             {
