@@ -191,7 +191,7 @@ export async function execute(interaction, client) {
         `TARS will now post memes in ${targetChannel} every *${INTERVAL_LABELS[intervalInput]}*.`,
       )
       .addFields({
-        name: "<:Timer:1542147643021725796> Next Meme Scheduled",
+        name: "<:Timer:1554945799308443748> Next Meme Scheduled",
         value: `<t:${Math.floor(nextPostAt / 1000)}:R>`,
       })
       .setColor(EMBED_COLORS.SUCCESS);
