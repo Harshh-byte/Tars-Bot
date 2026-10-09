@@ -108,7 +108,7 @@ export async function updateServerSettings(serverId, key, value) {
   if (!serverId) throw new Error("serverId is required.");
   await serverDoc(serverId).set(
     {
-      [`settings.${key}`]: value,
+      [`${key}`]: value,
       updatedAt: FieldValue.serverTimestamp(),
     },
     { merge: true },
@@ -444,7 +444,7 @@ export async function setUserGender(serverId, userId, gender) {
       { merge: true },
     );
   } catch (err) {
-    logger.error("Error setting user gender:", err);
+    logger.error("Error fetching user gender:", err);
   }
 }
 

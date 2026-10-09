@@ -1,24 +1,22 @@
 import { EmbedBuilder, PermissionFlagsBits } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { EMBED_COLORS, errorEmbed, successEmbed } from "../../utils/embeds.js";
+import { EMBED_COLORS, errorEmbed } from "../../utils/embeds.js";
 import { updateServerSettings } from "../../services/database.js";
-
-export const aliases = ["pref"];
 
 export const data = {
   name: "prefix",
-  description: "View or change command prefix.",
+  description: "View or change prefix.",
   dm_permission: false,
   options: [
     {
       type: 1,
       name: "set",
-      description: "Set a new command prefix.",
+      description: "Set a new prefix.",
       options: [
         {
-          name: "new_prefix",
-          description: "New prefix to set.",
+          name: "prefix",
+          description: "New prefix.",
           type: 3,
           required: true,
         },
@@ -27,7 +25,7 @@ export const data = {
     {
       type: 1,
       name: "view",
-      description: "View current server prefix.",
+      description: "View server prefix.",
     },
   ],
 };
@@ -41,7 +39,7 @@ export async function execute(interaction, client) {
     } catch {}
 
     const rawInput =
-      interaction.options?.getString("new_prefix") ||
+      interaction.options?.getString("prefix") ||
       interaction.options?.getString("getString") ||
       "";
 
@@ -60,8 +58,7 @@ export async function execute(interaction, client) {
       const currentPrefix = client.prefixCache?.get(serverId) || ".";
       const embed = new EmbedBuilder()
         .setDescription(
-          `<:Prefix:1542236764465274910> Server prefix is \`${currentPrefix}\`\n\n` +
-            `*Use \`.prefix set [prefix]\` or \`/prefix set [prefix]\` to change it.*`,
+          `<:Prefix:1542236764465274910> Server prefix is \`${currentPrefix}\``,
         )
         .setColor(EMBED_COLORS.WHITE);
       return interaction.reply({ embeds: [embed] });
