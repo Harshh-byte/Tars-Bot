@@ -22,6 +22,7 @@ import { detectUserGender } from "./src/utils/genderDetector.js";
 import logger from "./src/utils/logger.js";
 import * as interactionCreateEvent from "./src/events/interactionCreate.js";
 import * as messageCreateEvent from "./src/events/messageCreate.js";
+import * as guildCreateEvent from "./src/events/guildCreate.js";
 import { initReminderManager } from "./src/services/reminder.js";
 import { initAutoMemeService } from "./src/services/automeme.js";
 
@@ -34,6 +35,10 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
+  allowedMentions: {
+    parse: [],
+    repliedUser: false,
+  },
 });
 let maintenanceActive = false;
 let maintenanceStartTime = null;
@@ -552,6 +557,9 @@ client.on(Events.InteractionCreate, (interaction) =>
 );
 client.on(Events.MessageCreate, (message) =>
   messageCreateEvent.execute(message, client, { buildAiReply }),
+);
+client.on(Events.GuildCreate, (guild) =>
+  guildCreateEvent.execute(guild, client),
 );
 client.on(Events.GuildMemberRemove, async (member) => {
   try {

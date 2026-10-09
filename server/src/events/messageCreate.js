@@ -3,10 +3,6 @@ import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { checkCooldown } from "../utils/cooldowns.js";
 import { errorEmbed } from "../utils/embeds.js";
-import {
-  createSlashNoticeEmbed,
-  shouldSendSlashNotice,
-} from "../utils/slashNotice.js";
 
 export const name = Events.MessageCreate;
 
@@ -164,37 +160,46 @@ export async function execute(message, client, { buildAiReply }) {
         },
         reply: async (payload) => {
           mockInteraction.replied = true;
+          const cleanPayload =
+            typeof payload === "string" ? { content: payload } : { ...payload };
+          cleanPayload.allowedMentions = { parse: [], repliedUser: false };
           sentMessage =
             commandName === "ask" || commandName === "about"
               ? await message
-                  .reply(payload)
-                  .catch(() => message.channel.send(payload))
-              : await message.channel.send(payload).catch(() => null);
+                  .reply(cleanPayload)
+                  .catch(() => message.channel.send(cleanPayload))
+              : await message.channel.send(cleanPayload).catch(() => null);
           return sentMessage;
         },
         followUp: async (payload) => {
+          const cleanPayload =
+            typeof payload === "string" ? { content: payload } : { ...payload };
+          cleanPayload.allowedMentions = { parse: [], repliedUser: false };
           if (sentMessage) {
-            return sentMessage.edit(payload);
+            return sentMessage.edit(cleanPayload);
           }
           sentMessage =
             commandName === "ask" || commandName === "about"
               ? await message
-                  .reply(payload)
-                  .catch(() => message.channel.send(payload))
-              : await message.channel.send(payload).catch(() => null);
+                  .reply(cleanPayload)
+                  .catch(() => message.channel.send(cleanPayload))
+              : await message.channel.send(cleanPayload).catch(() => null);
           return sentMessage;
         },
         editReply: async (payload) => {
           mockInteraction.replied = true;
+          const cleanPayload =
+            typeof payload === "string" ? { content: payload } : { ...payload };
+          cleanPayload.allowedMentions = { parse: [], repliedUser: false };
           if (sentMessage) {
-            return sentMessage.edit(payload);
+            return sentMessage.edit(cleanPayload);
           }
           sentMessage =
             commandName === "ask" || commandName === "about"
               ? await message
-                  .reply(payload)
-                  .catch(() => message.channel.send(payload))
-              : await message.channel.send(payload).catch(() => null);
+                  .reply(cleanPayload)
+                  .catch(() => message.channel.send(cleanPayload))
+              : await message.channel.send(cleanPayload).catch(() => null);
           return sentMessage;
         },
         deleteReply: async () => {
@@ -207,22 +212,6 @@ export async function execute(message, client, { buildAiReply }) {
         await command.execute(mockInteraction, client, {
           buildAiReply,
         });
-
-        const isExemptGuild =
-          message.guild?.id && message.guild.id === EXEMPT_GUILD_ID;
-        if (
-          !isExemptGuild &&
-          shouldSendSlashNotice(message.author.id, 15, 600000)
-        ) {
-          setTimeout(async () => {
-            const noticeEmbed = createSlashNoticeEmbed(
-              client.user?.username || "TARS",
-            );
-            await message.channel
-              .send({ embeds: [noticeEmbed] })
-              .catch(() => null);
-          }, 1000);
-        }
       } catch (err) {
         logger.error(`Error executing prefix command .${commandName}:`, err);
         Sentry.captureException(err);
@@ -273,6 +262,7 @@ export async function execute(message, client, { buildAiReply }) {
     }
 
     if (messagePayload.content || messagePayload.files) {
+      messagePayload.allowedMentions = { parse: [], repliedUser: false };
       await message.reply(messagePayload);
     }
   } catch (err) {
