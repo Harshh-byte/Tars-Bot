@@ -43,7 +43,7 @@ export async function execute(interaction, client) {
         content:
           `## Bot Infomation\n` +
           `-# ᴘʟᴇɴᴛʏ ᴏꜰ ʜᴜᴍᴀɴꜱ ᴏᴜᴛ ᴛʜᴇʀᴇ, ʙᴜᴛ ᴅᴏᴡɴ ʜᴇʀᴇ ɪᴛ'ꜱ ᴊᴜꜱᴛ ᴜꜱ.\n\n` +
-          `Hey, I'm __**TARS**__!\n` +
+          `Hey, I'm __**${client.user.displayName}**__!\n` +
           `*A sarcasm-packed Discord companion ready to chat, entertain, and assist on demand.*`,
       },
     ],
