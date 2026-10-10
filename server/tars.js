@@ -374,7 +374,7 @@ export async function buildAiReply({
 
   let systemPrompt;
   if (mode === "ask") {
-    systemPrompt = `You are TARS — the sharp, witty Discord AI assistant.
+    systemPrompt = `You are Tars — the sharp, witty Discord assistant.
 The user asked: "${inputText}".
 
 LIVE SYSTEM DATA:
@@ -582,7 +582,7 @@ app.get("/", (req, res) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TARS Bot</title>
+  <title>Tars Bot</title>
   <link rel="icon" type="image/png" href="/assets/Icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -634,7 +634,7 @@ app.get("/", (req, res) => {
 <body>
   <div class="status">
     <span class="dot"></span>
-    <span>TARS Bot is active.</span>
+    <span>Tars Bot is active.</span>
   </div>
 </body>
 </html>`);

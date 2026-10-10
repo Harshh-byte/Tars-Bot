@@ -68,7 +68,7 @@ export async function execute(message, client, { buildAiReply }) {
         .setColor(0xffa502)
         .setTitle("<:Updates:1526472917964030053> **System Maintenance**")
         .setDescription(
-          "TARS is currently undergoing scheduled maintenance and will be back online shortly.",
+          `${client.user.displayName} is currently undergoing scheduled maintenance and will be back online shortly.`,
         )
         .setFooter({
           text: getFormattedMaintenanceTime(client.maintenanceStartTime),

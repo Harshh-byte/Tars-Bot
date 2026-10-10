@@ -29,13 +29,6 @@ export const data = {
         { name: "Disable", value: "off" },
       ],
     },
-    {
-      name: "channel",
-      description: "Specify channel for memes.",
-      type: 7,
-      required: false,
-      channel_types: [ChannelType.GuildText],
-    },
   ],
 };
 
@@ -134,8 +127,7 @@ export async function execute(interaction, client) {
     }
 
     const hours = INTERVAL_HOURS_MAP[intervalInput];
-    const targetChannel =
-      interaction.options?.getChannel?.("channel") || interaction.channel;
+    const targetChannel = interaction.channel;
 
     if (!targetChannel || targetChannel.type !== ChannelType.GuildText) {
       return interaction.reply
@@ -188,7 +180,7 @@ export async function execute(interaction, client) {
     const confirmEmbed = new EmbedBuilder()
       .setTitle("**AutoMeme Enabled!**")
       .setDescription(
-        `TARS will now post memes in ${targetChannel} every *${INTERVAL_LABELS[intervalInput]}*.`,
+        `${client.user.displayName} will now post memes every *${INTERVAL_LABELS[intervalInput]}*.`,
       )
       .addFields({
         name: "<:Timer:1554945799308443748> Next Meme Scheduled",

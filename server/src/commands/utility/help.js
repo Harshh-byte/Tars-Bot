@@ -157,7 +157,7 @@ const modulesCatalog = {
       { name: "Ping", cmd: "ping", desc: "Check bot latency." },
       { name: "About", cmd: "about", desc: "View information about the bot." },
       { name: "Remind", cmd: "remind", desc: "Set a reminder." },
-      { name: "Ask", cmd: "ask", desc: "Ask TARS anything." },
+      { name: "Ask", cmd: "ask", desc: "Ask Tars anything." },
       { name: "Purge", cmd: "purge", desc: "Purge messages from the channel." },
       {
         name: "AutoMeme",
@@ -243,7 +243,7 @@ export async function execute(interaction, client) {
     const bookNotice = `<:Book:1542647324570816532> Use \`${prefix}help (command)\` for details on a specific command`;
 
     const mainEmbed = new EmbedBuilder()
-      .setTitle("TARS Help")
+      .setTitle(`${client.user.displayName} Help`)
       .setDescription(
         "-# Experience the ultimate Discord bot designed for seamless management and community engagement.",
       )
@@ -392,7 +392,7 @@ export async function execute(interaction, client) {
 
       if (selectedModule === "module_home") {
         titleText =
-          `## TARS Help\n` +
+          `## ${client.user.displayName} Help\n` +
           `-# Experience the ultimate Discord bot designed for seamless management and community engagement.`;
         bodyText =
           `<:Prefix:1542236764465274910> **Prefix** \`${prefix}\`\n` +

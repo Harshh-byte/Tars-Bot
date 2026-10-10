@@ -206,7 +206,7 @@ async function startGame(interaction, client, opponent) {
       interaction.user.displayName ||
       interaction.user.username;
     const playerOName = isVsTars
-      ? "TARS"
+      ? client.user.displayName
       : interaction.guild?.members.cache.get(opponent.id)?.displayName ||
         opponent.displayName ||
         opponent.username;
