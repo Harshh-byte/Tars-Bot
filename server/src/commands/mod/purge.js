@@ -1,5 +1,6 @@
 import { PermissionFlagsBits, MessageFlags, EmbedBuilder } from "discord.js";
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 import logger from "../../utils/logger.js";
 
 export const data = {
@@ -133,7 +134,7 @@ export async function execute(interaction, client) {
       const botDeniedEmbed = new EmbedBuilder()
         .setColor(EMBED_COLORS.ERROR)
         .setDescription(
-          `<:Failed:1526228290413658184> I don't have permission to purge messages in ${interaction.channel}! Missing permissions: ${missing.join(", ")}.`,
+          `${EMOJIS.Failed} I don't have permission to purge messages in ${interaction.channel}! Missing permissions: ${missing.join(", ")}.`,
         );
 
       return sendResponse(
@@ -198,7 +199,7 @@ export async function execute(interaction, client) {
     const missingCountEmbed = new EmbedBuilder()
       .setColor(EMBED_COLORS.WARNING)
       .setDescription(
-        `<:Warning:1526228248458035381> Please specify the number of messages to purge.`,
+        `${EMOJIS.Warning} Please specify the number of messages to purge.`,
       );
 
     return sendResponse(
@@ -268,7 +269,7 @@ export async function execute(interaction, client) {
       const emptyEmbed = new EmbedBuilder()
         .setColor(EMBED_COLORS.WARNING)
         .setDescription(
-          `<:Warning:1526228248458035381> No messages found eligible for purge.`,
+          `${EMOJIS.Warning} No messages found eligible for purge.`,
         );
 
       return sendResponse(
@@ -291,7 +292,7 @@ export async function execute(interaction, client) {
     const successEmbed = new EmbedBuilder()
       .setColor(EMBED_COLORS.SUCCESS)
       .setDescription(
-        `<:Success:1526228339910643793> Successfully purged **${deletedCount}** message${deletedCount === 1 ? "" : "s"}.`,
+        `${EMOJIS.Success} Successfully purged **${deletedCount}** message${deletedCount === 1 ? "" : "s"}.`,
       );
 
     return sendResponse(
@@ -309,7 +310,7 @@ export async function execute(interaction, client) {
     const errorEmbed = new EmbedBuilder()
       .setColor(EMBED_COLORS.ERROR)
       .setDescription(
-        `<:Failed:1526228290413658184> Failed to purge messages.`,
+        `${EMOJIS.Failed} Failed to purge messages.`,
       );
 
     return sendResponse(

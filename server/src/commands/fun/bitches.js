@@ -2,6 +2,7 @@ import { EmbedBuilder } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 
 export const data = {
   name: "bitches",
@@ -23,7 +24,7 @@ function getBitchesCategory(count) {
   if (count >= 35)
     return {
       category: "Getting Your Dick Wet",
-      emoji: "<:blushed:1543158784653004810>",
+      emoji: EMOJIS.lipbite,
     };
   if (count >= 15)
     return { category: "Scraping Bottom of the Barrel", emoji: "🚮" };

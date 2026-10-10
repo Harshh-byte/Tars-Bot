@@ -1,7 +1,8 @@
-import { Events, ChannelType, PermissionFlagsBits } from "discord.js";
+import { Events, ChannelType, PermissionFlagsBits, EmbedBuilder } from "discord.js";
 import { createWelcomePayload } from "../utils/welcomeMessage.js";
 import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
+import { EMOJIS } from "../utils/emojis.js";
 
 export const name = Events.GuildCreate;
 
@@ -9,26 +10,26 @@ export async function execute(guild, client) {
   try {
     let targetChannel = null;
 
-    if (guild.systemChannelId) {
+    if (guild.systemChannelId && guild.channels?.cache) {
       const systemChan = guild.channels.cache.get(guild.systemChannelId);
       if (
         systemChan &&
         systemChan.type === ChannelType.GuildText &&
-        guild.members.me
-          .permissionsIn(systemChan)
-          .has(PermissionFlagsBits.SendMessages)
+        guild.members?.me
+          ?.permissionsIn(systemChan)
+          ?.has(PermissionFlagsBits.SendMessages)
       ) {
         targetChannel = systemChan;
       }
     }
 
-    if (!targetChannel) {
+    if (!targetChannel && guild.channels?.cache) {
       targetChannel = guild.channels.cache.find(
         (channel) =>
           channel.type === ChannelType.GuildText &&
-          guild.members.me
-            .permissionsIn(channel)
-            .has(PermissionFlagsBits.SendMessages),
+          guild.members?.me
+            ?.permissionsIn(channel)
+            ?.has(PermissionFlagsBits.SendMessages),
       );
     }
 
@@ -49,26 +50,17 @@ export async function execute(guild, client) {
       try {
         const owner = await client.users.fetch(process.env.OWNER_ID);
         const memberCount = guild.memberCount || 0;
-        const ownerCard = {
-          flags: 32768,
-          components: [
-            {
-              type: 17,
-              accent_color: 0xffffff,
-              components: [
-                {
-                  type: 10,
-                  content:
-                    `### <:Entry:1558432844320084110> **Server Joined!**\n` +
-                    `**Server:** ${guild.name}\n` +
-                    `**Members:** \`${memberCount.toLocaleString()}\`\n` +
-                    `-# **${botName}** was successfully added to ${guild.name}.`,
-                },
-              ],
-            },
-          ],
-        };
-        await owner.send(ownerCard).catch(() => null);
+        const ownerEmbed = new EmbedBuilder()
+          .setColor(0x2ecc71)
+          .setTitle(`${EMOJIS.Enter} **Server Joined!**`)
+          .setDescription(
+            `**Server:** ${guild.name}\n` +
+              `**Members:** \`${memberCount.toLocaleString()}\`\n\n` +
+              `-# ${botName} was successfully added to ${guild.name}.`,
+          );
+        await owner.send({ embeds: [ownerEmbed] }).catch((err) => {
+          logger.warn("Failed to send join DM to owner:", err);
+        });
       } catch (err) {
         logger.warn("Could not send join notification to bot owner DM:", err);
       }

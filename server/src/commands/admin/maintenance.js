@@ -1,5 +1,6 @@
 import { MessageFlags, PermissionFlagsBits } from "discord.js";
 import { accessDeniedEmbed } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 import fs from "fs";
 
 export const data = {
@@ -43,7 +44,7 @@ export async function execute(interaction, client) {
               {
                 type: 10,
                 content:
-                  "### <a:Maintenance:1526290002974343308> Maintenance Started",
+                  `### ${EMOJIS.Maintenance} Maintenance Started`,
               },
               {
                 type: 14,
@@ -84,12 +85,12 @@ export async function execute(interaction, client) {
 
       return interaction.reply({
         content:
-          "<a:Maintenance:1526290002974343308> **TARS is now under maintenance mode.**",
+          `${EMOJIS.Maintenance} **TARS is now under maintenance mode.**`,
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {
       return interaction.reply({
-        content: `<:Failed:1526228290413658184> Failed to start maintenance mode: \`${err.message || err}\``,
+        content: `${EMOJIS.Failed} Failed to start maintenance mode: \`${err.message || err}\``,
         flags: MessageFlags.Ephemeral,
       });
     }
@@ -129,7 +130,7 @@ export async function execute(interaction, client) {
               {
                 type: 10,
                 content:
-                  "### <a:Complete:1526291398863880293> Maintenance Completed",
+                  `### ${EMOJIS.Complete} Maintenance Completed`,
               },
               {
                 type: 14,
@@ -166,12 +167,12 @@ export async function execute(interaction, client) {
 
       return interaction.reply({
         content:
-          "<a:Complete:1526291398863880293> **TARS maintenance mode completed!**",
+          `${EMOJIS.Complete} **TARS maintenance mode completed!**`,
         flags: MessageFlags.Ephemeral,
       });
     } catch (err) {
       return interaction.reply({
-        content: `<:Failed:1526228290413658184> Failed to complete maintenance mode: \`${err.message || err}\``,
+        content: `${EMOJIS.Failed} Failed to complete maintenance mode: \`${err.message || err}\``,
         flags: MessageFlags.Ephemeral,
       });
     }

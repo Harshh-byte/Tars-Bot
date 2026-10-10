@@ -3,6 +3,7 @@ import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS, errorEmbed } from "../../utils/embeds.js";
 import { updateServerSettings } from "../../services/database.js";
+import { EMOJIS } from "../../utils/emojis.js";
 
 export const data = {
   name: "prefix",
@@ -58,7 +59,7 @@ export async function execute(interaction, client) {
       const currentPrefix = client.prefixCache?.get(serverId) || ".";
       const embed = new EmbedBuilder()
         .setDescription(
-          `<:Prefix:1542236764465274910> Server prefix is \`${currentPrefix}\``,
+          `${EMOJIS.Prefix} Server prefix is \`${currentPrefix}\``,
         )
         .setColor(EMBED_COLORS.WHITE);
       return interaction.reply({ embeds: [embed] });
@@ -100,7 +101,7 @@ export async function execute(interaction, client) {
 
     const sEmbed = new EmbedBuilder()
       .setDescription(
-        `<:Prefix:1542236764465274910> Server prefix changed to \`${cleanedPrefix}\``,
+        `${EMOJIS.Prefix} Server prefix changed to \`${cleanedPrefix}\``,
       )
       .setColor(EMBED_COLORS.WHITE);
 

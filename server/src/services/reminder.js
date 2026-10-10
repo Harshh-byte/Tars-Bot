@@ -2,6 +2,7 @@ import admin from "firebase-admin";
 import { GoogleGenAI } from "@google/genai";
 import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
+import { EMOJIS } from "../utils/emojis.js";
 
 const db = admin.firestore();
 const remindersRef = db.collection("reminders");
@@ -181,7 +182,7 @@ export async function deliverReminder(client, reminder) {
             {
               type: 10,
               content:
-                `## <:Timer:1554945799308443748> Reminder\n` +
+                `## ${EMOJIS.Timer} Reminder\n` +
                 `Hey <@${reminder.userId}>! You asked to be reminded of:`,
             },
             {

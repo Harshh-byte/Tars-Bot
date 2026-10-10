@@ -1,4 +1,5 @@
 import { EmbedBuilder } from "discord.js";
+import { EMOJIS } from "./emojis.js";
 
 export const EMBED_COLORS = {
   INFO: 0x5865f2,
@@ -43,7 +44,7 @@ export function successEmbed({
 }) {
   const embed = new EmbedBuilder()
     .setColor(EMBED_COLORS.SUCCESS)
-    .setTitle(`<:Success:1526228339910643793> **${title}**`);
+    .setTitle(`${EMOJIS.Success} **${title}**`);
   if (author) embed.setAuthor(author);
   if (description) embed.setDescription(description);
   if (fields.length) embed.addFields(fields);
@@ -53,7 +54,7 @@ export function successEmbed({
 export function errorEmbed({ title = "Error", description, author }) {
   const embed = new EmbedBuilder()
     .setColor(EMBED_COLORS.ERROR)
-    .setTitle(`<:Failed:1526228290413658184> **${title}**`);
+    .setTitle(`${EMOJIS.Failed} **${title}**`);
   if (author) embed.setAuthor(author);
   if (description) embed.setDescription(description);
   return embed;
@@ -62,7 +63,7 @@ export function errorEmbed({ title = "Error", description, author }) {
 export function warningEmbed({ title = "Warning", description, author }) {
   const embed = new EmbedBuilder().setColor(EMBED_COLORS.WARNING);
   if (author) embed.setAuthor(author);
-  if (title) embed.setTitle(`<:Warning:1526228248458035381> **${title}**`);
+  if (title) embed.setTitle(`${EMOJIS.Warning} **${title}**`);
   if (description) embed.setDescription(description);
   return embed;
 }

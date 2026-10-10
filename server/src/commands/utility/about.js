@@ -1,4 +1,5 @@
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS, EMOJI_IDS } from "../../utils/emojis.js";
 
 export const aliases = ["info"];
 
@@ -41,7 +42,7 @@ export async function execute(interaction, client) {
       {
         type: 10,
         content:
-          `### <a:TapTap:1526235921643737219> Bot Infomation\n` +
+          `### ${EMOJIS.TapTap} Bot Infomation\n\n` +
           `Hey, I'm __**${client.user.displayName}**__!\n` +
           `*A sarcasm-packed Discord companion ready to chat, entertain, and assist on demand.*`,
       },
@@ -70,14 +71,14 @@ export async function execute(interaction, client) {
         type: 2,
         style: 5,
         label: "Invite Me",
-        emoji: { id: "1554756188904759316", name: "Invite" },
+        emoji: { id: EMOJI_IDS.Invite, name: "Invite" },
         url: inviteUrl,
       },
       {
         type: 2,
         style: 5,
         label: "Developer",
-        emoji: { id: "1554756441074573353", name: "Developer" },
+        emoji: { id: EMOJI_IDS.Developer, name: "Developer" },
         url: `https://discord.com/users/${process.env.OWNER_ID}`,
       },
     ],

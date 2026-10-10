@@ -2,6 +2,7 @@ import { EmbedBuilder } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 
 export const aliases = ["dih"];
 
@@ -23,14 +24,14 @@ function getPpCategory(inches) {
   if (inches >= 12)
     return {
       category: "Throat Destroyer",
-      emoji: "<:lipbite:1543158624572932156>",
+      emoji: EMOJIS.lipbite,
     };
   if (inches >= 8) return { category: "Heavy Duty Meat", emoji: "🍌" };
   if (inches >= 4) return { category: "Average Pencil Pusher", emoji: "🍆" };
   if (inches > 0)
     return {
       category: "Limp Micro-Needle",
-      emoji: "<:nopepe:1543158686870937661>",
+      emoji: EMOJIS.nopepe,
     };
   return { category: "Inverted Hole", emoji: "🕳️" };
 }

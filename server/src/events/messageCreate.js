@@ -3,6 +3,7 @@ import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { checkCooldown } from "../utils/cooldowns.js";
 import { errorEmbed } from "../utils/embeds.js";
+import { EMOJIS } from "../utils/emojis.js";
 
 export const name = Events.MessageCreate;
 
@@ -66,7 +67,7 @@ export async function execute(message, client, { buildAiReply }) {
     if (message.content.startsWith(PREFIX) || isMentioned || isReplyToBot) {
       const maintenanceEmbed = new EmbedBuilder()
         .setColor(0xffa502)
-        .setTitle("<:Updates:1526472917964030053> **System Maintenance**")
+        .setTitle(`${EMOJIS.Updates} **System Maintenance**`)
         .setDescription(
           `${client.user.displayName} is currently undergoing scheduled maintenance and will be back online shortly.`,
         )
@@ -98,7 +99,7 @@ export async function execute(message, client, { buildAiReply }) {
             name: message.member?.displayName || message.author.username,
             iconURL: userAvatar,
           },
-          description: `<:Timer:1542147643021725796> You can use \`${PREFIX}${commandName}\` again <t:${cooldown.expirationTimestamp}:R>.`,
+          description: `${EMOJIS.Timer} You can use \`${PREFIX}${commandName}\` again <t:${cooldown.expirationTimestamp}:R>.`,
         });
 
         await message.reply({ embeds: [cooldownEmbed] }).catch(() => null);

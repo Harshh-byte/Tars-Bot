@@ -4,6 +4,7 @@ import {
   saveAndScheduleReminder,
 } from "../../services/reminder.js";
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 import logger from "../../utils/logger.js";
 
 export const aliases = ["timer"];
@@ -59,7 +60,7 @@ export async function execute(interaction, client) {
               {
                 type: 10,
                 content:
-                  `### <:Failed:1526228290413658184> Missing Reminder Details\n` +
+                  `### ${EMOJIS.Failed} Missing Reminder Details\n` +
                   `Please specify a time and task for the reminder.`,
               },
             ],
@@ -86,7 +87,7 @@ export async function execute(interaction, client) {
               {
                 type: 10,
                 content:
-                  `### <:Failed:1526228290413658184> Could Not Parse Time\n` +
+                  `### ${EMOJIS.Failed} Could Not Parse Time\n` +
                   `I couldn't figure out the timeframe from \`${inputText}\`.\n\n` +
                   `Try specifying a duration like \`in 2 hours\`, \`30 mins\`, or \`10m\`.`,
               },
@@ -134,7 +135,7 @@ export async function execute(interaction, client) {
             {
               type: 10,
               content:
-                `### <:Timer:1554945799308443748> Reminder Scheduled\n` +
+                `### ${EMOJIS.Timer} Reminder Scheduled\n` +
                 `\`-\` **${parsed.task}**`,
             },
             {

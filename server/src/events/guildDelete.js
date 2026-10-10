@@ -1,7 +1,8 @@
-import { Events, AuditLogEvent } from "discord.js";
+import { Events, AuditLogEvent, EmbedBuilder } from "discord.js";
 import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { deleteServerData } from "../services/database.js";
+import { EMOJIS } from "../utils/emojis.js";
 
 export const name = Events.GuildDelete;
 
@@ -11,8 +12,8 @@ export async function execute(guild, client) {
     const isServerDeleted = guild.available === false;
     let titleText = isServerDeleted ? "Server Deleted" : "Server Removed";
     let detailText = isServerDeleted
-      ? `**${guild.name}** was deleted or became unavailable.`
-      : `**${botName}** was removed from ${guild.name}.`;
+      ? `${guild.name} was deleted or became unavailable.`
+      : `${botName} was removed from ${guild.name}.`;
     let kickedByText = "";
 
     if (!isServerDeleted) {
@@ -46,26 +47,17 @@ export async function execute(guild, client) {
       try {
         const owner = await client.users.fetch(process.env.OWNER_ID);
         const memberCount = guild.memberCount || 0;
-        const ownerCard = {
-          flags: 32768,
-          components: [
-            {
-              type: 17,
-              accent_color: 0xed4245,
-              components: [
-                {
-                  type: 10,
-                  content:
-                    `### <:Exit:1558432876586864682> **${titleText}**\n` +
-                    `**Server:** ${guild.name}\n` +
-                    `**Members:** \`${memberCount.toLocaleString()}\`${kickedByText}\n` +
-                    `-# ${detailText}`,
-                },
-              ],
-            },
-          ],
-        };
-        await owner.send(ownerCard).catch(() => null);
+        const ownerEmbed = new EmbedBuilder()
+          .setColor(0xed4245)
+          .setTitle(`${EMOJIS.Exit} **${titleText}**`)
+          .setDescription(
+            `**Server:** ${guild.name}\n` +
+            `**Members:** \`${memberCount.toLocaleString()}\`${kickedByText}\n\n` +
+            `-# ${detailText}`,
+          );
+        await owner.send({ embeds: [ownerEmbed] }).catch((err) => {
+          logger.warn("Failed to send leave DM to owner:", err);
+        });
       } catch (err) {
         logger.warn("Could not send leave notification to bot owner DM:", err);
       }
@@ -75,3 +67,4 @@ export async function execute(guild, client) {
     Sentry.captureException(err);
   }
 }
+

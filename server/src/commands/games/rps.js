@@ -1,6 +1,7 @@
 import { ComponentType, MessageFlags } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
+import { EMOJIS } from "../../utils/emojis.js";
 
 export const data = {
   name: "rps",
@@ -142,11 +143,11 @@ async function startGame(interaction, client, opponent) {
         } else if (CHOICES[userChoice].beats === tarsChoice) {
           const quote =
             userWinQuotes[Math.floor(Math.random() * userWinQuotes.length)];
-          resultText = `<a:Tada:1544329561955770488> **You won!** Your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}** beats TARS's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}**.\n\n*${quote}*`;
+          resultText = `${EMOJIS.Tada} **You won!** Your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}** beats TARS's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}**.\n\n*${quote}*`;
         } else {
           const quote =
             tarsWinQuotes[Math.floor(Math.random() * tarsWinQuotes.length)];
-          resultText = `<a:Tada:1544329561955770488> **TARS won!** TARS's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}** beats your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.\n\n*${quote}*`;
+          resultText = `${EMOJIS.Tada} **TARS won!** TARS's ${CHOICES[tarsChoice].emoji} **${CHOICES[tarsChoice].name}** beats your ${CHOICES[userChoice].emoji} **${CHOICES[userChoice].name}**.\n\n*${quote}*`;
         }
 
         const resultContainerPayload = {
@@ -354,11 +355,11 @@ async function startGame(interaction, client, opponent) {
       });
 
       const p1Choice = playerChoices[interaction.user.id]
-        ? "<:Success:1526228339910643793> Picked"
-        : "<:Timer:1554945799308443748> Waiting...";
+        ? `${EMOJIS.Success} Picked`
+        : `${EMOJIS.Timer} Waiting...`;
       const p2Choice = playerChoices[opponent.id]
-        ? "<:Success:1526228339910643793> Picked"
-        : "<:Timer:1554945799308443748> Waiting...";
+        ? `${EMOJIS.Success} Picked`
+        : `${EMOJIS.Timer} Waiting...`;
 
       const updatedContainer = {
         flags: 32768,
@@ -433,9 +434,9 @@ async function startGame(interaction, client, opponent) {
         if (c1 === c2) {
           resultMsg = `🫱🏻‍🫲🏿 **It's a tie!** Both players picked ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
         } else if (CHOICES[c1].beats === c2) {
-          resultMsg = `<a:Tada:1544329561955770488> **<@${interaction.user.id}> wins!**\n${CHOICES[c1].emoji} **${CHOICES[c1].name}** beats ${CHOICES[c2].emoji} **${CHOICES[c2].name}**.`;
+          resultMsg = `${EMOJIS.Tada} **<@${interaction.user.id}> wins!**\n${CHOICES[c1].emoji} **${CHOICES[c1].name}** beats ${CHOICES[c2].emoji} **${CHOICES[c2].name}**.`;
         } else {
-          resultMsg = `<a:Tada:1544329561955770488> **<@${opponent.id}> wins!**\n${CHOICES[c2].emoji} **${CHOICES[c2].name}** beats ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
+          resultMsg = `${EMOJIS.Tada} **<@${opponent.id}> wins!**\n${CHOICES[c2].emoji} **${CHOICES[c2].name}** beats ${CHOICES[c1].emoji} **${CHOICES[c1].name}**.`;
         }
 
         const pvpContainerPayload = {
@@ -509,11 +510,11 @@ async function startGame(interaction, client, opponent) {
         });
       } else {
         const p1Status = playerChoices[interaction.user.id]
-          ? "<:Success:1526228339910643793> Picked"
-          : "<:Failed:1526228290413658184> Timed out!";
+          ? `${EMOJIS.Success} Picked`
+          : `${EMOJIS.Failed} Timed out!`;
         const p2Status = playerChoices[opponent.id]
-          ? "<:Success:1526228339910643793> Picked"
-          : "<:Failed:1526228290413658184> Timed out!";
+          ? `${EMOJIS.Success} Picked`
+          : `${EMOJIS.Failed} Timed out!`;
 
         const timeoutContainer = {
           flags: 32768,

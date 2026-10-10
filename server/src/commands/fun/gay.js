@@ -2,6 +2,7 @@ import { EmbedBuilder } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 
 export const aliases = ["howgay"];
 
@@ -28,7 +29,7 @@ function getGayCategory(percentage) {
   if (percentage >= 15)
     return {
       category: "Checks Out Guys in Gym Showers",
-      emoji: "<:suseyes:1543158740985839638>",
+      emoji: EMOJIS.suseyes,
     };
   return { category: "Hetero Alpha", emoji: "🗿" };
 }

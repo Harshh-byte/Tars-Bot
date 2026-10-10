@@ -1,5 +1,6 @@
 import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
+import { EMOJI_IDS } from "../../utils/emojis.js";
 import {
   getTopFlagPlayers,
   getTopPokemonPlayers,
@@ -221,7 +222,7 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
                 type: 2,
                 style: 2,
                 custom_id: `lb_prev_${normalizedCat}_${currentPage}`,
-                emoji: { id: "1542658287894528100" },
+                emoji: { id: EMOJI_IDS.Left },
                 disabled: currentPage <= 1,
               },
               {
@@ -235,7 +236,7 @@ async function buildLbPayload(guild, category, page = 1, userId = null) {
                 type: 2,
                 style: 2,
                 custom_id: `lb_next_${normalizedCat}_${currentPage}`,
-                emoji: { id: "1542658241400414298" },
+                emoji: { id: EMOJI_IDS.Right },
                 disabled: currentPage >= totalPages,
               },
             ],

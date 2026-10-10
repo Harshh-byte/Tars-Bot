@@ -1,4 +1,5 @@
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS, EMOJI_IDS } from "../../utils/emojis.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { addScrambleScore } from "../../services/database.js";
@@ -193,7 +194,7 @@ export async function execute(interaction) {
     if (activeGamesMap.has(channel.id)) {
       return interaction.reply({
         content:
-          "<:Timer:1542147643021725796> A game is already active in this channel!",
+          `${EMOJIS.Timer} A game is already active in this channel!`,
         flags: 64,
       });
     }
@@ -419,10 +420,10 @@ export async function execute(interaction) {
         msgCollector.stop("guessed");
 
         await m
-          .react("1526228339910643793")
+          .react(EMOJI_IDS.Success)
           .catch(() =>
             m
-              .react("<:Success:1526228339910643793>")
+              .react(EMOJIS.Success)
               .catch(() => m.react("✅").catch(() => null)),
           );
 
@@ -472,7 +473,7 @@ export async function execute(interaction) {
               components: [
                 {
                   type: 10,
-                  content: `### <a:Tada:1544329561955770488> Correct Unscramble!`,
+                  content: `### ${EMOJIS.Tada} Correct Unscramble!`,
                 },
                 {
                   type: 14,

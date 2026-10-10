@@ -1,4 +1,5 @@
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 
@@ -225,7 +226,7 @@ export async function execute(interaction) {
                   {
                     type: 10,
                     content:
-                      "<:Failed:1526228290413658184> Game lobby was cancelled by the host.",
+                      `${EMOJIS.Failed} Game lobby was cancelled by the host.`,
                   },
                 ],
               },
@@ -460,7 +461,7 @@ async function runGameLoop(channel, players) {
               components: [
                 {
                   type: 10,
-                  content: "### <a:Tada:1544329561955770488> CREWMATES WIN!",
+                  content: `### ${EMOJIS.Tada} CREWMATES WIN!`,
                 },
                 {
                   type: 14,
@@ -799,7 +800,7 @@ async function runGameLoop(channel, players) {
               components: [
                 {
                   type: 10,
-                  content: "### <a:Tada:1544329561955770488> CREWMATES WIN!",
+                  content: `### ${EMOJIS.Tada} CREWMATES WIN!`,
                 },
                 {
                   type: 14,
@@ -883,7 +884,7 @@ async function runGameLoop(channel, players) {
         const playerStatusList = postNightAlive
           .map((p) => {
             const hasVoted = votes.has(p.id);
-            return `• ${p.displayName} ${hasVoted ? "<:Success:1526228339910643793> *(Voted)*" : "<:Timer:1554945799308443748> *(Thinking...)*"}`;
+            return `• ${p.displayName} ${hasVoted ? `${EMOJIS.Success} *(Voted)*` : `${EMOJIS.Timer} *(Thinking...)*`}`;
           })
           .join("\n");
 
@@ -1032,7 +1033,7 @@ async function runGameLoop(channel, players) {
                     {
                       type: 10,
                       content:
-                        "### <a:Tada:1544329561955770488> 🤡 JESTER WINS!",
+                        `### ${EMOJIS.Tada} 🤡 JESTER WINS!`,
                     },
                     {
                       type: 14,

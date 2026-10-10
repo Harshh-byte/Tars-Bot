@@ -14,6 +14,7 @@ import {
   accessDeniedEmbed,
   EMBED_COLORS,
 } from "../../utils/embeds.js";
+import { EMOJIS, EMOJI_IDS } from "../../utils/emojis.js";
 import logger from "../../utils/logger.js";
 
 export const data = {
@@ -101,7 +102,7 @@ async function handleEraseUser(interaction, targetUser) {
             {
               type: 10,
               content:
-                `### <:Check:1526228234851450910> Memory Erased\n` +
+                `### ${EMOJIS.Complete} Memory Erased\n` +
                 `Successfully erased all stored memory for **${targetUser.tag}**.\n\n` +
                 `• **Deleted Data:** Conversation history, saved profile, Memory\n` +
                 `• **Requested By:** <@${interaction.user.id}>\n` +
@@ -125,7 +126,7 @@ async function handleEraseUser(interaction, targetUser) {
             {
               type: 10,
               content:
-                `### <:Failed:1526228290413658184> Erase Failed\n` +
+                `### ${EMOJIS.Failed} Erase Failed\n` +
                 `-# Couldn't delete stored memory for <@${targetUser.id}>. Please try again later.`,
             },
           ],
@@ -167,7 +168,7 @@ async function handleEraseServer(interaction) {
                 custom_id: "erase_confirm",
                 style: 4,
                 label: "Delete",
-                emoji: { id: "1526228290413658184", name: "Delete" },
+                emoji: { id: EMOJI_IDS.Failed, name: "Failed" },
               },
               {
                 type: 2,
@@ -224,7 +225,7 @@ async function handleEraseServer(interaction) {
             {
               type: 10,
               content:
-                `### <:Check:1526228234851450910> Server Memory Erased\n` +
+                `### ${EMOJIS.Complete} Server Memory Erased\n` +
                 `Successfully deleted all stored memory for **${guildName}**.\n\n` +
                 `• **Deleted Data:** All conversation history, member profiles, Memory, server settings\n` +
                 `• **Requested By:** <@${interaction.user.id}>`,
