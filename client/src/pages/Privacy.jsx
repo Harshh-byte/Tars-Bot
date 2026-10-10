@@ -12,7 +12,7 @@ export default function Privacy() {
     <div className="min-h-screen bg-ds-bg text-ds-text font-mono flex flex-col">
       <SEO
         title="Privacy Policy"
-        description="How we handle your data and privacy parameters at TARS Bot."
+        description="How we handle your data and privacy parameters at Tars Bot."
       />
       <header className="border-b-3 border-ds-border py-4 px-6 bg-ds-card/85 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -24,11 +24,11 @@ export default function Privacy() {
             >
               <img
                 src="/Icon.png"
-                alt="TARS Logo"
+                alt="Tars Logo"
                 className="w-8 h-8 rounded-none bg-black border border-ds-text p-0.5"
               />
               <span className="font-display font-extrabold tracking-wider text-ds-text text-lg">
-                TARS<span className="text-ds-blurple">.</span>
+                Tars<span className="text-ds-blurple">.</span>
               </span>
             </Link>
             <div className="h-5 w-0.5 bg-ds-border/40" />
@@ -60,7 +60,7 @@ export default function Privacy() {
               <span className="text-ds-blurple">01.</span> Data Collection
             </h2>
             <p className="text-ds-muted mb-4">
-              TARS only collects the minimal scope of metrics required to
+              Tars only collects the minimal scope of metrics required to
               execute bot prompts and maintain standard quality operations:
             </p>
             <ul className="list-none pl-4 space-y-2 text-sm">
@@ -108,7 +108,7 @@ export default function Privacy() {
               Boundaries
             </h2>
             <p className="text-ds-muted">
-              TARS operates using official Discord APIs in full compliance with Discord's
+              Tars operates using official Discord APIs in full compliance with Discord's
               Developer Terms and Privacy Policy. We do not sell, trade, or share
               server statistics or user data with third parties.
             </p>
@@ -126,7 +126,7 @@ export default function Privacy() {
 
           <section className="pt-8 border-t border-ds-border/40 mt-8">
             <p className="text-sm font-medium text-ds-muted">
-              Last Updated: September 2026
+              Last Updated: October 2026
             </p>
           </section>
         </div>
