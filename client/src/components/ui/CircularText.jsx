@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 export default function CircularText({
-  text = "TARS_BOT • COGNITIVE_POWERHOUSE • SAVAGE_COMPANION • ",
+  text = "TARS • ALWAYS WATCHING • ALWAYS SARCASTIC • ",
   radius = 80,
   fontSize = "10px",
   className = "",
