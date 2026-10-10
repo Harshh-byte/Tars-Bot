@@ -1,6 +1,6 @@
-# TARS Bot 🤖
+# Tars Chat Bot
 
-![TARS Bot Banner](./assets/ReadMe.png)
+![Tars Bot Banner](./assets/ReadMe.png)
 
 A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, **React (Vite Dashboard)**, and powered by **Google Gemini AI**. Designed for server engagement, interactive games, custom prefix management, and dynamic help interfaces.
 
@@ -77,5 +77,5 @@ npm start
 ---
 
 <p align="center">
-  <i>Built with 🤍 for modern Discord communities.</i>
+  <i>Built with 🤍 for Discord communities.</i>
 </p>
