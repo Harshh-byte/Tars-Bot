@@ -33,7 +33,7 @@ export async function execute(interaction, client) {
     0,
   );
 
-  const inviteUrl = `https://discord.com/oauth2/authorize?client_id=${client.user.id}&permissions=277025778752&integration_type=0&scope=bot+applications.commands`;
+  const inviteUrl = `https://discord.com/oauth2/authorize?client_id=${client.user.id}&permissions=277024730176&integration_type=0&scope=bot+applications.commands`;
 
   const headerSection = {
     type: 9,
@@ -41,8 +41,7 @@ export async function execute(interaction, client) {
       {
         type: 10,
         content:
-          `## Bot Infomation\n` +
-          `-# ᴘʟᴇɴᴛʏ ᴏꜰ ʜᴜᴍᴀɴꜱ ᴏᴜᴛ ᴛʜᴇʀᴇ, ʙᴜᴛ ᴅᴏᴡɴ ʜᴇʀᴇ ɪᴛ'ꜱ ᴊᴜꜱᴛ ᴜꜱ.\n\n` +
+          `### <a:TapTap:1526235921643737219> Bot Infomation\n` +
           `Hey, I'm __**${client.user.displayName}**__!\n` +
           `*A sarcasm-packed Discord companion ready to chat, entertain, and assist on demand.*`,
       },
@@ -58,11 +57,10 @@ export async function execute(interaction, client) {
   const statsSection = {
     type: 10,
     content:
-      `<a:TapTap:1526235921643737219> **Bot Diagnostics**\n` +
-      `• **Active Servers:** \`${serverCount}\`\n` +
-      `• **Users Monitored:** \`${totalMembers.toLocaleString()}\`\n` +
-      `• **Uptime:** \`${uptimeString}\`\n` +
-      `• **Memory Policy:** \`2-Month Auto Cleanup\``,
+      `**Bot Diagnostics**\n` +
+      `-# \`•\` **Active Servers:** \`${serverCount}\`\n` +
+      `-# \`•\` **Users Monitored:** \`${totalMembers.toLocaleString()}\`\n` +
+      `-# \`•\` **Memory Policy:** \`2-Month Auto Cleanup\``,
   };
 
   const buttonRow = {

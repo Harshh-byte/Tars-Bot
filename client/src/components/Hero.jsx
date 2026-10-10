@@ -155,7 +155,7 @@ export default function Hero() {
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center lg:justify-start">
             <StarBorder
               as="a"
-              href="https://discord.com/oauth2/authorize?client_id=1413246880954978417&permissions=277025778752&integration_type=0&scope=bot+applications.commands"
+              href="https://discord.com/oauth2/authorize?client_id=1413246880954978417&permissions=277024730176&integration_type=0&scope=bot+applications.commands"
               color="var(--accent-color)"
               className="hero-action-btn"
               data-cursor="typing"
