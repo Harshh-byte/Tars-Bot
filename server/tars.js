@@ -23,6 +23,7 @@ import logger from "./src/utils/logger.js";
 import * as interactionCreateEvent from "./src/events/interactionCreate.js";
 import * as messageCreateEvent from "./src/events/messageCreate.js";
 import * as guildCreateEvent from "./src/events/guildCreate.js";
+import * as guildDeleteEvent from "./src/events/guildDelete.js";
 import { initReminderManager } from "./src/services/reminder.js";
 import { initAutoMemeService } from "./src/services/automeme.js";
 
@@ -151,8 +152,13 @@ client.resolveEmoji = function (emojiInput) {
   const customEmoji =
     client.emojis.cache.get(id) ||
     client.emojis.cache.find(
-      (e) => e.name.toLowerCase() === id.toLowerCase() || e.id === id,
+      (e) =>
+        e.available !== false &&
+        (e.name.toLowerCase() === id.toLowerCase() || e.id === id),
     );
+  if (customEmoji && customEmoji.available === false) {
+    return emojiInput.trim();
+  }
   return customEmoji || emojiInput.trim();
 };
 
@@ -163,7 +169,9 @@ function replaceEmojiNamesWithTags(text, guild) {
     /(?<!<a?):([^:\s]+):(?!\d+>)/g,
     (match, emojiName) => {
       const customEmoji = client.emojis.cache.find(
-        (e) => e.name.toLowerCase() === emojiName.toLowerCase(),
+        (e) =>
+          e.available !== false &&
+          e.name.toLowerCase() === emojiName.toLowerCase(),
       );
       return customEmoji ? customEmoji.toString() : "";
     },
@@ -174,11 +182,14 @@ function replaceEmojiNamesWithTags(text, guild) {
 function validateEmojiTags(text) {
   if (!text) return text;
   return text.replace(/<(?:a?):(\w+):(\d+)>/g, (match, name, id) => {
-    if (client.emojis.cache.has(id)) {
+    const existing = client.emojis.cache.get(id);
+    if (existing && existing.available !== false) {
       return match;
     }
     const fallback = client.emojis.cache.find(
-      (e) => e.name.toLowerCase() === name.toLowerCase(),
+      (e) =>
+        e.available !== false &&
+        e.name.toLowerCase() === name.toLowerCase(),
     );
     return fallback ? fallback.toString() : "";
   });
@@ -356,7 +367,9 @@ export async function buildAiReply({
 
   let emojisContext = "";
   try {
-    const globalCustomEmojis = Array.from(client.emojis.cache.values());
+    const globalCustomEmojis = Array.from(client.emojis.cache.values()).filter(
+      (e) => e.available !== false,
+    );
     if (globalCustomEmojis.length > 0) {
       const sampledEmojis = globalCustomEmojis
         .sort(() => 0.5 - Math.random())
@@ -560,6 +573,9 @@ client.on(Events.MessageCreate, (message) =>
 );
 client.on(Events.GuildCreate, (guild) =>
   guildCreateEvent.execute(guild, client),
+);
+client.on(Events.GuildDelete, (guild) =>
+  guildDeleteEvent.execute(guild, client),
 );
 client.on(Events.GuildMemberRemove, async (member) => {
   try {
