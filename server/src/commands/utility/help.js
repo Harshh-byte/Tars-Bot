@@ -8,6 +8,7 @@ import {
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS, EMOJI_IDS } from "../../utils/emojis.js";
 
 export const aliases = ["h"];
 
@@ -29,7 +30,7 @@ const ITEMS_PER_PAGE = 5;
 
 const modulesCatalog = {
   module_games: {
-    title: "<:Games:1542645834808565821> Games Module",
+    title: `${EMOJIS.Games} Games Module`,
     description: "Interactive games & scoreboards.",
     commands: [
       {
@@ -72,7 +73,7 @@ const modulesCatalog = {
     ],
   },
   module_fun: {
-    title: "<:Fun:1542240014388170772> Fun Module",
+    title: `${EMOJIS.Fun} Fun Module`,
     description: "Calculators, roasts, and memes.",
     commands: [
       {
@@ -121,7 +122,7 @@ const modulesCatalog = {
     ],
   },
   module_actions: {
-    title: "<:Actions:1542647256782737559> Actions Module",
+    title: `${EMOJIS.Actions} Actions Module`,
     description: "Roleplay & social interactions.",
     commands: [
       { name: "Smoke", cmd: "smoke", desc: "Take a hit of smoke." },
@@ -134,7 +135,7 @@ const modulesCatalog = {
     ],
   },
   module_utility: {
-    title: "<:Utility:1542239958612320306> Utility Module",
+    title: `${EMOJIS.Utility} Utility Module`,
     description: "Server tools and utilities.",
     commands: [
       {
@@ -186,7 +187,7 @@ export async function execute(interaction, client) {
 
       if (!targetCmd) {
         const notFoundEmbed = new EmbedBuilder()
-          .setTitle("<:Failed:1526228290413658184> Command Not Found")
+          .setTitle(`${EMOJIS.Failed} Command Not Found`)
           .setDescription(
             `No command or alias found for \`${queryCmd}\`.\nType \`${prefix}help\` to view all commands.`,
           )
@@ -221,7 +222,7 @@ export async function execute(interaction, client) {
 
       const detailEmbed = new EmbedBuilder()
         .setTitle(
-          `<:Book:1542647324570816532> **Command: ${prefix}${cmdName}**`,
+          `${EMOJIS.Book} **Command: ${prefix}${cmdName}**`,
         )
         .setDescription(cmdDesc)
         .addFields(
@@ -240,7 +241,7 @@ export async function execute(interaction, client) {
       size: 512,
     });
 
-    const bookNotice = `<:Book:1542647324570816532> Use \`${prefix}help (command)\` for details on a specific command`;
+    const bookNotice = `${EMOJIS.Book} Use \`${prefix}help (command)\` for details on a specific command`;
 
     const mainEmbed = new EmbedBuilder()
       .setTitle(`${client.user.displayName} Help`)
@@ -251,7 +252,7 @@ export async function execute(interaction, client) {
       .addFields(
         {
           name: "\u200b",
-          value: `<:Prefix:1542236764465274910> **Prefix** \`${prefix}\`\n<:Commands:1542236622521901088> **Commands** \`${totalCommands}\`\n<:Modules:1542236707599163422> **Modules** \`${totalModules}\``,
+          value: `${EMOJIS.Prefix} **Prefix** \`${prefix}\`\n${EMOJIS.Commands} **Commands** \`${totalCommands}\`\n${EMOJIS.Modules} **Modules** \`${totalModules}\``,
         },
         {
           name: "\u200b",
@@ -272,35 +273,35 @@ export async function execute(interaction, client) {
             label: "Home",
             description: "Overview & bot stats.",
             value: "module_home",
-            emoji: "<:Home:1542647191691071548>",
+            emoji: EMOJIS.Home,
             default: defaultValue === "module_home",
           },
           {
             label: "Games",
             description: "Interactive games & scoreboards.",
             value: "module_games",
-            emoji: "<:Games:1542645834808565821>",
+            emoji: EMOJIS.Games,
             default: defaultValue === "module_games",
           },
           {
             label: "Fun",
             description: "Calculators, roasts & memes.",
             value: "module_fun",
-            emoji: "<:Fun:1542240014388170772>",
+            emoji: EMOJIS.Fun,
             default: defaultValue === "module_fun",
           },
           {
             label: "Actions",
             description: "Interactive commands & animations.",
             value: "module_actions",
-            emoji: "<:Actions:1542647256782737559>",
+            emoji: EMOJIS.Actions,
             default: defaultValue === "module_actions",
           },
           {
             label: "Utility",
             description: "Server tools & utilities.",
             value: "module_utility",
-            emoji: "<:Utility:1542239958612320306>",
+            emoji: EMOJIS.Utility,
             default: defaultValue === "module_utility",
           },
         ]);
@@ -312,7 +313,7 @@ export async function execute(interaction, client) {
 
       const prevBtn = new ButtonBuilder()
         .setCustomId("help_prev_page")
-        .setEmoji("<:Left:1542658287894528100>")
+        .setEmoji(EMOJIS.Left)
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === 0);
 
@@ -324,7 +325,7 @@ export async function execute(interaction, client) {
 
       const nextBtn = new ButtonBuilder()
         .setCustomId("help_next_page")
-        .setEmoji("<:Right:1542658241400414298>")
+        .setEmoji(EMOJIS.Right)
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === totalPages - 1);
 
@@ -341,35 +342,35 @@ export async function execute(interaction, client) {
           label: "Home",
           description: "Overview & bot stats.",
           value: "module_home",
-          emoji: { id: "1542647191691071548", name: "Home" },
+          emoji: { id: EMOJI_IDS.Home, name: "Home" },
           default: selectedModule === "module_home",
         },
         {
           label: "Games",
           description: "Interactive games & scoreboards.",
           value: "module_games",
-          emoji: { id: "1542645834808565821", name: "Games" },
+          emoji: { id: EMOJI_IDS.Games, name: "Games" },
           default: selectedModule === "module_games",
         },
         {
           label: "Fun",
           description: "Calculators, roasts & memes.",
           value: "module_fun",
-          emoji: { id: "1542240014388170772", name: "Fun" },
+          emoji: { id: EMOJI_IDS.Fun, name: "Fun" },
           default: selectedModule === "module_fun",
         },
         {
           label: "Actions",
           description: "Roleplay & social interactions.",
           value: "module_actions",
-          emoji: { id: "1542647256782737559", name: "Actions" },
+          emoji: { id: EMOJI_IDS.Actions, name: "Actions" },
           default: selectedModule === "module_actions",
         },
         {
           label: "Utility",
           description: "Server tools & utilities.",
           value: "module_utility",
-          emoji: { id: "1542239958612320306", name: "Utility" },
+          emoji: { id: EMOJI_IDS.Utility, name: "Utility" },
           default: selectedModule === "module_utility",
         },
       ];
@@ -395,9 +396,9 @@ export async function execute(interaction, client) {
           `## ${client.user.displayName} Help\n` +
           `-# Experience the ultimate Discord bot designed for seamless management and community engagement.`;
         bodyText =
-          `<:Prefix:1542236764465274910> **Prefix** \`${prefix}\`\n` +
-          `<:Commands:1542236622521901088> **Commands** \`${totalCommands}\`\n` +
-          `<:Modules:1542236707599163422> **Modules** \`${totalModules}\``;
+          `${EMOJIS.Prefix} **Prefix** \`${prefix}\`\n` +
+          `${EMOJIS.Commands} **Commands** \`${totalCommands}\`\n` +
+          `${EMOJIS.Modules} **Modules** \`${totalModules}\``;
       } else {
         const mod = modulesCatalog[selectedModule];
         if (!mod) {
@@ -430,7 +431,7 @@ export async function execute(interaction, client) {
                 type: 2,
                 custom_id: "help_prev_page",
                 style: 2,
-                emoji: { id: "1542658287894528100", name: "Left" },
+                emoji: { id: EMOJI_IDS.Left, name: "Left" },
                 disabled: validPage === 0,
               },
               {
@@ -444,7 +445,7 @@ export async function execute(interaction, client) {
                 type: 2,
                 custom_id: "help_next_page",
                 style: 2,
-                emoji: { id: "1542658241400414298", name: "Right" },
+                emoji: { id: EMOJI_IDS.Right, name: "Right" },
                 disabled: validPage === totalPages - 1,
               },
             ],

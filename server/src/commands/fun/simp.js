@@ -2,6 +2,7 @@ import { EmbedBuilder } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 
 export const aliases = ["howsimp"];
 
@@ -23,12 +24,12 @@ function getSimpCategory(percentage) {
   if (percentage >= 85)
     return {
       category: "Financial Slave",
-      emoji: "<:money:1478399282154573836>",
+      emoji: EMOJIS.money,
     };
   if (percentage >= 60)
     return {
       category: "Feet-Pic Donor",
-      emoji: "<a:pepe_simp:1546229473589072062>",
+      emoji: EMOJIS.lipbite,
     };
   if (percentage >= 35)
     return { category: "Down Bad & Desperate", emoji: "🥵" };

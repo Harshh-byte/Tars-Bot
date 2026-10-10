@@ -6,6 +6,7 @@ import {
 } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
+import { EMOJIS, EMOJI_IDS } from "../../utils/emojis.js";
 
 export const data = {
   name: "ttt",
@@ -22,8 +23,8 @@ export const data = {
 };
 
 const SYMBOLS = {
-  X: "<:x_:1542154950065524757>",
-  O: "<:o_:1542154996013863023>",
+  X: EMOJIS.x_,
+  O: EMOJIS.o_,
   EMPTY: "",
 };
 
@@ -79,10 +80,10 @@ function buildGridComponents(board, disabled = false) {
       };
 
       if (cellVal === "X") {
-        btn.emoji = { id: "1542154950065524757", name: "x_" };
+        btn.emoji = { id: EMOJI_IDS.x_, name: "x_" };
         btn.style = 4;
       } else if (cellVal === "O") {
-        btn.emoji = { id: "1542154996013863023", name: "o_" };
+        btn.emoji = { id: EMOJI_IDS.o_, name: "o_" };
         btn.style = 3;
       } else {
         btn.emoji = { name: "▫️" };
@@ -231,11 +232,11 @@ async function startGame(interaction, client, opponent) {
 
       let winnerText = "";
       if (winner === "X") {
-        winnerText = `<a:Tada:1544329561955770488> **<@${playerX.id}> won the match!**`;
+        winnerText = `${EMOJIS.Tada} **<@${playerX.id}> won the match!**`;
       } else if (winner === "O") {
         const winnerMention = isVsTars ? "**TARS**" : `<@${playerO.id}>`;
         winnerText =
-          `<a:Tada:1544329561955770488> **${winnerMention} won the match!**` +
+          `${EMOJIS.Tada} **${winnerMention} won the match!**` +
           (isVsTars ? `\n\n*TARS: Predictable outcome.*` : "");
       } else if (winner === "TIE") {
         winnerText = `🫱🏻‍🫲🏿 **It's a Tie Game!**`;

@@ -2,6 +2,7 @@ import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 import { incrementUserStat } from "../../services/database.js";
 
 export const aliases = ["cigar"];
@@ -44,7 +45,7 @@ export async function execute(interaction, client) {
           components: [
             {
               type: 10,
-              content: "### <a:smok:1542640291654144082> SMOKE SESSION",
+              content: `### ${EMOJIS.smok} SMOKE SESSION`,
             },
             {
               type: 14,

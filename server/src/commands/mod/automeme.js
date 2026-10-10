@@ -11,6 +11,7 @@ import {
   deleteAutoMemeConfig,
 } from "../../services/database.js";
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 
 export const data = {
   name: "automeme",
@@ -153,7 +154,7 @@ export async function execute(interaction, client) {
         const botDeniedEmbed = new EmbedBuilder()
           .setColor(EMBED_COLORS.ERROR)
           .setDescription(
-            `<:Failed:1526228290413658184> I don't have permission to post in ${targetChannel}! Missing permissions: ${missing.join(", ")}.`,
+            `${EMOJIS.Failed} I don't have permission to post in ${targetChannel}! Missing permissions: ${missing.join(", ")}.`,
           );
 
         return interaction.reply
@@ -183,7 +184,7 @@ export async function execute(interaction, client) {
         `${client.user.displayName} will now post memes every *${INTERVAL_LABELS[intervalInput]}*.`,
       )
       .addFields({
-        name: "<:Timer:1554945799308443748> Next Meme Scheduled",
+        name: `${EMOJIS.Timer} Next Meme Scheduled`,
         value: `<t:${Math.floor(nextPostAt / 1000)}:R>`,
       })
       .setColor(EMBED_COLORS.SUCCESS);

@@ -9,6 +9,7 @@ import {
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS, errorEmbed } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 
 export const aliases = ["ui", "whois", "user"];
 
@@ -194,13 +195,13 @@ export async function execute(interaction, client) {
 
       const prevBtn = new ButtonBuilder()
         .setCustomId("userinfo_prev")
-        .setEmoji("<:Left:1542658287894528100>")
+        .setEmoji(EMOJIS.Left)
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === 0);
 
       const nextBtn = new ButtonBuilder()
         .setCustomId("userinfo_next")
-        .setEmoji("<:Right:1542658241400414298>")
+        .setEmoji(EMOJIS.Right)
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === totalPages - 1);
 

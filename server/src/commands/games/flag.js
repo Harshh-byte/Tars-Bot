@@ -7,6 +7,7 @@ import {
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS, EMOJI_IDS } from "../../utils/emojis.js";
 import { addFlagScore } from "../../services/database.js";
 import { showLeaderboard } from "./leaderboard.js";
 
@@ -613,7 +614,7 @@ async function startFlagGame(
           return bInt
             .reply({
               content:
-                "<:Warning:1526228248458035381> **Maximum skips reached!** You must guess this flag or wait for the timer.",
+                `${EMOJIS.Warning} **Maximum skips reached!** You must guess this flag or wait for the timer.`,
               flags: 64,
             })
             .catch(() => null);
@@ -640,10 +641,10 @@ async function startFlagGame(
         winnerMessage = m;
         collector.stop("correct");
         await m
-          .react("1526228339910643793")
+          .react(EMOJI_IDS.Success)
           .catch(() =>
             m
-              .react("<:Success:1526228339910643793>")
+              .react(EMOJIS.Success)
               .catch(() => m.react("✅").catch(() => null)),
           );
       } else if (isCloseMatch(input, targetCountry.aliases)) {
@@ -757,7 +758,7 @@ async function startFlagGame(
                 components: [
                   {
                     type: 10,
-                    content: `### <a:Tada:1544329561955770488> Correct Guess!`,
+                    content: `### ${EMOJIS.Tada} Correct Guess!`,
                   },
                   {
                     type: 14,

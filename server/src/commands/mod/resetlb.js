@@ -8,6 +8,7 @@ import {
 } from "discord.js";
 import { resetLeaderboards } from "../../services/database.js";
 import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMOJIS } from "../../utils/emojis.js";
 import logger from "../../utils/logger.js";
 
 export const data = {
@@ -49,7 +50,7 @@ export async function execute(interaction) {
       const denyEmbed = new EmbedBuilder()
         .setColor(EMBED_COLORS.ERROR)
         .setDescription(
-          "<:Failed:1526228290413658184> You need the `Manage Server` or `Administrator` permission to reset leaderboards.",
+          `${EMOJIS.Failed} You need the \`Manage Server\` or \`Administrator\` permission to reset leaderboards.`,
         );
 
       if (typeof interaction.reply === "function") {
@@ -66,7 +67,7 @@ export async function execute(interaction) {
       const warnEmbed = new EmbedBuilder()
         .setColor(EMBED_COLORS.WARNING)
         .setDescription(
-          "<:Warning:1526228248458035381> Please specify a category to reset.",
+          `${EMOJIS.Warning} Please specify a category to reset.`,
         );
       if (typeof interaction.reply === "function") {
         return interaction.reply({ embeds: [warnEmbed], flags: 64 });
@@ -91,7 +92,7 @@ export async function execute(interaction) {
       const warnEmbed = new EmbedBuilder()
         .setColor(EMBED_COLORS.WARNING)
         .setDescription(
-          "<:Warning:1526228248458035381> Invalid category specified.",
+          `${EMOJIS.Warning} Invalid category specified.`,
         );
       if (typeof interaction.reply === "function") {
         return interaction.reply({ embeds: [warnEmbed], flags: 64 });
@@ -113,7 +114,7 @@ export async function execute(interaction) {
     const warnEmbed = new EmbedBuilder()
       .setColor(EMBED_COLORS.WARNING)
       .setDescription(
-        `<:Warning:1526228248458035381> Are you sure you want to reset the **${catTitle}** leaderboard?\n\n` +
+        `${EMOJIS.Warning} Are you sure you want to reset the **${catTitle}** leaderboard?\n\n` +
           `This action will **permanently delete all scores** for this category. This cannot be undone!`,
       );
 
@@ -164,7 +165,7 @@ export async function execute(interaction) {
       ) {
         return btnInteraction.reply({
           content:
-            "<:Failed:1526228290413658184> You cannot control this confirmation menu.",
+            `${EMOJIS.Failed} You cannot control this confirmation menu.`,
           flags: 64,
         });
       }
@@ -177,7 +178,7 @@ export async function execute(interaction) {
         const sEmbed = new EmbedBuilder()
           .setColor(EMBED_COLORS.SUCCESS)
           .setDescription(
-            `<:Success:1526228339910643793> Successfully reset the **${catTitle}** leaderboard!`,
+            `${EMOJIS.Success} Successfully reset the **${catTitle}** leaderboard!`,
           );
 
         await btnInteraction.update({
@@ -188,7 +189,7 @@ export async function execute(interaction) {
         const cancelEmbed = new EmbedBuilder()
           .setColor(EMBED_COLORS.GREY)
           .setDescription(
-            "<:Failed:1526228290413658184> Reset operation cancelled. No data was deleted.",
+            `${EMOJIS.Failed} Reset operation cancelled. No data was deleted.`,
           );
 
         await btnInteraction.update({
