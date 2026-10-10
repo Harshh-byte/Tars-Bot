@@ -316,8 +316,8 @@ export const commands = [
   {
     trigger: "/ask",
     category: "util",
-    title: "Ask TARS",
-    description: "Ask TARS anything.",
+    title: "Ask Tars",
+    description: "Ask Tars anything.",
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },

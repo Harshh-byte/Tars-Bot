@@ -209,7 +209,7 @@ export default function Hero() {
               <div className="relative w-52 h-52 sm:w-56 sm:h-56 rounded-full border-3 border-ds-border bg-ds-card p-1 overflow-hidden shadow-[6px_6px_0px_var(--border-shadow)] pointer-events-auto">
                 <img
                   src="/Icon.png"
-                  alt="TARS Logo"
+                  alt="Tars Logo"
                   className="w-full h-full object-cover rounded-full bg-black transform-gpu backface-hidden"
                 />
               </div>
