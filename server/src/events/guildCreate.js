@@ -59,7 +59,7 @@ export async function execute(guild, client) {
                 {
                   type: 10,
                   content:
-                    `### <:Entry:1558432844320084110> **New Server Joined!**\n` +
+                    `### <:Entry:1558432844320084110> **Server Joined!**\n` +
                     `**Server:** ${guild.name}\n` +
                     `**Members:** \`${memberCount.toLocaleString()}\`\n` +
                     `-# **${botName}** was successfully added to ${guild.name}.`,
