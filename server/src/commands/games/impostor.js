@@ -225,8 +225,7 @@ export async function execute(interaction) {
                 components: [
                   {
                     type: 10,
-                    content:
-                      `${EMOJIS.Failed} Game lobby was cancelled by the host.`,
+                    content: `${EMOJIS.Failed} Game lobby was cancelled by the host.`,
                   },
                 ],
               },
@@ -367,7 +366,8 @@ async function runGameLoop(channel, players) {
               type: 10,
               content:
                 `All ${players.length} players have been assigned their secret roles.\n\n` +
-                `Click the **View My Role** button below to check your secret role privately!`,
+                `Click the **View My Role** button below to check your secret role privately!\n\n` +
+                `-# ⏳ Night 1 begins in 15 seconds... Get ready!`,
             },
             {
               type: 14,
@@ -436,6 +436,8 @@ async function runGameLoop(channel, players) {
           .catch(() => null);
       }
     });
+
+    await new Promise((resolve) => setTimeout(resolve, 15000));
 
     let gameOver = false;
 
@@ -534,14 +536,14 @@ async function runGameLoop(channel, players) {
               },
               {
                 type: 10,
-                content: `Special roles are taking their actions.\n-# Night ends in 20s...`,
+                content: "Special roles are taking their actions.\n-# Night ends in 25s...",
               },
             ],
           },
         ],
       };
 
-      await channel.send(nightPayload);
+      const nightMsg = await channel.send(nightPayload);
 
       let nightKilledId = null;
       let nightSavedId = null;
@@ -569,11 +571,14 @@ async function runGameLoop(channel, players) {
           alivePlayers[Math.floor(Math.random() * alivePlayers.length)].id;
       }
 
-      const humanSpecialRoles = alivePlayers.filter(
-        (p) => !p.isBot && p.role !== "CREWMATE" && p.role !== "JESTER",
-      );
+      const activeEligibleActors = alivePlayers.filter((p) => {
+        if (p.isBot || p.role === "CREWMATE" || p.role === "JESTER")
+          return false;
+        if (p.role === "SHERIFF" && p.hasShot) return false;
+        return true;
+      });
 
-      if (humanSpecialRoles.length > 0) {
+      if (activeEligibleActors.length > 0) {
         const actionPayload = {
           flags: 32768,
           components: [
@@ -584,7 +589,7 @@ async function runGameLoop(channel, players) {
                 {
                   type: 10,
                   content:
-                    "### 🎭 Special Roles Action Menu\nSelect a target player below to perform your night action.",
+                    "### 🎭 Special Roles Action Menu\nSelect a target player below to perform your night action.\n-# Night ends in 25s...",
                 },
                 {
                   type: 14,
@@ -613,8 +618,14 @@ async function runGameLoop(channel, players) {
 
         const menuMsg = await channel.send(actionPayload);
 
+        let endedEarly = false;
+        const actedPlayerIds = new Set();
         const menuCollector = menuMsg.createMessageComponentCollector({
-          time: 18000,
+          time: 25000,
+        });
+
+        const nightActionPromise = new Promise((resolve) => {
+          menuCollector.on("end", () => resolve());
         });
 
         menuCollector.on("collect", async (selInt) => {
@@ -675,12 +686,54 @@ async function runGameLoop(channel, players) {
               })
               .catch(() => null);
           }
+
+          actedPlayerIds.add(actor.id);
+          const allActed =
+            activeEligibleActors.length > 0 &&
+            activeEligibleActors.every((p) => actedPlayerIds.has(p.id));
+
+          if (allActed) {
+            endedEarly = true;
+            menuCollector.stop("all_acted");
+          }
         });
 
-        await new Promise((resolve) => setTimeout(resolve, 20000));
+        await nightActionPromise;
         await menuMsg.delete().catch(() => null);
+
+        if (endedEarly && nightMsg?.edit) {
+          await nightMsg
+            .edit({
+              flags: 32768,
+              components: [
+                {
+                  type: 17,
+                  accent_color: 0x2b2d31,
+                  components: [
+                    {
+                      type: 10,
+                      content: "### 🌃 Night Phase Falls!",
+                    },
+                    {
+                      type: 14,
+                      divider: true,
+                      spacing: 1,
+                    },
+                    {
+                      type: 10,
+                      content:
+                        "All night actions have concluded early!\n-# Dawn approaches...",
+                    },
+                  ],
+                },
+              ],
+            })
+            .catch(() => null);
+
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+        }
       } else {
-        await new Promise((resolve) => setTimeout(resolve, 10000));
+        await new Promise((resolve) => setTimeout(resolve, 8000));
       }
 
       const ROOMS = [
@@ -748,7 +801,7 @@ async function runGameLoop(channel, players) {
                 content:
                   deathNotices.length > 0
                     ? deathNotices.join("\n")
-                    : `The sun rises. Nobody was killed last night! (maybe the doctor saved someone?)`,
+                    : "The sun rises. Nobody was killed last night! (maybe the doctor saved someone?)",
               },
             ],
           },
@@ -907,10 +960,10 @@ async function runGameLoop(channel, players) {
                 {
                   type: 10,
                   content:
-                    `Discuss in chat who you think the Impostor is!\n\n` +
+                    "Discuss in chat who you think the Impostor is!\n\n" +
                     `**Alive Players:**\n${playerStatusList}\n\n` +
                     `**Voting Progress:** \`${currentVotes}/${totalVoters}\` Votes Cast\n${bar}\n\n` +
-                    `-# Voting ends in 25 seconds...`,
+                    "-# Voting ends in 25 seconds...",
                 },
                 {
                   type: 14,
@@ -1032,8 +1085,7 @@ async function runGameLoop(channel, players) {
                   components: [
                     {
                       type: 10,
-                      content:
-                        `### ${EMOJIS.Tada} 🤡 JESTER WINS!`,
+                      content: `### ${EMOJIS.Tada} 🤡 JESTER WINS!`,
                     },
                     {
                       type: 14,
@@ -1044,7 +1096,7 @@ async function runGameLoop(channel, players) {
                       type: 10,
                       content:
                         `**${ejectedPlayer.displayName}** fooled everyone into voting them out!\n\n` +
-                        `🤡 **The Jester wins the game!**\n\n` +
+                        "🤡 **The Jester wins the game!**\n\n" +
                         `**Role Summary:**\n${getRoleSummary()}`,
                     },
                   ],
