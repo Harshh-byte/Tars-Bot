@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import fs from "fs";
-dotenv.config({ path: fileURLToPath(new URL(".env", import.meta.url)) });
+dotenv.config({ path: fileURLToPath(new URL(".env", import.meta.url)), quiet: true });
 import * as Sentry from "@sentry/node";
 
 if (process.env.SENTRY_DSN) {
@@ -24,6 +24,7 @@ import * as interactionCreateEvent from "./src/events/interactionCreate.js";
 import * as messageCreateEvent from "./src/events/messageCreate.js";
 import * as guildCreateEvent from "./src/events/guildCreate.js";
 import * as guildDeleteEvent from "./src/events/guildDelete.js";
+import * as guildMemberAddEvent from "./src/events/guildMemberAdd.js";
 import { initReminderManager } from "./src/services/reminder.js";
 import { initAutoMemeService } from "./src/services/automeme.js";
 
@@ -576,6 +577,9 @@ client.on(Events.GuildCreate, (guild) =>
 );
 client.on(Events.GuildDelete, (guild) =>
   guildDeleteEvent.execute(guild, client),
+);
+client.on(Events.GuildMemberAdd, (member) =>
+  guildMemberAddEvent.execute(member, client),
 );
 client.on(Events.GuildMemberRemove, async (member) => {
   try {

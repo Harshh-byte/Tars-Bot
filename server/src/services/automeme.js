@@ -25,7 +25,7 @@ async function fetchMeme() {
 }
 
 export function initAutoMemeService(client) {
-  cron.schedule("*/10 * * * * *", async () => {
+  cron.schedule("* * * * *", async () => {
     try {
       const configs = await getAutoMemeConfigs();
       if (!configs || configs.length === 0) return;
