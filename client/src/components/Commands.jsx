@@ -1,11 +1,24 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { commands, categories } from "../data/commands";
+import RubberSegment from "./ui/RubberSegment";
+
+const BADGE_THEMES = {
+  games: "text-ds-blurple bg-ds-blurple/10 border border-ds-blurple/25",
+  fun: "text-ds-yellow bg-ds-yellow/10 border border-ds-yellow/25",
+  actions: "text-ds-fuchsia bg-ds-fuchsia/10 border border-ds-fuchsia/25",
+  util: "text-ds-green bg-ds-green/10 border border-ds-green/25",
+};
 
 export default function Commands() {
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState("games");
 
   const filteredCommands = commands.filter(
-    (cmd) => activeCategory === "all" || cmd.category === activeCategory,
+    (cmd) => cmd.category === activeCategory,
+  );
+
+  const segmentItems = useMemo(
+    () => categories.map((cat) => ({ label: cat.label, value: cat.value })),
+    [],
   );
 
   return (
@@ -20,29 +33,25 @@ export default function Commands() {
           </h2>
         </div>
 
-        <div
-          role="group"
-          aria-label="Filter commands by category"
-          className="flex justify-center gap-3 flex-wrap mb-8"
-        >
-          {categories.map((cat) => {
-            const isActive = activeCategory === cat.value;
-            return (
-              <button
-                key={cat.value}
-                type="button"
-                aria-pressed={isActive}
-                onClick={() => setActiveCategory(cat.value)}
-                className={`px-4 py-2.5 sm:px-6 sm:py-3 rounded-full border text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ds-blurple ${
-                  isActive
-                    ? "border-ds-blurple/50 bg-ds-blurple/10 text-ds-blurple shadow-[0_0_20px_rgba(88,101,242,0.15)]"
-                    : "border-ds-border text-ds-muted hover:text-ds-text hover:bg-ds-border/60"
-                }`}
-              >
-                {cat.label}
-              </button>
-            );
-          })}
+        <div className="flex justify-center mb-10 overflow-x-auto no-scrollbar py-2">
+          <RubberSegment
+            items={segmentItems}
+            value={activeCategory}
+            onChange={(val) => setActiveCategory(val)}
+            trackColor="rgba(26, 32, 46, 0.7)"
+            thumbColor="#5865F2"
+            textColor="#94a3b8"
+            activeTextColor="#ffffff"
+            size="md"
+            radius={999}
+            inset={4}
+            equalSlots={false}
+            stretch={90}
+            squash={4}
+            speed={1.05}
+            className="border border-ds-border backdrop-blur-md shadow-md"
+            aria-label="Command categories"
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
@@ -57,7 +66,9 @@ export default function Commands() {
                     {cmd.trigger}
                   </code>
                   <span
-                    className={`text-[8px] uppercase font-bold tracking-wider px-2 py-0.5 rounded ${cmd.badgeColor}`}
+                    className={`text-[8px] uppercase font-bold tracking-wider px-2 py-0.5 rounded ${
+                      BADGE_THEMES[cmd.category] || cmd.badgeColor
+                    }`}
                   >
                     {cmd.badge}
                   </span>
@@ -76,3 +87,4 @@ export default function Commands() {
     </section>
   );
 }
+

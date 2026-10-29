@@ -350,9 +350,8 @@ export const commands = [
 ];
 
 export const categories = [
-  { value: "all", label: "All" },
   { value: "games", label: "Games" },
   { value: "fun", label: "Fun" },
   { value: "actions", label: "Actions" },
-  { value: "util", label: "Tools" },
+  { value: "util", label: "Utility" },
 ];

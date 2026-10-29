@@ -4,42 +4,7 @@ import Squares from "./ui/Squares";
 import DecryptedText from "./ui/DecryptedText";
 import CircularText from "./ui/CircularText";
 import StarBorder from "./ui/StarBorder";
-
-function useTypewriter(words, speed = 60, delay = 2500) {
-  const [text, setText] = useState("");
-  const [wordIndex, setWordIndex] = useState(0);
-  const [charIndex, setCharIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    const currentWord = words[wordIndex];
-    let timer;
-
-    if (isDeleting) {
-      timer = setTimeout(() => {
-        setText(currentWord.substring(0, charIndex - 1));
-        setCharIndex((prev) => prev - 1);
-      }, speed / 2.5);
-    } else {
-      timer = setTimeout(() => {
-        setText(currentWord.substring(0, charIndex + 1));
-        setCharIndex((prev) => prev + 1);
-      }, speed);
-    }
-
-    if (!isDeleting && charIndex === currentWord.length) {
-      clearTimeout(timer);
-      timer = setTimeout(() => setIsDeleting(true), delay);
-    } else if (isDeleting && charIndex === 0) {
-      setIsDeleting(false);
-      setWordIndex((prev) => (prev + 1) % words.length);
-    }
-
-    return () => clearTimeout(timer);
-  }, [charIndex, isDeleting, wordIndex, words, speed, delay]);
-
-  return text;
-}
+import TextType from "./ui/TextType";
 
 export default function Hero() {
   const [isDecrypted, setIsDecrypted] = useState(false);
@@ -58,7 +23,6 @@ export default function Hero() {
     "Here to help. Mostly to roast.",
   ];
 
-  const typewriterText = useTypewriter(phrases);
   const heroImageRef = useRef(null);
 
   useEffect(() => {
@@ -97,14 +61,6 @@ export default function Hero() {
         delay: 0.6,
       },
     );
-
-    gsap.to(".floating-avatar-container", {
-      y: -15,
-      repeat: -1,
-      yoyo: true,
-      duration: 3,
-      ease: "power1.inOut",
-    });
   }, []);
 
   return (
@@ -144,12 +100,17 @@ export default function Hero() {
           </h1>
 
           <div className="hero-description-container flex items-center justify-center lg:justify-start mb-8 min-h-[4em] text-lg sm:text-xl font-mono text-ds-muted leading-relaxed max-w-xl">
-            <span className="font-mono text-ds-text">
-              {typewriterText}
-              <span className="animate-[pulse_1s_infinite] font-black text-ds-text ml-0.5">
-                |
-              </span>
-            </span>
+            <TextType
+              text={phrases}
+              typingSpeed={45}
+              deletingSpeed={25}
+              pauseDuration={2400}
+              mistakes={1}
+              cursorGlide={true}
+              cursorStyle="bar"
+              cursorColor="var(--accent-color)"
+              className="text-ds-text font-mono"
+            />
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center lg:justify-start">
@@ -201,10 +162,12 @@ export default function Hero() {
 
             <CircularText
               text="• ADAPTIVE COMPANION • SAVAGE REPLIES • GAMES • DISCORD UTILITY "
-              radius={120}
-              fontSize="9px"
-              className="scale-75 xs:scale-90 sm:scale-100 text-ds-muted opacity-80"
-              spinDuration={24}
+              size={265}
+              fontSize={11}
+              fontWeight={700}
+              className="scale-75 xs:scale-90 sm:scale-100 text-ds-muted hover:text-ds-text transition-colors duration-300"
+              spinDuration={22}
+              onHover="speedUp"
             >
               <div className="relative w-52 h-52 sm:w-56 sm:h-56 rounded-full border-3 border-ds-border bg-ds-card p-1 overflow-hidden shadow-[6px_6px_0px_var(--border-shadow)] pointer-events-auto">
                 <img

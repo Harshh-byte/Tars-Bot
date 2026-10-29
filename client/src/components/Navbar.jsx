@@ -66,6 +66,14 @@ export default function Navbar() {
             </li>
             <li>
               <a
+                href="#sandbox"
+                className="text-[11px] font-bold uppercase tracking-wider text-ds-muted hover:text-ds-text transition-colors"
+              >
+                Sandbox
+              </a>
+            </li>
+            <li>
+              <a
                 href="#faqs"
                 className="text-[11px] font-bold uppercase tracking-wider text-ds-muted hover:text-ds-text transition-colors"
               >
@@ -95,7 +103,6 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-3 md:hidden">
-
             <button
               onClick={toggleMobileMenu}
               className="flex flex-col gap-1.5 p-2 focus:outline-none relative z-50"
@@ -144,6 +151,15 @@ export default function Navbar() {
               className="block font-display text-3xl font-extrabold text-ds-muted hover:text-ds-text transition-all"
             >
               Commands
+            </a>
+          </li>
+          <li>
+            <a
+              href="#sandbox"
+              onClick={handleMobileLinkClick}
+              className="block font-display text-3xl font-extrabold text-ds-muted hover:text-ds-text transition-all"
+            >
+              Sandbox
             </a>
           </li>
           <li>
