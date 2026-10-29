@@ -7,7 +7,7 @@ export default function DecryptedText({
   sequential = false,
   className = "",
   characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+{}[]|;:,.<>?",
-  animateOn = "view", // "view" | "hover"
+  animateOn = "view",
 }) {
   const [displayText, setDisplayText] = useState(text);
   const [inView, setInView] = useState(false);

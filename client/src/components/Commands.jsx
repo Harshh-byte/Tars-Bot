@@ -1,6 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { commands, categories } from "../data/commands";
 import RubberSegment from "./ui/RubberSegment";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const BADGE_THEMES = {
   games: "text-ds-blurple bg-ds-blurple/10 border border-ds-blurple/25",
@@ -11,6 +15,8 @@ const BADGE_THEMES = {
 
 export default function Commands() {
   const [activeCategory, setActiveCategory] = useState("games");
+  const sectionRef = useRef(null);
+  const cardsGridRef = useRef(null);
 
   const filteredCommands = commands.filter(
     (cmd) => cmd.category === activeCategory,
@@ -21,19 +27,91 @@ export default function Commands() {
     [],
   );
 
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion || !sectionRef.current) return;
+
+    const ctx = gsap.context(() => {
+      // Reveal header + tabs
+      gsap.fromTo(
+        ".commands-header",
+        { y: 35, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        },
+      );
+
+      gsap.fromTo(
+        ".commands-tabs",
+        { y: 25, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          delay: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        },
+      );
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Animate cards on category change or initial appearance
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion || !cardsGridRef.current) return;
+
+    gsap.fromTo(
+      ".command-card-item",
+      { y: 24, opacity: 0, scale: 0.98 },
+      {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.45,
+        stagger: 0.05,
+        ease: "power2.out",
+      },
+    );
+  }, [activeCategory]);
+
   return (
     <section
       id="commands"
-      className="py-16 md:py-20 lg:py-24 relative z-10 border-t border-ds-border reveal"
+      ref={sectionRef}
+      className="py-16 md:py-24 relative z-10 border-t-3 border-ds-border bg-ds-bg"
     >
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center max-w-2xl mx-auto mb-10">
+        <div className="commands-header text-center max-w-2xl mx-auto mb-8">
           <h2 className="font-body text-3xl sm:text-4xl md:text-5xl font-extrabold text-ds-text tracking-tight">
             Command <span className="text-gradient">Directory</span>
           </h2>
+          <p className="text-ds-muted text-sm sm:text-base mt-3 font-sans">
+            Every tool in TARS&apos; arsenal, built for instant execution and maximum banter.
+          </p>
         </div>
 
-        <div className="flex justify-center mb-10 overflow-x-auto no-scrollbar py-2">
+        <div className="commands-tabs flex justify-center mb-10 overflow-x-auto no-scrollbar py-2">
           <RubberSegment
             items={segmentItems}
             value={activeCategory}
@@ -54,11 +132,14 @@ export default function Commands() {
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <div
+          ref={cardsGridRef}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"
+        >
           {filteredCommands.map((cmd) => (
             <div
               key={cmd.trigger}
-              className="custom-card flex flex-col justify-between p-4 sm:p-5 h-full"
+              className="command-card-item custom-card flex flex-col justify-between p-4 sm:p-5 h-full"
             >
               <div>
                 <div className="flex justify-between items-center mb-3">
@@ -87,4 +168,3 @@ export default function Commands() {
     </section>
   );
 }
-

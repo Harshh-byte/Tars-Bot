@@ -1,5 +1,9 @@
 import { useState, useRef, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Send, Hash, SendHorizontal, UserRound } from "lucide-react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const SUGGESTIONS = [
   {
@@ -64,10 +68,57 @@ const DYNAMIC_REPLIES = [
 ];
 
 export default function Sandbox() {
+  const sectionRef = useRef(null);
   const [messages, setMessages] = useState(getRandomStarter);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const chatContainerRef = useRef(null);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion || !sectionRef.current) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ".sandbox-header-animate",
+        { y: 35, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        },
+      );
+
+      gsap.fromTo(
+        ".sandbox-window-animate",
+        { y: 50, opacity: 0, scale: 0.98 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.95,
+          delay: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        },
+      );
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -117,15 +168,22 @@ export default function Sandbox() {
   };
 
   return (
-    <section id="sandbox" className="py-12 md:py-20 relative z-10 border-t-3 border-ds-border bg-ds-bg">
+    <section
+      id="sandbox"
+      ref={sectionRef}
+      className="py-16 md:py-24 relative z-10 border-t-3 border-ds-border bg-ds-bg"
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto text-center mb-8 md:mb-10">
+        <div className="sandbox-header-animate max-w-3xl mx-auto text-center mb-8 md:mb-10">
           <h2 className="font-body text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-ds-text leading-[1.15] mb-4">
             Provoke <span className="text-gradient">Tars</span>
           </h2>
+          <p className="text-ds-muted text-sm sm:text-base font-sans">
+            Test our response matrix in real-time. Zero compliments guaranteed.
+          </p>
         </div>
 
-        <div className="sandbox-window border-2 border-ds-border rounded-2xl shadow-2xl overflow-hidden bg-[#121620] flex flex-col">
+        <div className="sandbox-window sandbox-window-animate border-2 border-ds-border rounded-2xl shadow-2xl overflow-hidden bg-[#121620] flex flex-col">
           <div className="px-3.5 py-2.5 sm:px-4 sm:py-3.5 bg-[#0d1017] border-b border-ds-border">
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2.5 min-w-0">
               <div className="flex items-center gap-1.5 sm:gap-2">
