@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Capabilities from "./components/Capabilities";
 import Commands from "./components/Commands";
-import Parameters from "./components/Parameters";
+import Sandbox from "./components/Sandbox";
 import FAQs from "./components/FAQs";
 import Footer from "./components/Footer";
 import SEO from "./components/shared/SEO";
@@ -67,7 +67,7 @@ export default function App() {
       <Hero />
       <Capabilities />
       <Commands />
-      <Parameters />
+      <Sandbox />
       <FAQs />
       <Footer />
       <CustomCursor />

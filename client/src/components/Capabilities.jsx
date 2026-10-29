@@ -102,14 +102,13 @@ export default function Capabilities() {
       className="py-10 md:py-14 relative z-10 border-t-3 border-ds-border bg-ds-bg"
     >
       <div className="max-w-7xl mx-auto px-6">
-        <div className="max-w-3xl mb-8 md:mb-10">
+        <div className="max-w-3xl mx-auto text-center mb-8 md:mb-10">
           <h2 className="font-body text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-ds-text leading-[1.15] mb-4">
             Built for Chaos &amp;{" "}
-            <span className="block sm:inline">Zero Chill</span>
+            <span className="block sm:inline">
+              <span className="text-gradient">Zero Chill</span>
+              </span>
           </h2>
-          <p className="text-ds-muted text-base md:text-lg leading-relaxed max-w-xl font-medium">
-            Packed with savage responses, interactive party games, and just enough utility to keep the server alive.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

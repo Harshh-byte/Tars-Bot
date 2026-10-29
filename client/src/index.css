@@ -20,25 +20,25 @@
 }
 
 :root {
-  --bg-color: #08090d;
+  --bg-color: #0f131a;
   --text-color: #f8fafc;
   --text-muted: #94a3b8;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --card-bg: rgba(16, 20, 30, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --card-bg: rgba(26, 32, 46, 0.7);
   --card-hover-border: rgba(88, 101, 242, 0.4);
   --dot-color: rgba(255, 255, 255, 0.14);
   --grid-color: rgba(255, 255, 255, 0.25);
   --grid-opacity: 0.85;
-  --glass-bg: rgba(9, 10, 15, 0.5);
+  --glass-bg: rgba(18, 23, 33, 0.65);
   --accent-color: #5865f2;
   --accent: var(--accent-color);
   --accent-secondary: #eb459e;
   --accent-glow: rgba(88, 101, 242, 0.25);
-  --sandbox-bg: #10131a;
-  --sandbox-header: #0b0d12;
-  --scrollbar-track: #08090d;
-  --scrollbar-thumb: #1e293b;
-  --scrollbar-hover: #334155;
+  --sandbox-bg: #161b26;
+  --sandbox-header: #10141d;
+  --scrollbar-track: #0f131a;
+  --scrollbar-thumb: #283346;
+  --scrollbar-hover: #3d4c66;
   color-scheme: dark;
 }
 
