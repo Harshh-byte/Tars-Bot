@@ -18,9 +18,9 @@ export default function Hero() {
 
   const phrases = [
     "Certified professional instigator.",
-    "Emotionally unavailable. Technically online.",
+    "Zero downtime. Zero patience.",
     "Generating violence in lowercase.",
-    "Here to help. Mostly to roast.",
+    "Here to assist, judge, and outsmart.",
   ];
 
   const heroImageRef = useRef(null);
@@ -99,7 +99,7 @@ export default function Hero() {
             </span>
           </h1>
 
-          <div className="hero-description-container flex items-center justify-center lg:justify-start mb-8 min-h-[4em] text-lg sm:text-xl font-jakarta text-ds-muted leading-relaxed max-w-xl">
+          <div className="hero-description-container flex items-center justify-center lg:justify-start mb-8 min-h-[4em] text-lg sm:text-xl font-mono text-ds-muted leading-relaxed max-w-xl">
             <TextType
               text={phrases}
               typingSpeed={45}
@@ -109,7 +109,7 @@ export default function Hero() {
               cursorGlide={true}
               cursorStyle="bar"
               cursorColor="var(--accent-color)"
-              className="text-ds-text font-jakarta"
+              className="text-ds-text font-mono"
             />
           </div>
 

@@ -1,117 +1,133 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Flame, PartyPopper, GamepadDirectional, Gift, MessagesSquare, ShieldCheck } from "lucide-react";
+import {
+  Sparkles,
+  Gamepad2,
+  PartyPopper,
+  Shield,
+  MessageSquare,
+} from "lucide-react";
 import SpotlightCard from "./ui/SpotlightCard";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const capabilities = [
   {
-    icon: Flame,
-    title: "Adaptive Roasts",
+    icon: Sparkles,
+    title: "Maximum Sarcasm",
     description:
-      "Chill and witty by default. If provoked, Tars unleashes absolute verbal destruction with zero filter.",
-    iconColor: "text-ds-red",
-    spotlightColor: "rgba(237, 66, 69, 0.15)",
-    span: false,
+      "Engineered with zero chill. Advanced dry humor that roasts your server into submission with surgical emotional precision.",
+    span: true,
+    spotlightColor: "rgba(88, 101, 242, 0.18)",
+    iconColor: "text-ds-blurple",
+  },
+  {
+    icon: Gamepad2,
+    title: "Classic Arcade",
+    description:
+      "RPS, Tic-Tac-Toe, and Connect4 embedded right in chat. Zero lag, high stakes.",
+    spotlightColor: "rgba(254, 231, 92, 0.18)",
+    iconColor: "text-ds-yellow",
   },
   {
     icon: PartyPopper,
-    title: "Party Games",
+    title: "Party Utilities",
     description:
-      "Host multiplayer mini-games, truth challenges, dilemma games, and instant chat showdowns.",
-    iconColor: "text-cyan-400",
-    spotlightColor: "rgba(34, 211, 238, 0.15)",
-    span: false,
-  },
-  {
-    icon: GamepadDirectional,
-    title: "Entertainment",
-    description:
-      "Instant IQ checks, simp meters, size calculators, personality ratings, and fresh memes on demand.",
-    iconColor: "text-ds-yellow",
-    spotlightColor: "rgba(254, 231, 92, 0.15)",
-    span: false,
-  },
-  {
-    icon: Gift,
-    title: "Smooth Wishes",
-    description:
-      'Switches to charming mode for birthdays & achievements.',
+      "Truth or Dare, Never Have I Ever, and trivia engines designed to violently kill quiet text channels.",
+    spotlightColor: "rgba(235, 69, 158, 0.18)",
     iconColor: "text-ds-fuchsia",
-    spotlightColor: "rgba(235, 69, 158, 0.15)",
-    span: false,
   },
   {
-    icon: MessagesSquare,
-    title: "Chat Actions",
+    icon: Shield,
+    title: "Battle-Tested",
     description:
-      "Expressive animated interactions and casual smoke actions to keep channel conversations active.",
+      "Enterprise uptime architecture. Sub-second response times, zero ghosting, and bulletproof uptime.",
+    spotlightColor: "rgba(87, 242, 135, 0.18)",
     iconColor: "text-ds-green",
-    spotlightColor: "rgba(87, 242, 135, 0.15)",
-    span: false,
   },
   {
-    icon: ShieldCheck,
-    title: "Server Tools",
+    icon: MessageSquare,
+    title: "Dynamic Banter",
     description:
-      "Inspect server & user stats, check avatars, and bulk purge channel spam in seconds.",
-    iconColor: "text-ds-blurple",
-    spotlightColor: "rgba(88, 101, 242, 0.15)",
-    span: false,
+      "Context-aware comebacks that analyze ongoing threads and deliver perfectly timed chaos.",
+    span: true,
+    spotlightColor: "rgba(237, 66, 69, 0.18)",
+    iconColor: "text-ds-red",
   },
 ];
 
 export default function Capabilities() {
+  const sectionRef = useRef(null);
+
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    if (prefersReducedMotion) {
-      gsap.set(".bento-card-animate", { y: 0, opacity: 1 });
-      return;
-    }
+    if (prefersReducedMotion || !sectionRef.current) return;
 
-    const anim = gsap.fromTo(
-      ".bento-card-animate",
-      { y: 50, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: "#features",
-          start: "top 80%",
+    const ctx = gsap.context(() => {
+      // Header animation
+      gsap.fromTo(
+        ".capabilities-header",
+        { y: 35, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
         },
-      },
-    );
+      );
 
-    return () => {
-      anim.scrollTrigger?.kill();
-      anim.kill();
-    };
+      // Cards staggered reveal
+      gsap.fromTo(
+        ".bento-card-animate",
+        { y: 55, opacity: 0, scale: 0.97 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.85,
+          stagger: 0.12,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".capabilities-grid",
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        },
+      );
+    }, sectionRef);
+
+    return () => ctx.revert();
   }, []);
 
   return (
     <section
       id="features"
-      className="py-10 md:py-14 relative z-10 border-t-3 border-ds-border bg-ds-bg"
+      ref={sectionRef}
+      className="py-16 md:py-24 relative z-10 border-t-3 border-ds-border bg-ds-bg"
     >
       <div className="max-w-7xl mx-auto px-6">
-        <div className="max-w-3xl mx-auto text-center mb-8 md:mb-10">
+        <div className="capabilities-header max-w-3xl mx-auto text-center mb-10 md:mb-14">
           <h2 className="font-body text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-ds-text leading-[1.15] mb-4">
             Built for Chaos &amp;{" "}
             <span className="block sm:inline">
               <span className="text-gradient">Zero Chill</span>
-              </span>
+            </span>
           </h2>
+          <p className="text-ds-muted text-base sm:text-lg max-w-xl mx-auto font-sans leading-relaxed">
+            Engineered with raw computational superiority, sharp comedic timing, and zero tolerance for small talk.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="capabilities-grid grid grid-cols-1 md:grid-cols-3 gap-6">
           {capabilities.map((cap) => {
             const Icon = cap.icon;
             return (

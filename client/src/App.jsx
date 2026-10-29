@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Capabilities from "./components/Capabilities";
@@ -9,6 +11,8 @@ import FAQs from "./components/FAQs";
 import Footer from "./components/Footer";
 import SEO from "./components/shared/SEO";
 import CustomCursor from "./components/CustomCursor";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
   const prefersReducedMotion =
@@ -22,42 +26,22 @@ export default function App() {
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      wheelMultiplier: 1.1,
+      wheelMultiplier: 1.05,
     });
 
-    const raf = (time) => {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
+    lenis.on("scroll", ScrollTrigger.update);
+
+    const updateLenis = (time) => {
+      lenis.raf(time * 1000);
     };
 
-    requestAnimationFrame(raf);
+    gsap.ticker.add(updateLenis);
+    gsap.ticker.lagSmoothing(0);
 
-    return () => lenis.destroy();
-  }, [prefersReducedMotion]);
-
-  useEffect(() => {
-    const revealEls = document.querySelectorAll(".reveal");
-
-    if (prefersReducedMotion) {
-      revealEls.forEach((el) => el.classList.add("visible"));
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-
-          entry.target.classList.add("visible");
-          observer.unobserve(entry.target);
-        });
-      },
-      { threshold: 0.05 },
-    );
-
-    revealEls.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
+    return () => {
+      gsap.ticker.remove(updateLenis);
+      lenis.destroy();
+    };
   }, [prefersReducedMotion]);
 
   return (
