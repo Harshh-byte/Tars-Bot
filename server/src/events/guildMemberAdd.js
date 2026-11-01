@@ -29,10 +29,10 @@ export async function execute(member, client) {
       })
       .setThumbnail(userAvatar)
       .setDescription(
-        `Thanks for joining **${targetGuild?.name}**!\n\n` +
-          `*Don't be a stranger, hop into chat before we assume you're an NPC!* <a:paimon_cookie:1167491163142500472>\n\n` +
-          `-# Member #${memberCount} • Welcome!`,
-      );
+        `Thanks for joining **${member.guild.name}**!\n\n` +
+          `*Don't be a stranger, hop into chat before we assume you're an NPC!* <a:paimon_cookie:1167491163142500472>\n`
+      )
+      .setFooter({ text: `Member #${memberCount} • Welcome!` });
 
     await member.send({
       content: messageContent,
