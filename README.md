@@ -8,18 +8,18 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 
 ## ✨ Features
 
-- **🧠 Conversational AI Engine:** Smart AI-powered chat, contextual roasts, personalized wishes, and instant Q&A powered by `@google/genai`.
-- **⚙️ Dynamic Server Settings:** Per-server custom prefix configuration and automated database cleanup backed by Firebase Firestore.
-- **📖 Next-Gen Help & Navigation:** Rich Discord component menus, paginated command catalogs, and category inspectors.
-- **🎭 Social & Roleplay Interactions:** Interactive user reactions with animated media, custom counters, and persistent action stats.
-- **🛠️ Administrative & Server Controls:** Fine-grained owner controls including system maintenance toggles, custom bot presence, and memory management.
-- **🎮 Interactive Party & Mini-Games:** Comprehensive collection of multiplayer party games, decision tools, guessing games, and global leaderboards.
-- **📊 Entertainment & Utilities:** Fun user rating calculators, automated Reddit meme feed, custom reminders, and server diagnostics.
-- **🌐 Web Dashboard:** Modern React + Vite web dashboard displaying real-time command documentation and bot metrics.
+- **Conversational AI Engine:** Smart AI-powered chat, contextual roasts, personalized wishes, and instant Q&A powered by `@google/genai`.
+- **Dynamic Server Settings:** Per-server custom prefix configuration and automated database cleanup backed by Firebase Firestore.
+- **Next-Gen Help & Navigation:** Rich Discord component menus, paginated command catalogs, and category inspectors.
+- **Social & Roleplay Interactions:** Interactive user reactions with animated media, custom counters, and persistent action stats.
+- **Administrative & Server Controls:** Fine-grained owner controls including system maintenance toggles, custom bot presence, and memory management.
+- **Interactive Party & Mini-Games:** Comprehensive collection of multiplayer party games, decision tools, guessing games, and global leaderboards.
+- **Entertainment & Utilities:** Fun user rating calculators, automated Reddit meme feed, custom reminders, and server diagnostics.
+- **Web Dashboard:** Modern React + Vite web dashboard displaying real-time command documentation and bot metrics.
 
 ---
 
-## ⚡ Quick Command Reference
+## 🎮 Quick Command Reference
 
 | Category    | Commands                                                                                                                          | Description                                                   |
 | :---------- | :-------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------ |
@@ -35,7 +35,7 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 ## 🛠️ Tech Stack
 
 - **Backend:** Node.js, Discord.js v14, Express.js
-- **AI Model:** Google Gemini AI (`gemini-2.5-flash-lite`)
+- **AI Model:** Google Gemini AI (`gemini-3.5-flash-lite`, `gemini-3.8-flash`)
 - **Database & Logs:** Firebase Admin SDK (Firestore), Winston, Sentry
 - **Frontend Dashboard:** React 18, Vite, Tailwind CSS
 

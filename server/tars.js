@@ -203,7 +203,7 @@ async function generateContentJson(
 ) {
   const apiCall = () =>
     ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-3.5-flash-lite",
       contents,
       config: {
         systemInstruction,
@@ -258,7 +258,7 @@ async function generateContentJson(
 async function generateAskContent(contents, systemInstruction) {
   const apiCall = () =>
     ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.8-flash",
       contents,
       config: {
         systemInstruction,
