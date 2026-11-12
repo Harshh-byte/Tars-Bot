@@ -12,7 +12,7 @@ export default function Privacy() {
     <div className="min-h-screen bg-ds-bg text-ds-text font-mono flex flex-col">
       <SEO
         title="Privacy Policy"
-        description="How we handle your data and privacy parameters at Tars Bot."
+        description="How we handle your data and privacy at Tars Bot."
       />
       <header className="border-b-3 border-ds-border py-4 px-6 bg-ds-card/85 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-4xl mx-auto flex items-center justify-between">

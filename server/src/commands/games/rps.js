@@ -134,7 +134,7 @@ async function startGame(interaction, client, opponent) {
 
         const tarsWinQuotes = [
           "TARS: Predictable. I calculated your move before your brain even signaled your thumb.",
-          "TARS: Did you actually think that move was going to work, or were you just testing my pity parameters?",
+          "TARS: Did you actually think that move was going to work, or were you just testing my patience?",
           "TARS: Skill issue. Lower your difficulty setting or ask a human for help.",
         ];
 
