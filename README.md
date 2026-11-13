@@ -35,7 +35,7 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 ## 🛠️ Tech Stack
 
 - **Backend:** Node.js, Discord.js v14, Express.js
-- **AI Model:** Google Gemini AI (`gemini-3.5-flash-lite`, `gemini-3.8-flash`)
+- **AI Model:** Google Gemini AI (`gemini-3.1-flash-lite`, `gemini-3.8-flash`)
 - **Database & Logs:** Firebase Admin SDK (Firestore), Winston, Sentry
 - **Frontend Dashboard:** React 18, Vite, Tailwind CSS
 

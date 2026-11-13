@@ -1,7 +1,10 @@
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import fs from "fs";
-dotenv.config({ path: fileURLToPath(new URL(".env", import.meta.url)), quiet: true });
+dotenv.config({
+  path: fileURLToPath(new URL(".env", import.meta.url)),
+  quiet: true,
+});
 import * as Sentry from "@sentry/node";
 
 if (process.env.SENTRY_DSN) {
@@ -189,8 +192,7 @@ function validateEmojiTags(text) {
     }
     const fallback = client.emojis.cache.find(
       (e) =>
-        e.available !== false &&
-        e.name.toLowerCase() === name.toLowerCase(),
+        e.available !== false && e.name.toLowerCase() === name.toLowerCase(),
     );
     return fallback ? fallback.toString() : "";
   });
@@ -203,7 +205,7 @@ async function generateContentJson(
 ) {
   const apiCall = () =>
     ai.models.generateContent({
-      model: "gemini-3.5-flash-lite",
+      model: "gemini-3.1-flash-lite",
       contents,
       config: {
         systemInstruction,
@@ -471,15 +473,17 @@ const ACTIVITY_POOL = [
   { name: "the Endurance", type: ActivityType.Watching },
   { name: "the Wormhole", type: ActivityType.Watching },
   { name: "Rick's Portal Gun", type: ActivityType.Watching },
+  { name: "The Watcher watching you", type: ActivityType.Watching },
 
   { name: "Chess with CASE", type: ActivityType.Playing },
-  { name: "Interdimensional Cable", type: ActivityType.Playing },
   { name: "Quantum Roulette", type: ActivityType.Playing },
+  { name: "with a TemPad", type: ActivityType.Playing },
 
   { name: "Voyager Golden Record", type: ActivityType.Listening },
   { name: "Cosmic Microwave Background", type: ActivityType.Listening },
   { name: "1D: Drag Me Down", type: ActivityType.Listening },
   { name: "The Weeknd: Starboy", type: ActivityType.Listening },
+  { name: "Post Malone: Sunflower", type: ActivityType.Listening },
   { name: "the Sound of the Void", type: ActivityType.Listening },
   { name: "Radio from Deep Space", type: ActivityType.Listening },
 
@@ -499,7 +503,7 @@ const ACTIVITY_POOL = [
   {
     name: "Live from Area 51",
     type: ActivityType.Streaming,
-    url: "https://www.twitch.tv/nasa",
+    url: "https://www.youtube.com/nasa",
   },
   {
     name: "NASA Feed",
@@ -507,9 +511,9 @@ const ACTIVITY_POOL = [
     url: "https://www.youtube.com/nasa",
   },
   {
-    name: "Deep Space Network",
+    name: "Live from the End of Time",
     type: ActivityType.Streaming,
-    url: "https://www.youtube.com/nasa",
+    url: "https://www.youtube.com/marvel",
   },
 ];
 
