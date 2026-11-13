@@ -3,21 +3,31 @@ import { EmbedBuilder } from "discord.js";
 import logger from "../utils/logger.js";
 import { getAutoMemeConfigs, saveAutoMemeConfig } from "./database.js";
 
-const SUBREDDITS = ["darkmemers", "comics", "meirl", "FingMemes"];
+const SUBREDDITS = ["memes", "dankmemes", "meirl", "comics", "darkmemers", "wholesomememes"];
 
 async function fetchMeme() {
   const subreddit = SUBREDDITS[Math.floor(Math.random() * SUBREDDITS.length)];
   try {
-    const res = await fetch(`https://meme-api.com/gimme/${subreddit}`);
+    const res = await fetch(`https://meme-api.com/gimme/${subreddit}/25`);
     if (!res.ok) return null;
-    const data = await res.json();
-    if (!data || !data.url) return null;
+    const payload = await res.json();
+    const memes = Array.isArray(payload.memes)
+      ? payload.memes
+      : payload.url
+        ? [payload]
+        : [];
 
-    const lowerUrl = data.url.toLowerCase();
-    const isImage = /\.(jpg|jpeg|png|webp)(\?.*)?$/i.test(lowerUrl);
-    if (!isImage) return null;
+    const validMemes = memes.filter(
+      (m) =>
+        m &&
+        m.url &&
+        /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(m.url.toLowerCase()),
+    );
+    if (validMemes.length === 0) return null;
 
-    return data;
+    validMemes.sort((a, b) => (b.ups || 0) - (a.ups || 0));
+    const topTier = validMemes.slice(0, Math.min(5, validMemes.length));
+    return topTier[Math.floor(Math.random() * topTier.length)];
   } catch (err) {
     logger.warn(`Failed to fetch auto-meme: ${err.message}`);
     return null;

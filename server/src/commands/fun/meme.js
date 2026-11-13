@@ -23,10 +23,12 @@ export const data = {
 };
 
 const SUBREDDITS = [
-  "darkmemers",
   "memes",
-  "comics",
+  "dankmemes",
   "meirl",
+  "comics",
+  "darkmemers",
+  "wholesomememes",
 ];
 
 export async function execute(interaction, client) {
@@ -37,7 +39,7 @@ export async function execute(interaction, client) {
     const subreddit =
       selectedType || SUBREDDITS[Math.floor(Math.random() * SUBREDDITS.length)];
 
-    const response = await fetch(`https://meme-api.com/gimme/${subreddit}`);
+    const response = await fetch(`https://meme-api.com/gimme/${subreddit}/30`);
 
     if (!response.ok) {
       return interaction.editReply({
@@ -46,15 +48,30 @@ export async function execute(interaction, client) {
       });
     }
 
-    const data = await response.json();
+    const payload = await response.json();
+    const memes = Array.isArray(payload.memes)
+      ? payload.memes
+      : payload.url
+        ? [payload]
+        : [];
 
-    if (!data || !data.url || data.nsfw) {
+    const validMemes = memes.filter(
+      (m) =>
+        m &&
+        m.url &&
+        /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(m.url.toLowerCase()),
+    );
+
+    if (validMemes.length === 0) {
       return interaction.editReply({
         content: "Failed to load a suitable meme. Try running `/meme` again!",
       });
     }
 
-    const isGif = data.url.endsWith(".gif");
+    validMemes.sort((a, b) => (b.ups || 0) - (a.ups || 0));
+
+    const topTierPool = validMemes.slice(0, Math.min(5, validMemes.length));
+    const data = topTierPool[Math.floor(Math.random() * topTierPool.length)];
 
     const randomColor = Math.floor(Math.random() * 16777215);
 
@@ -68,7 +85,7 @@ export async function execute(interaction, client) {
       .setImage(data.url)
       .setColor(randomColor)
       .setFooter({
-        text: `${data.ups ? data.ups.toLocaleString() : 0} upvotes • Posted by u/${data.author || "anonymous"}`,
+        text: `r/${data.subreddit} • ${data.ups ? data.ups.toLocaleString() : 0} ${data.ups === 1 ? "upvote" : "upvotes"} • u/${data.author || "anonymous"}`,
         iconURL: "https://cdn.discordapp.com/emojis/1540698439594016778.png",
       });
 
