@@ -30,6 +30,7 @@ import * as guildDeleteEvent from "./src/events/guildDelete.js";
 import * as guildMemberAddEvent from "./src/events/guildMemberAdd.js";
 import { initReminderManager } from "./src/services/reminder.js";
 import { initAutoMemeService } from "./src/services/automeme.js";
+import { initAutoAvatarService } from "./src/services/autoavatar.js";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -554,6 +555,7 @@ client.once(Events.ClientReady, async (c) => {
   );
   initReminderManager(client);
   initAutoMemeService(client);
+  initAutoAvatarService(client);
 
   const uniqueCommandsMap = new Map();
   for (const cmd of client.commands.values()) {

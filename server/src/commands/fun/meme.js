@@ -85,7 +85,7 @@ export async function execute(interaction, client) {
       .setImage(data.url)
       .setColor(randomColor)
       .setFooter({
-        text: `r/${data.subreddit} • ${data.ups ? data.ups.toLocaleString() : 0} ${data.ups === 1 ? "upvote" : "upvotes"} • u/${data.author || "anonymous"}`,
+        text: `${data.ups ? data.ups.toLocaleString() : 0} ${data.ups === 1 ? "upvote" : "upvotes"} • r/${data.subreddit}`,
         iconURL: "https://cdn.discordapp.com/emojis/1540698439594016778.png",
       });
 
