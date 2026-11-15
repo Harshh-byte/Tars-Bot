@@ -73,11 +73,9 @@ async function updateDailyAvatar(client) {
     await client.user.setAvatar(buffer);
   } catch (err) {
     if (err.status === 429 || err.message?.includes("429")) {
-      logger.warn(
-        "[AutoAvatar] Rate limited by Discord for avatar changes. Will retry next cycle.",
-      );
+      logger.warn("[AutoAvatar] Rate limited by Discord for avatar changes.");
     } else {
-      logger.error(`[AutoAvatar] Failed to set avatar: ${err.message}. Applying fallback...`);
+      logger.error(`[AutoAvatar] Failed to set avatar: ${err.message}`);
       await setFallbackAvatar(client);
     }
   }
@@ -86,9 +84,15 @@ async function updateDailyAvatar(client) {
 export function initAutoAvatarService(client) {
   setTimeout(() => {
     updateDailyAvatar(client);
-  }, 10000);
+  }, 3000);
 
-  cron.schedule("0 0 * * *", () => {
-    updateDailyAvatar(client);
-  });
+  cron.schedule(
+    "0 11 * * *",
+    () => { 
+      updateDailyAvatar(client);
+    },
+    {
+      timezone: "Asia/Kolkata",
+    },
+  );
 }
