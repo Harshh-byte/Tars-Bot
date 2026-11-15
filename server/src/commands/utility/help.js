@@ -158,6 +158,11 @@ const modulesCatalog = {
       { name: "Ping", cmd: "ping", desc: "Check bot latency." },
       { name: "About", cmd: "about", desc: "View information about the bot." },
       { name: "Remind", cmd: "remind", desc: "Set a reminder." },
+      {
+        name: "NASA APOD",
+        cmd: "apod",
+        desc: "NASA's Astronomy Picture of the Day.",
+      },
       { name: "Ask", cmd: "ask", desc: "Ask Tars anything." },
       { name: "Purge", cmd: "purge", desc: "Purge messages from the channel." },
       {

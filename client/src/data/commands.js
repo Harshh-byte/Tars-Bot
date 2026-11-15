@@ -347,6 +347,15 @@ export const commands = [
     badge: "Utility",
     badgeColor: "text-ds-green bg-ds-green/10",
   },
+  {
+    trigger: "/apod",
+    alias: ".apod",
+    category: "util",
+    title: "NASA APOD",
+    description: "View NASA's Astronomy Picture of the Day.",
+    badge: "Utility",
+    badgeColor: "text-ds-green bg-ds-green/10",
+  },
 ];
 
 export const categories = [

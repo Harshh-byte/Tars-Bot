@@ -2,6 +2,7 @@ import cron from "node-cron";
 import { EmbedBuilder } from "discord.js";
 import logger from "../utils/logger.js";
 import { getAutoMemeConfigs, saveAutoMemeConfig } from "./database.js";
+import { EMOJI_IDS } from "../utils/emojis.js";
 
 const SUBREDDITS = ["memes", "dankmemes", "meirl", "comics", "darkmemers", "wholesomememes"];
 
@@ -64,8 +65,7 @@ export function initAutoMemeService(client) {
               .setColor(randomColor)
               .setFooter({
                 text: `AutoMeme • ${meme.ups ? meme.ups.toLocaleString() : 0} ${meme.ups === 1 ? "upvote" : "upvotes"} • r/${meme.subreddit}`,
-                iconURL:
-                  "https://cdn.discordapp.com/emojis/1540698439594016778.png",
+                iconURL: `https://cdn.discordapp.com/emojis/${EMOJI_IDS.Like}.png`,
               });
 
             await channel.send({ embeds: [embed] }).catch(() => null);

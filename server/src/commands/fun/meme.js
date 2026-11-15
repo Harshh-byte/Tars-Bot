@@ -1,6 +1,7 @@
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EmbedBuilder } from "discord.js";
+import { EMOJI_IDS } from "../../utils/emojis.js";
 
 export const data = {
   name: "meme",
@@ -86,7 +87,7 @@ export async function execute(interaction, client) {
       .setColor(randomColor)
       .setFooter({
         text: `${data.ups ? data.ups.toLocaleString() : 0} ${data.ups === 1 ? "upvote" : "upvotes"} • r/${data.subreddit}`,
-        iconURL: "https://cdn.discordapp.com/emojis/1540698439594016778.png",
+        iconURL: `https://cdn.discordapp.com/emojis/${EMOJI_IDS.Like}.png`,
       });
 
     await interaction.editReply({
