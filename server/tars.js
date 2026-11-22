@@ -479,6 +479,8 @@ const ACTIVITY_POOL = [
   { name: "Chess with CASE", type: ActivityType.Playing },
   { name: "Quantum Roulette", type: ActivityType.Playing },
   { name: "with a TemPad", type: ActivityType.Playing },
+{ name: "with Miss Minutes", type: ActivityType.Playing },
+  { name: "with Schrödinger's Cat", type: ActivityType.Playing },
 
   { name: "Voyager Golden Record", type: ActivityType.Listening },
   { name: "Cosmic Microwave Background", type: ActivityType.Listening },
