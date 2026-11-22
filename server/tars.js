@@ -485,8 +485,12 @@ const ACTIVITY_POOL = [
   { name: "1D: Drag Me Down", type: ActivityType.Listening },
   { name: "The Weeknd: Starboy", type: ActivityType.Listening },
   { name: "Post Malone: Sunflower", type: ActivityType.Listening },
+  { name: "Coldplay: Yellow", type: ActivityType.Listening },
+  { name: "vaultboy: you're my moon", type: ActivityType.Listening },
+  { name: "Bruno Mars: Talking to the Moon", type: ActivityType.Listening },
   { name: "the Sound of the Void", type: ActivityType.Listening },
   { name: "Radio from Deep Space", type: ActivityType.Listening },
+  { name: "Whispers from a Dying Star", type: ActivityType.Listening },
 
   { name: "the Race to Mars", type: ActivityType.Competing },
   { name: "Space Race", type: ActivityType.Competing },
