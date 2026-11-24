@@ -58,12 +58,9 @@ export async function execute(guild, client) {
 
         const ownerEmbed = new EmbedBuilder()
           .setColor("#2ecc71")
-          .setAuthor({
-            name: `${guild.name}`,
-            iconURL: guildIcon || undefined,
-          })
+          .setTitle(`${EMOJIS.Enter} Joined a Server!`)
           .setDescription(
-            `### ${EMOJIS.Enter} Joined a Server!\n\n` +
+            `### ${guild.name}\n\n` +
             `> • **Members:** \`${memberCount.toLocaleString()}\`\n` +
             `> • **Owner:** \`${ownerName}\`\n` +
             `> • **Servers:** \`${totalGuilds}\``,
