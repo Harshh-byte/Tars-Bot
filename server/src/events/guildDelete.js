@@ -9,7 +9,7 @@ export const name = Events.GuildDelete;
 export async function execute(guild, client) {
   try {
     const isServerDeleted = guild.available === false;
-    const titleText = isServerDeleted ? "Server Deleted" : "Server Left / Removed";
+    const titleText = isServerDeleted ? "Server Deleted" : "Server Removed";
 
     if (guild.id) {
       deleteServerData(guild.id).catch((err) => {
