@@ -130,9 +130,6 @@ function scheduleInMemoryTimer(client, reminderObj) {
   const delayMs = Math.max(0, reminderObj.triggerAt - Date.now());
 
   if (delayMs > 2147483647) {
-    logger.warn(
-      `Reminder ${reminderObj.id} is beyond 24 days, skipping in-memory timer.`,
-    );
     return;
   }
 
@@ -142,6 +139,36 @@ function scheduleInMemoryTimer(client, reminderObj) {
   }, delayMs);
 
   activeTimers.set(reminderObj.id, timer);
+}
+
+export async function getUserReminders(userId) {
+  try {
+    const snapshot = await remindersRef.where("userId", "==", userId).get();
+    if (snapshot.empty) return [];
+    const list = [];
+    snapshot.forEach((doc) => {
+      list.push(doc.data());
+    });
+    list.sort((a, b) => a.triggerAt - b.triggerAt);
+    return list;
+  } catch (err) {
+    logger.error(`Failed to fetch reminders for user ${userId}:`, err);
+    return [];
+  }
+}
+
+export async function deleteReminder(reminderId) {
+  try {
+    if (activeTimers.has(reminderId)) {
+      clearTimeout(activeTimers.get(reminderId));
+      activeTimers.delete(reminderId);
+    }
+    await remindersRef.doc(reminderId).delete();
+    return true;
+  } catch (err) {
+    logger.error(`Failed to delete reminder ${reminderId}:`, err);
+    return false;
+  }
 }
 
 export async function initReminderManager(client) {

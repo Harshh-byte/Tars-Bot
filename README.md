@@ -23,7 +23,7 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 
 | Category    | Commands                                                                                                                          | Description                                                   |
 | :---------- | :-------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------ |
-| **Utility** | `/about`, `/apod`, `/ask`, `/avatar`, `/help`, `/ping`, `/prefix`, `/remind`, `/serverinfo`, `/userinfo`                         | Server tools and utilities                                    |
+| **Utility** | `/about`, `/apod`, `/ask`, `/avatar`, `/help`, `/ping`, `/prefix`, `/remind`, `/reminders`, `/serverinfo`, `/userinfo`                         | Server tools and utilities                                    |
 | **Actions** | `/hug`, `/kiss`, `/pat`, `/punch`, `/slap`, `/smoke`, `/vape`                                                                     | Roleplay & social interactions                                |
 | **Games**   | `/flag`, `/flip`, `/impostor`, `/leaderboard`, `/nhie`, `/para`, `/pokemon`, `/roll`, `/rps`, `/scramble`, `/tod`, `/ttt`, `/wyr` | Interactive games & scoreboards |
 | **Fun**     | `/autism`, `/bitches`, `/gay`, `/iq`, `/lesbian`, `/meme`, `/pp`, `/roast`, `/ship`, `/simp`, `/wish`                             | Calculators, roasts, and memes                                |

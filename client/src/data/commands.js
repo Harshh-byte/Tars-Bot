@@ -348,6 +348,15 @@ export const commands = [
     badgeColor: "text-ds-green bg-ds-green/10",
   },
   {
+    trigger: "/reminders",
+    alias: ".reminders",
+    category: "util",
+    title: "Reminders",
+    description: "View and manage reminders.",
+    badge: "Utility",
+    badgeColor: "text-ds-green bg-ds-green/10",
+  },
+  {
     trigger: "/apod",
     alias: ".apod",
     category: "util",

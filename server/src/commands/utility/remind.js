@@ -3,6 +3,7 @@ import {
   parseReminderInput,
   saveAndScheduleReminder,
 } from "../../services/reminder.js";
+import { execute as executeRemindersList } from "./reminders.js";
 import { EMBED_COLORS } from "../../utils/embeds.js";
 import { EMOJIS } from "../../utils/emojis.js";
 import logger from "../../utils/logger.js";
@@ -47,6 +48,10 @@ export async function execute(interaction, client) {
     if (!inputText && interaction.message?.content) {
       const parts = interaction.message.content.trim().split(/ +/);
       inputText = parts.slice(1).join(" ");
+    }
+
+    if (inputText.toLowerCase().trim() === "list") {
+      return executeRemindersList(interaction, client);
     }
 
     if (!inputText || inputText.trim() === "") {

@@ -50,14 +50,22 @@ export async function execute(guild, client) {
       try {
         const owner = await client.users.fetch(process.env.OWNER_ID);
         const memberCount = guild.memberCount || 0;
+        const guildIcon = guild.iconURL({ dynamic: true, size: 256 });
+        const totalGuilds = client.guilds.cache.size;
+
         const ownerEmbed = new EmbedBuilder()
           .setColor(0x2ecc71)
-          .setTitle(`${EMOJIS.Enter} **Server Joined!**`)
+          .setTitle(`${EMOJIS.Enter} **Joined a Server!**`)
           .setDescription(
-            `**Server:** ${guild.name}\n` +
-              `**Members:** \`${memberCount.toLocaleString()}\`\n\n` +
-              `-# ${botName} was successfully added to ${guild.name}.`,
+            `**${guild.name}**\n\n` +
+            `• **Members:** \`${memberCount.toLocaleString()}\`\n` +
+            `• **Servers:** \`${totalGuilds}\``,
           );
+
+        if (guildIcon) {
+          ownerEmbed.setThumbnail(guildIcon);
+        }
+
         await owner.send({ embeds: [ownerEmbed] }).catch((err) => {
           logger.warn("Failed to send join DM to owner:", err);
         });

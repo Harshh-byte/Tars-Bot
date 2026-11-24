@@ -4,12 +4,24 @@ import logger from "../utils/logger.js";
 import { getAutoMemeConfigs, saveAutoMemeConfig } from "./database.js";
 import { EMOJI_IDS } from "../utils/emojis.js";
 
-const SUBREDDITS = ["memes", "dankmemes", "meirl", "comics", "darkmemers", "wholesomememes"];
+const SUBREDDITS = [
+  "dankmemes",
+  "BikiniBottomTwitter",
+  "shitposting",
+  "memes",
+];
+
+function formatUpvotes(num) {
+  if (!num) return "0";
+  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (num >= 1_000) return (num / 1_000).toFixed(1).replace(/\.0$/, "") + "k";
+  return num.toString();
+}
 
 async function fetchMeme() {
   const subreddit = SUBREDDITS[Math.floor(Math.random() * SUBREDDITS.length)];
   try {
-    const res = await fetch(`https://meme-api.com/gimme/${subreddit}/25`);
+    const res = await fetch(`https://meme-api.com/gimme/${subreddit}/50`);
     if (!res.ok) return null;
     const payload = await res.json();
     const memes = Array.isArray(payload.memes)
@@ -22,12 +34,19 @@ async function fetchMeme() {
       (m) =>
         m &&
         m.url &&
+        !m.nsfw &&
         /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(m.url.toLowerCase()),
     );
     if (validMemes.length === 0) return null;
 
+    // Sort descending by upvotes so high quality memes come first
     validMemes.sort((a, b) => (b.ups || 0) - (a.ups || 0));
-    const topTier = validMemes.slice(0, Math.min(5, validMemes.length));
+
+    // Prefer memes with at least 150 upvotes; fall back to top sorted if not enough
+    const qualityMemes = validMemes.filter((m) => (m.ups || 0) >= 150);
+    const candidatePool = qualityMemes.length >= 3 ? qualityMemes : validMemes;
+
+    const topTier = candidatePool.slice(0, Math.min(5, candidatePool.length));
     return topTier[Math.floor(Math.random() * topTier.length)];
   } catch (err) {
     logger.warn(`Failed to fetch auto-meme: ${err.message}`);
@@ -64,7 +83,7 @@ export function initAutoMemeService(client) {
               .setImage(meme.url)
               .setColor(randomColor)
               .setFooter({
-                text: `AutoMeme • ${meme.ups ? meme.ups.toLocaleString() : 0} ${meme.ups === 1 ? "upvote" : "upvotes"} • r/${meme.subreddit}`,
+                text: `AutoMeme • ${formatUpvotes(meme.ups)} ${meme.ups === 1 ? "upvote" : "upvotes"} • r/${meme.subreddit}`,
                 iconURL: `https://cdn.discordapp.com/emojis/${EMOJI_IDS.Like}.png`,
               });
 

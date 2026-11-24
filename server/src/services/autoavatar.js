@@ -49,12 +49,17 @@ async function fetchTodaysNasaApod() {
   }
 }
 
+let lastAvatarDate = null;
+
 async function updateDailyAvatar(client) {
   if (!client.user) return;
   try {
     const apod = await fetchTodaysNasaApod();
     if (!apod || !apod.url) {
-      await setFallbackAvatar(client);
+      return;
+    }
+
+    if (lastAvatarDate === apod.date) {
       return;
     }
 
@@ -63,7 +68,6 @@ async function updateDailyAvatar(client) {
       signal: AbortSignal.timeout(20000),
     });
     if (!imgRes.ok) {
-      await setFallbackAvatar(client);
       return;
     }
 
@@ -71,13 +75,18 @@ async function updateDailyAvatar(client) {
     const buffer = Buffer.from(arrayBuffer);
 
     await client.user.setAvatar(buffer);
+    lastAvatarDate = apod.date;
   } catch (err) {
-    if (err.status === 429 || err.message?.includes("429")) {
-      logger.warn("[AutoAvatar] Rate limited by Discord for avatar changes.");
-    } else {
-      logger.error(`[AutoAvatar] Failed to set avatar: ${err.message}`);
-      await setFallbackAvatar(client);
+    if (
+      err.status === 429 ||
+      err.code === 50035 ||
+      err.message?.includes("AVATAR_RATE_LIMIT") ||
+      err.message?.includes("429")
+    ) {
+      // Discord strict avatar rate limit - silently back off
+      return;
     }
+    logger.error(`[AutoAvatar] Failed to set avatar: ${err.message}`);
   }
 }
 

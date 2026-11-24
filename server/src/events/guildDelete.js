@@ -47,14 +47,22 @@ export async function execute(guild, client) {
       try {
         const owner = await client.users.fetch(process.env.OWNER_ID);
         const memberCount = guild.memberCount || 0;
+        const guildIcon = guild.iconURL?.({ dynamic: true, size: 256 }) || null;
+        const totalGuilds = client.guilds.cache.size;
+
         const ownerEmbed = new EmbedBuilder()
           .setColor(0xed4245)
           .setTitle(`${EMOJIS.Exit} **${titleText}**`)
           .setDescription(
-            `**Server:** ${guild.name}\n` +
-            `**Members:** \`${memberCount.toLocaleString()}\`${kickedByText}\n\n` +
-            `-# ${detailText}`,
+            `**${guild.name}**\n\n` +
+            `• **Members:** \`${memberCount.toLocaleString()}\`\n` +
+            `• **Servers:** \`${totalGuilds}\`${kickedByText ? `\n• **Kicked By:** ${kickedByText.replace(/^[\s\S]*?\*\*Kicked By:\*\*\s*/i, "")}` : ""}`,
           );
+
+        if (guildIcon) {
+          ownerEmbed.setThumbnail(guildIcon);
+        }
+
         await owner.send({ embeds: [ownerEmbed] }).catch((err) => {
           logger.warn("Failed to send leave DM to owner:", err);
         });

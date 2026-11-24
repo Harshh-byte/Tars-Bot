@@ -12,10 +12,10 @@ export function createWelcomePayload(guild, client) {
 
   const quickStartText =
     `Quick Start Guide:\n` +
-    `>>> \`${prefix}help [command]\` — View interactive command list & option inspector.\n` +
-    `\`${prefix}ask (prompt)\` — Ask ${botName} anything with live search.\n` +
-    `\`${prefix}tod\` / \`${prefix}wyr\` / \`${prefix}nhie\` — Interactive party games.\n` +
-    `\`${prefix}ship (user1) [user2]\` — Love percentage calculator.\n\n` +
+    `>>> \`@${botName} (message)\` — Chat directly with ${botName} for witty banter & answers.\n` +
+    `\`${prefix}tod\` / \`${prefix}wyr\` / \`${prefix}ttt\` — Multiplayer interactive games.\n` +
+    `\`${prefix}apod\` / \`${prefix}meme\` — Daily NASA cosmic explorations & trending Reddit memes.\n` +
+    `\`${prefix}help\` — Interactive command catalog & option inspector.\n\n` +
     `-# Explore all features & command documentation on our website dashboard.`;
 
   return {

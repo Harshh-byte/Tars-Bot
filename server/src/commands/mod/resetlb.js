@@ -132,17 +132,19 @@ export async function execute(interaction) {
 
     let msg;
     if (interaction.deferred || interaction.replied) {
-      msg = await interaction.followUp({
+      const response = await interaction.followUp({
         embeds: [warnEmbed],
         components: [row],
-        fetchReply: true,
+        withResponse: true,
       });
+      msg = response.resource?.message || (await interaction.fetchReply().catch(() => null));
     } else if (typeof interaction.reply === "function") {
-      await interaction.reply({
+      const response = await interaction.reply({
         embeds: [warnEmbed],
         components: [row],
+        withResponse: true,
       });
-      msg = await interaction.fetchReply().catch(() => null);
+      msg = response.resource?.message || (await interaction.fetchReply().catch(() => null));
     } else {
       msg = await interaction.channel?.send({
         embeds: [warnEmbed],

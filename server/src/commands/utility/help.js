@@ -159,6 +159,11 @@ const modulesCatalog = {
       { name: "About", cmd: "about", desc: "View information about the bot." },
       { name: "Remind", cmd: "remind", desc: "Set a reminder." },
       {
+        name: "Reminders",
+        cmd: "reminders",
+        desc: "View and manage reminders.",
+      },
+      {
         name: "NASA APOD",
         cmd: "apod",
         desc: "NASA's Astronomy Picture of the Day.",

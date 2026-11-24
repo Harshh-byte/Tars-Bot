@@ -10,37 +10,44 @@ export const data = {
   options: [
     {
       name: "type",
-      description: "Meme type.",
+      description: "Meme type / subreddit",
       type: 3,
       required: false,
       choices: [
-        { name: "Dark Memes", value: "darkmemers" },
+        { name: "Dank Memes", value: "dankmemes" },
+        { name: "Bikini Bottom", value: "BikiniBottomTwitter" },
+        { name: "Shitposting", value: "shitposting" },
         { name: "General Memes", value: "memes" },
-        { name: "Comics", value: "comics" },
-        { name: "Me IRL", value: "meirl" },
       ],
     },
   ],
 };
 
 const SUBREDDITS = [
-  "memes",
   "dankmemes",
-  "meirl",
-  "comics",
-  "darkmemers",
-  "wholesomememes",
+  "BikiniBottomTwitter",
+  "shitposting",
+  "memes",
 ];
+
+function formatUpvotes(num) {
+  if (!num) return "0";
+  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (num >= 1_000) return (num / 1_000).toFixed(1).replace(/\.0$/, "") + "k";
+  return num.toString();
+}
 
 export async function execute(interaction, client) {
   try {
     await interaction.deferReply();
 
-    const selectedType = interaction.options.getString("type");
+    // Only honor category choices from slash commands; prefix (.meme) always picks randomly
+    const isSlashCommand = typeof interaction.isCommand === "function" && interaction.isCommand();
+    const selectedType = isSlashCommand ? interaction.options.getString("type") : null;
     const subreddit =
       selectedType || SUBREDDITS[Math.floor(Math.random() * SUBREDDITS.length)];
 
-    const response = await fetch(`https://meme-api.com/gimme/${subreddit}/30`);
+    const response = await fetch(`https://meme-api.com/gimme/${subreddit}/50`);
 
     if (!response.ok) {
       return interaction.editReply({
@@ -60,6 +67,7 @@ export async function execute(interaction, client) {
       (m) =>
         m &&
         m.url &&
+        !m.nsfw &&
         /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(m.url.toLowerCase()),
     );
 
@@ -69,9 +77,15 @@ export async function execute(interaction, client) {
       });
     }
 
+    // Sort descending by upvotes so high quality memes come first
     validMemes.sort((a, b) => (b.ups || 0) - (a.ups || 0));
 
-    const topTierPool = validMemes.slice(0, Math.min(5, validMemes.length));
+    // Filter for quality: prefer posts with at least 150 upvotes
+    const qualityMemes = validMemes.filter((m) => (m.ups || 0) >= 150);
+    const candidatePool = qualityMemes.length >= 3 ? qualityMemes : validMemes;
+
+    // Pick randomly from the top upvoted memes to ensure quality and humor
+    const topTierPool = candidatePool.slice(0, Math.min(5, candidatePool.length));
     const data = topTierPool[Math.floor(Math.random() * topTierPool.length)];
 
     const randomColor = Math.floor(Math.random() * 16777215);
@@ -86,7 +100,7 @@ export async function execute(interaction, client) {
       .setImage(data.url)
       .setColor(randomColor)
       .setFooter({
-        text: `${data.ups ? data.ups.toLocaleString() : 0} ${data.ups === 1 ? "upvote" : "upvotes"} • r/${data.subreddit}`,
+        text: `${formatUpvotes(data.ups)} ${data.ups === 1 ? "upvote" : "upvotes"} • r/${data.subreddit}`,
         iconURL: `https://cdn.discordapp.com/emojis/${EMOJI_IDS.Like}.png`,
       });
 

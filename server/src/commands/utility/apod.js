@@ -113,7 +113,7 @@ async function fetchApodByOffset(offset = 0) {
 }
 
 function cleanHtmlTags(str = "") {
-  return str
+  let cleaned = str
     .replace(/<[^>]*>/g, "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
@@ -122,18 +122,31 @@ function cleanHtmlTags(str = "") {
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .trim();
+
+  cleaned = cleaned.replace(/^Explanation:\s*/i, "").trim();
+  cleaned = cleaned.replace(/Tomorrow(?:'s)?\s+picture:.*$/is, "").trim();
+  return cleaned;
+}
+
+const SPACE_EMOJIS = ["📡", "🛰", "🪐", "👾", "☄️", "🌠", "🛸"];
+
+function getRandomSpaceEmoji() {
+  return SPACE_EMOJIS[Math.floor(Math.random() * SPACE_EMOJIS.length)];
 }
 
 async function buildApodV2Payload(apod, offset = 0, disabled = false) {
   const imageUrl = apod.hdurl || apod.url;
   const rawExplanation = cleanHtmlTags(apod.explanation || "");
-  const trimmedExplanation =
-    rawExplanation.length > 700
-      ? rawExplanation.substring(0, 697) + "..."
+  const fullExplanation =
+    rawExplanation.length > 3800
+      ? rawExplanation.substring(0, 3797) + "..."
       : rawExplanation || "No explanation provided by NASA.";
 
+  const spaceEmoji = getRandomSpaceEmoji();
   const titlePrefix =
-    offset === 0 ? "🌌 Today's APOD: " : `🌌 APOD (${apod.date}): `;
+    offset === 0
+      ? `${spaceEmoji} Today's APOD: `
+      : `${spaceEmoji} APOD (${apod.date}): `;
   const apodTitle = apod.title || "Astronomy Picture";
   const apodUrl =
     apod.permalink || apod.url || "https://science.nasa.gov/apod/";
@@ -146,7 +159,7 @@ async function buildApodV2Payload(apod, offset = 0, disabled = false) {
 
   containerComponents.push({
     type: 10,
-    content: `### ${titlePrefix}[${apodTitle}](${apodUrl})\n\n${trimmedExplanation}`,
+    content: `### ${titlePrefix}[${apodTitle}](${apodUrl})\n\n${fullExplanation}`,
   });
 
   if (apod.media_type === "image" && imageUrl) {
@@ -218,8 +231,7 @@ async function buildApodV2Payload(apod, offset = 0, disabled = false) {
   };
   containerComponents.push(buttonsRow);
 
-  const footerTypeLabel =
-    apod.media_type === "video" ? "Video" : "Picture";
+  const footerTypeLabel = apod.media_type === "video" ? "Video" : "Picture";
 
   return {
     flags: 32768,
@@ -257,10 +269,12 @@ export async function execute(interaction, client) {
     if (interaction.deferred || interaction.replied) {
       replyMessage = await interaction.editReply(payload);
     } else {
-      replyMessage = await interaction.reply({
+      const response = await interaction.reply({
         ...payload,
-        fetchReply: true,
+        withResponse: true,
       });
+      replyMessage =
+        response.resource?.message || (await interaction.fetchReply());
     }
 
     const targetUserId = interaction.user?.id || interaction.author?.id;
@@ -277,8 +291,6 @@ export async function execute(interaction, client) {
         });
       }
 
-      await btnInteraction.deferUpdate().catch(() => null);
-
       if (btnInteraction.customId === "apod_today") {
         currentOffset = 0;
       } else if (btnInteraction.customId === "apod_prev") {
@@ -287,14 +299,27 @@ export async function execute(interaction, client) {
         currentOffset = Math.max(currentOffset - 1, 0);
       }
 
-      const updatedApod = await fetchApodByOffset(currentOffset);
-      if (updatedApod) {
-        const updatedPayload = await buildApodV2Payload(
-          updatedApod,
-          currentOffset,
-          false,
-        );
-        await btnInteraction.editReply(updatedPayload);
+      try {
+        const updatedApod = await fetchApodByOffset(currentOffset);
+        if (updatedApod) {
+          const updatedPayload = await buildApodV2Payload(
+            updatedApod,
+            currentOffset,
+            false,
+          );
+          if (btnInteraction.deferred || btnInteraction.replied) {
+            await btnInteraction.editReply(updatedPayload).catch(() => null);
+          } else {
+            await btnInteraction.update(updatedPayload).catch(() => null);
+          }
+        } else {
+          await btnInteraction.deferUpdate().catch(() => null);
+        }
+      } catch (collectErr) {
+        logger.error("Error updating APOD interaction:", collectErr);
+        if (!btnInteraction.deferred && !btnInteraction.replied) {
+          await btnInteraction.deferUpdate().catch(() => null);
+        }
       }
     });
 

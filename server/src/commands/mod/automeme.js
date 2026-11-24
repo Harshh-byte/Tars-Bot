@@ -9,6 +9,7 @@ import * as Sentry from "@sentry/node";
 import {
   saveAutoMemeConfig,
   deleteAutoMemeConfig,
+  getAutoMemeConfig,
 } from "../../services/database.js";
 import { EMBED_COLORS } from "../../utils/embeds.js";
 import { EMOJIS } from "../../utils/emojis.js";
@@ -115,11 +116,24 @@ export async function execute(interaction, client) {
     }
 
     if (intervalInput === "off") {
+      const existingConfig = await getAutoMemeConfig(guild.id);
+      if (!existingConfig || !existingConfig.enabled) {
+        const notEnabledEmbed = new EmbedBuilder()
+          .setTitle(`${EMOJIS.Warning} **AutoMeme Not Active**`)
+          .setDescription(
+            "-# Automated memes are not enabled for the server.",
+          )
+          .setColor(EMBED_COLORS.WARNING);
+        return interaction.reply
+          ? interaction.reply({ embeds: [notEnabledEmbed], flags: MessageFlags.Ephemeral })
+          : null;
+      }
+
       await deleteAutoMemeConfig(guild.id);
       const disableEmbed = new EmbedBuilder()
-        .setTitle("🛑 **AutoMeme Disabled**")
+        .setTitle(`${EMOJIS.Failed} **AutoMeme Disabled**`)
         .setDescription(
-          "-# Automated meme delivery has been turned off for the server.",
+          "-# Automated memes has been turned off for the server.",
         )
         .setColor(EMBED_COLORS.ERROR);
       return interaction.reply

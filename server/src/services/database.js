@@ -486,6 +486,19 @@ export async function getAutoMemeConfigs() {
   }
 }
 
+export async function getAutoMemeConfig(serverId) {
+  if (!serverId) return null;
+  try {
+    const doc = await serverDoc(serverId).get();
+    if (!doc.exists) return null;
+    const data = doc.data();
+    return data?.autoMeme || null;
+  } catch (err) {
+    logger.error(`Failed to get autoMeme config for ${serverId}:`, err);
+    return null;
+  }
+}
+
 export async function deleteAutoMemeConfig(serverId) {
   if (!serverId) return;
   try {

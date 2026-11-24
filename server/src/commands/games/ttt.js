@@ -236,7 +236,7 @@ async function startGame(interaction, client, opponent) {
       } else if (winner === "O") {
         const winnerMention = isVsTars ? "**TARS**" : `<@${playerO.id}>`;
         winnerText =
-          `${EMOJIS.Tada} **${winnerMention} won the match!**` +
+          `${EMOJIS.Tada} ${winnerMention} won the match!` +
           (isVsTars ? `\n\n*TARS: Predictable outcome.*` : "");
       } else if (winner === "TIE") {
         winnerText = `🫱🏻‍🫲🏿 **It's a Tie Game!**`;
