@@ -1,6 +1,6 @@
 export const EMOJIS = {
-  Exit: "<a:Exit:1574829770879934494>",
-  Enter: "<a:Enter:1574829745223376926>",
+  Exit: "<:Exit:1574829770879934494>",
+  Enter: "<:Enter:1574829745223376926>",
   Timer: "<:Timer:1558458344962785351>",
   Developer: "<:Developer:1558458336809193583>",
   Invite: "<:Invite:1558458333202087956>",

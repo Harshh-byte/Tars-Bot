@@ -51,16 +51,24 @@ export async function execute(guild, client) {
         const owner = await client.users.fetch(process.env.OWNER_ID);
         const memberCount = guild.memberCount || 0;
         const guildIcon = guild.iconURL({ dynamic: true, size: 256 });
+        const guildOwner = await guild.fetchOwner().catch(() => null);
         const totalGuilds = client.guilds.cache.size;
 
+        const ownerName = guildOwner?.user?.tag || guildOwner?.user?.username || "Unknown";
+
         const ownerEmbed = new EmbedBuilder()
-          .setColor(0x2ecc71)
-          .setTitle(`${EMOJIS.Enter} **Joined a Server!**`)
+          .setColor("#2ecc71")
+          .setAuthor({
+            name: `${guild.name}`,
+            iconURL: guildIcon || undefined,
+          })
           .setDescription(
-            `**${guild.name}**\n\n` +
-            `• **Members:** \`${memberCount.toLocaleString()}\`\n` +
-            `• **Servers:** \`${totalGuilds}\``,
-          );
+            `### ${EMOJIS.Enter} Joined a Server!\n\n` +
+            `> • **Members:** \`${memberCount.toLocaleString()}\`\n` +
+            `> • **Owner:** \`${ownerName}\`\n` +
+            `> • **Servers:** \`${totalGuilds}\``,
+          )
+          .setFooter({ text: `Server #${totalGuilds} • ID: ${guild.id}` });
 
         if (guildIcon) {
           ownerEmbed.setThumbnail(guildIcon);

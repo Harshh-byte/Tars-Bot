@@ -1,4 +1,4 @@
-import { Events, AuditLogEvent, EmbedBuilder } from "discord.js";
+import { Events, EmbedBuilder } from "discord.js";
 import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { deleteServerData } from "../services/database.js";
@@ -8,34 +8,8 @@ export const name = Events.GuildDelete;
 
 export async function execute(guild, client) {
   try {
-    const botName = client.user?.displayName || client.user?.username;
     const isServerDeleted = guild.available === false;
-    let titleText = isServerDeleted ? "Server Deleted" : "Server Removed";
-    let detailText = isServerDeleted
-      ? `${guild.name} was deleted or became unavailable.`
-      : `${botName} was removed from ${guild.name}.`;
-    let kickedByText = "";
-
-    if (!isServerDeleted) {
-      try {
-        if (guild.members?.me?.permissions?.has("ViewAuditLog")) {
-          const fetchedLogs = await guild.fetchAuditLogs({
-            limit: 1,
-            type: AuditLogEvent.MemberKick,
-          }).catch(() => null);
-
-          const kickEntry = fetchedLogs?.entries?.first();
-          if (kickEntry && kickEntry.target?.id === client.user.id) {
-            const executor = kickEntry.executor;
-            const reason = kickEntry.reason ? ` (Reason: "${kickEntry.reason}")` : "";
-            if (executor) {
-              titleText = "Kicked from Server";
-              kickedByText = `\n**Kicked By:** ${executor.tag || executor.username}${reason}`;
-            }
-          }
-        }
-      } catch (e) {}
-    }
+    const titleText = isServerDeleted ? "Server Deleted" : "Server Left / Removed";
 
     if (guild.id) {
       deleteServerData(guild.id).catch((err) => {
@@ -48,16 +22,24 @@ export async function execute(guild, client) {
         const owner = await client.users.fetch(process.env.OWNER_ID);
         const memberCount = guild.memberCount || 0;
         const guildIcon = guild.iconURL?.({ dynamic: true, size: 256 }) || null;
+        const guildOwner = await guild.fetchOwner?.().catch(() => null);
         const totalGuilds = client.guilds.cache.size;
 
+        const ownerName = guildOwner?.user?.tag || guildOwner?.user?.username || "Unknown";
+
         const ownerEmbed = new EmbedBuilder()
-          .setColor(0xed4245)
-          .setTitle(`${EMOJIS.Exit} **${titleText}**`)
+          .setColor("#ed4245")
+          .setAuthor({
+            name: `${guild.name}`,
+            iconURL: guildIcon || undefined,
+          })
           .setDescription(
-            `**${guild.name}**\n\n` +
-            `• **Members:** \`${memberCount.toLocaleString()}\`\n` +
-            `• **Servers:** \`${totalGuilds}\`${kickedByText ? `\n• **Kicked By:** ${kickedByText.replace(/^[\s\S]*?\*\*Kicked By:\*\*\s*/i, "")}` : ""}`,
-          );
+            `### ${EMOJIS.Exit} ${titleText}\n\n` +
+            `> • **Members:** \`${memberCount.toLocaleString()}\`\n` +
+            `> • **Owner:** \`${ownerName}\`\n` +
+            `> • **Servers:** \`${totalGuilds}\``,
+          )
+          .setFooter({ text: `${totalGuilds} Servers Remaining • ID: ${guild.id}` });
 
         if (guildIcon) {
           ownerEmbed.setThumbnail(guildIcon);
