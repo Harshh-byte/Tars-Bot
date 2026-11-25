@@ -34,15 +34,19 @@ async function fetchTodaysNasaApod() {
     if (!Array.isArray(items) || items.length === 0) return null;
 
     const apod = items[0];
-    if (apod.media_type !== "image") return null;
 
-    const imageUrl = apod.hdurl || apod.url;
-    if (!imageUrl) return null;
+    let imageUrl = null;
+    if (apod.media_type === "image") {
+      imageUrl = apod.hdurl || apod.url;
+    } else if (apod.media_type === "video" && apod.hdurl && /\.(jpg|jpeg|png|webp)(\?.*)?$/i.test(apod.hdurl)) {
+      imageUrl = apod.hdurl;
+    }
 
     return {
       url: imageUrl,
       title: apod.title || "NASA Astronomy Picture of the Day",
       date: apod.date,
+      isVideo: apod.media_type === "video",
     };
   } catch (err) {
     return null;
@@ -55,11 +59,15 @@ async function updateDailyAvatar(client) {
   if (!client.user) return;
   try {
     const apod = await fetchTodaysNasaApod();
-    if (!apod || !apod.url) {
+    if (!apod) return;
+
+    if (lastAvatarDate === apod.date) {
       return;
     }
 
-    if (lastAvatarDate === apod.date) {
+    if (!apod.url) {
+      await setFallbackAvatar(client);
+      lastAvatarDate = apod.date;
       return;
     }
 
@@ -68,6 +76,8 @@ async function updateDailyAvatar(client) {
       signal: AbortSignal.timeout(20000),
     });
     if (!imgRes.ok) {
+      await setFallbackAvatar(client);
+      lastAvatarDate = apod.date;
       return;
     }
 
@@ -83,7 +93,6 @@ async function updateDailyAvatar(client) {
       err.message?.includes("AVATAR_RATE_LIMIT") ||
       err.message?.includes("429")
     ) {
-      // Discord strict avatar rate limit - silently back off
       return;
     }
     logger.error(`[AutoAvatar] Failed to set avatar: ${err.message}`);

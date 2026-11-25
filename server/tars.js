@@ -178,7 +178,7 @@ function replaceEmojiNamesWithTags(text, guild) {
           e.available !== false &&
           e.name.toLowerCase() === emojiName.toLowerCase(),
       );
-      return customEmoji ? customEmoji.toString() : "";
+      return customEmoji ? customEmoji.toString() : match;
     },
   );
   return cleaned.replace(/\s{2,}/g, " ").trim();
@@ -379,11 +379,13 @@ export async function buildAiReply({
         .sort(() => 0.5 - Math.random())
         .slice(0, 40);
       emojisContext =
-        `\n### GLOBAL CUSTOM EMOJIS (ACROSS ALL SERVERS):\n` +
+        `\n### EMOJI INSTRUCTIONS:\n` +
+        `- You can freely use standard Unicode emojis (💀, 😭, 🤡, 🗿, 🔥, 🧢, 💅, 🤏, 🫠, 🫡, 👀, etc.).\n` +
+        `- You can ALSO use any of these custom server emojis by writing their code (e.g. :emoji_name:):\n` +
         sampledEmojis
-          .map((e) => `- Name: "${e.name}", Code: ":${e.name}:"`)
+          .map((e) => `- Name: "${e.name}", Code: ":${e.name}:"${e.animated ? " (animated)" : ""}`)
           .join("\n") +
-        `\n\nInstructions: You have a superpower—you can use custom emojis from ANY server I am in! Include them in your text reply via Code format (e.g., :emoji_name:) or in your "reactions" array. Match your savage, edgy persona perfectly with these choices.`;
+        `\n- Put custom or standard emojis in your "text" or "reactions" array to match your witty, unhinged persona!`;
     }
   } catch (e) {
     logger.warn("Could not aggregate global client emojis:", e);
@@ -453,7 +455,7 @@ Rules for ASK mode:
 
   let gifUrl = null;
   const isExplicitGifRequest = /gif|image|pic|photo|meme/i.test(inputText);
-  const allowGif = isExplicitGifRequest || Math.random() < 0.2;
+  const allowGif = isExplicitGifRequest || Math.random() < 0.6;
 
   if (replyObj.gifSearchQuery && allowGif) {
     gifUrl = await searchGiphy(replyObj.gifSearchQuery);
