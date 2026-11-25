@@ -34,7 +34,7 @@ export async function execute(interaction, client) {
     0,
   );
 
-  const inviteUrl = `https://discord.com/oauth2/authorize?client_id=${client.user.id}&permissions=277024730304&integration_type=0&scope=bot+applications.commands`;
+  const inviteUrl = `https://discord.com/oauth2/authorize?client_id=${client.user.id}&permissions=414463683776&integration_type=0&scope=bot+applications.commands`;
 
   const headerSection = {
     type: 9,
