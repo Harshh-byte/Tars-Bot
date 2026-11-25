@@ -40,6 +40,7 @@ const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildEmojisAndStickers,
   ],
   allowedMentions: {
     parse: [],
@@ -430,17 +431,10 @@ export async function buildAiReply({
   let stickersContext = "";
   try {
     const stickerMap = new Map();
-    // Prioritize current server stickers first
-    if (guild?.stickers?.cache) {
-      for (const s of guild.stickers.cache.values()) {
-        if (s.available !== false) stickerMap.set(s.id, s);
-      }
-    }
-    // Aggregate global stickers across all servers the bot is in
-    if (client.stickers?.cache) {
-      for (const s of client.stickers.cache.values()) {
-        if (s.available !== false && !stickerMap.has(s.id)) {
-          stickerMap.set(s.id, s);
+    for (const g of client.guilds.cache.values()) {
+      if (g.stickers?.cache) {
+        for (const s of g.stickers.cache.values()) {
+          if (s.available !== false) stickerMap.set(s.id, s);
         }
       }
     }
@@ -521,15 +515,14 @@ Rules for ASK mode:
   let stickerId = null;
   if (replyObj.stickerName && replyObj.stickerName.trim() !== "") {
     const cleanStickerQuery = replyObj.stickerName.trim().toLowerCase();
-    const matchedSticker =
-      guild?.stickers?.cache.find(
-        (s) => s.available !== false && s.name.toLowerCase() === cleanStickerQuery,
-      ) ||
-      client.stickers?.cache.find(
-        (s) => s.available !== false && s.name.toLowerCase() === cleanStickerQuery,
+    for (const g of client.guilds.cache.values()) {
+      const s = g.stickers?.cache?.find(
+        (st) => st.available !== false && st.name.toLowerCase() === cleanStickerQuery,
       );
-    if (matchedSticker) {
-      stickerId = matchedSticker.id;
+      if (s) {
+        stickerId = s.id;
+        break;
+      }
     }
   }
 
