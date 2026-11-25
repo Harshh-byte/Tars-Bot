@@ -429,18 +429,28 @@ export async function buildAiReply({
 
   let stickersContext = "";
   try {
-    const availableStickers = [];
+    const stickerMap = new Map();
+    // Prioritize current server stickers first
     if (guild?.stickers?.cache) {
-      availableStickers.push(...guild.stickers.cache.values());
+      for (const s of guild.stickers.cache.values()) {
+        if (s.available !== false) stickerMap.set(s.id, s);
+      }
     }
-    if (availableStickers.length === 0 && client.stickers?.cache) {
-      availableStickers.push(...client.stickers.cache.values());
+    // Aggregate global stickers across all servers the bot is in
+    if (client.stickers?.cache) {
+      for (const s of client.stickers.cache.values()) {
+        if (s.available !== false && !stickerMap.has(s.id)) {
+          stickerMap.set(s.id, s);
+        }
+      }
     }
-    const usableStickers = availableStickers.filter((s) => s.available !== false);
+    const usableStickers = Array.from(stickerMap.values());
     if (usableStickers.length > 0) {
-      const sampledStickers = usableStickers.slice(0, 20);
+      const sampledStickers = usableStickers
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 30);
       stickersContext =
-        `\n### AVAILABLE STICKERS:\n` +
+        `\n### AVAILABLE STICKERS (ACROSS ALL SERVERS):\n` +
         sampledStickers.map((s) => `- "${s.name}"`).join("\n") +
         `\n- If one of these stickers fits your roast or mood, output its exact name in "stickerName" (otherwise leave it empty "").`;
     }
