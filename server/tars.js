@@ -149,22 +149,51 @@ async function searchKlipy(query) {
   }
 }
 
+const COMMON_UNICODE_EMOJIS = {
+  skull: "💀",
+  clown: "🤡",
+  moyai: "🗿",
+  fire: "🔥",
+  sob: "😭",
+  rofl: "🤣",
+  joy: "😂",
+  eyes: "👀",
+  nail_care: "💅",
+  cap: "🧢",
+  saluting_face: "🫡",
+  melting_face: "🫠",
+  pinch: "🤏",
+  thumbsup: "👍",
+  thumbsdown: "👎",
+  poop: "💩",
+  heart: "❤️",
+  facepalm: "🤦",
+};
+
 client.resolveEmoji = function (emojiInput) {
   if (!emojiInput) return emojiInput;
-  const match = emojiInput.match(/<?a?:?\w+:(\d+)>?/);
-  const id = match ? match[1] : emojiInput.trim();
+  const raw = emojiInput.trim();
+  const nameOnly = raw.replace(/^:+|:+$/g, "").toLowerCase();
+
+  const match = raw.match(/<?a?:?\w+:(\d+)>?/);
+  const id = match ? match[1] : raw;
 
   const customEmoji =
     client.emojis.cache.get(id) ||
     client.emojis.cache.find(
       (e) =>
         e.available !== false &&
-        (e.name.toLowerCase() === id.toLowerCase() || e.id === id),
+        (e.name.toLowerCase() === nameOnly || e.id === id),
     );
-  if (customEmoji && customEmoji.available === false) {
-    return emojiInput.trim();
+  if (customEmoji && customEmoji.available !== false) {
+    return customEmoji;
   }
-  return customEmoji || emojiInput.trim();
+
+  if (COMMON_UNICODE_EMOJIS[nameOnly]) {
+    return COMMON_UNICODE_EMOJIS[nameOnly];
+  }
+
+  return raw;
 };
 
 function replaceEmojiNamesWithTags(text, guild) {
@@ -224,14 +253,19 @@ async function generateContentJson(
             reactions: {
               type: "ARRAY",
               items: { type: "STRING" },
-              description: "Max 1 emoji or empty.",
+              description:
+                "1 or 2 emojis (Unicode or custom :emoji_name:) to react to the user's message, or empty if none fits.",
             },
             gifSearchQuery: {
               type: "STRING",
               description: "Search query or empty.",
             },
+            stickerName: {
+              type: "STRING",
+              description: "Exact sticker name from AVAILABLE STICKERS if one fits, otherwise empty.",
+            },
           },
-          required: ["text", "reactions", "gifSearchQuery"],
+          required: ["text", "reactions", "gifSearchQuery", "stickerName"],
         },
       },
     });
@@ -245,15 +279,17 @@ async function generateContentJson(
     return {
       text: parsed.text || "",
       reactions: Array.isArray(parsed.reactions)
-        ? parsed.reactions.slice(0, 1)
+        ? parsed.reactions.slice(0, 2)
         : [],
       gifSearchQuery: parsed.gifSearchQuery || "",
+      stickerName: parsed.stickerName || "",
     };
   } catch (error) {
     return {
       text: "My sarcasm core processor short-circuited.",
       reactions: [],
       gifSearchQuery: "",
+      stickerName: "",
     };
   }
 }
@@ -391,6 +427,25 @@ export async function buildAiReply({
     logger.warn("Could not aggregate global client emojis:", e);
   }
 
+  let stickersContext = "";
+  try {
+    const availableStickers = [];
+    if (guild?.stickers?.cache) {
+      availableStickers.push(...guild.stickers.cache.values());
+    }
+    if (availableStickers.length === 0 && client.stickers?.cache) {
+      availableStickers.push(...client.stickers.cache.values());
+    }
+    const usableStickers = availableStickers.filter((s) => s.available !== false);
+    if (usableStickers.length > 0) {
+      const sampledStickers = usableStickers.slice(0, 20);
+      stickersContext =
+        `\n### AVAILABLE STICKERS:\n` +
+        sampledStickers.map((s) => `- "${s.name}"`).join("\n") +
+        `\n- If one of these stickers fits your roast or mood, output its exact name in "stickerName" (otherwise leave it empty "").`;
+    }
+  } catch (e) {}
+
   let systemPrompt;
   if (mode === "ask") {
     systemPrompt = `You are Tars — the sharp, witty Discord assistant.
@@ -409,7 +464,7 @@ Rules for ASK mode:
 3. FOR ALL OTHER TOPICS: DO NOT include any roast or jokes. Give a 100% straight, direct, plain factual answer only.
 4. Format in plain text only.`;
   } else {
-    systemPrompt = `${tarsSystemPrompt}\n### USER_CONTEXT:\n- Mode: ${mode}\n- Author: ${authorName}\n- Author Gender: ${authorGender || "Unknown"}\n- Target: ${targetName}\n### LIVE_DATA:\n- Time: ${Time.time} | Date: ${Time.date}\n${emojisContext}`;
+    systemPrompt = `${tarsSystemPrompt}\n### USER_CONTEXT:\n- Mode: ${mode}\n- Author: ${authorName}\n- Author Gender: ${authorGender || "Unknown"}\n- Target: ${targetName}\n### LIVE_DATA:\n- Time: ${Time.time} | Date: ${Time.date}\n${emojisContext}\n${stickersContext}`;
   }
 
   const messagesPayload =
@@ -453,18 +508,36 @@ Rules for ASK mode:
     await saveConversation(serverId, authorId, convo);
   }
 
-  let gifUrl = null;
-  const isExplicitGifRequest = /gif|image|pic|photo|meme/i.test(inputText);
-  const allowGif = isExplicitGifRequest || Math.random() < 0.6;
-
-  if (replyObj.gifSearchQuery && allowGif) {
-    gifUrl = await searchGiphy(replyObj.gifSearchQuery);
-    if (!gifUrl) {
-      gifUrl = await searchKlipy(replyObj.gifSearchQuery);
+  let stickerId = null;
+  if (replyObj.stickerName && replyObj.stickerName.trim() !== "") {
+    const cleanStickerQuery = replyObj.stickerName.trim().toLowerCase();
+    const matchedSticker =
+      guild?.stickers?.cache.find(
+        (s) => s.available !== false && s.name.toLowerCase() === cleanStickerQuery,
+      ) ||
+      client.stickers?.cache.find(
+        (s) => s.available !== false && s.name.toLowerCase() === cleanStickerQuery,
+      );
+    if (matchedSticker) {
+      stickerId = matchedSticker.id;
     }
   }
 
-  return { text: replyObj.text, reactions: replyObj.reactions, gifUrl };
+  let gifUrl = null;
+  // Anti-clutter: Never send both a GIF and a Sticker in the same message
+  if (!stickerId) {
+    const isExplicitGifRequest = /gif|image|pic|photo|meme/i.test(inputText);
+    const allowGif = isExplicitGifRequest || Math.random() < 0.5;
+
+    if (replyObj.gifSearchQuery && allowGif) {
+      gifUrl = await searchGiphy(replyObj.gifSearchQuery);
+      if (!gifUrl) {
+        gifUrl = await searchKlipy(replyObj.gifSearchQuery);
+      }
+    }
+  }
+
+  return { text: replyObj.text, reactions: replyObj.reactions, gifUrl, stickerId };
 }
 
 const STATUS_POOL = ["online", "idle", "dnd"];

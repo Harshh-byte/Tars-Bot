@@ -262,7 +262,11 @@ export async function execute(message, client, { buildAiReply }) {
       ];
     }
 
-    if (messagePayload.content || messagePayload.files) {
+    if (replyData.stickerId) {
+      messagePayload.stickers = [replyData.stickerId];
+    }
+
+    if (messagePayload.content || messagePayload.files || messagePayload.stickers) {
       messagePayload.allowedMentions = { parse: [], repliedUser: false };
       await message.reply(messagePayload);
     }
