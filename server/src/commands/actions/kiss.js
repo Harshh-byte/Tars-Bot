@@ -1,14 +1,7 @@
-import {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType,
-} from "discord.js";
+import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import { incrementUserStat } from "../../services/database.js";
 import { fetchAnimeGif } from "../../utils/gif.js";
 
 export const aliases = ["smooch"];
@@ -27,12 +20,18 @@ export const data = {
   ],
 };
 
-const LOCATIONS = [
-  "the cheek",
-  "the forehead",
-  "the lips",
-  "the hand",
-  "the nose",
+const PHRASES = [
+  "Aww, so romantic!",
+  "Sweet!",
+  "How lovely!",
+  "Sealed with a kiss!",
+];
+
+const BACK_PHRASES = [
+  "Kissed right back!",
+  "Couldn't let them have the last kiss!",
+  "Sparks flying!",
+  "Mutual affection!",
 ];
 
 function getRandomItem(arr) {
@@ -47,6 +46,51 @@ function getShortDisplayName(user, member) {
     user?.username ||
     "User";
   return name.trim().split(/\s+/)[0];
+}
+
+function buildCard(content, gifUrl, buttons = [], accentColor = EMBED_COLORS.RED) {
+  const containerComponents = [
+    {
+      type: 10,
+      content,
+    },
+  ];
+
+  if (gifUrl) {
+    containerComponents.push({
+      type: 12,
+      items: [
+        {
+          media: {
+            url: gifUrl,
+          },
+        },
+      ],
+    });
+  }
+
+  if (buttons.length > 0) {
+    containerComponents.push({
+      type: 14,
+      divider: true,
+      spacing: 1,
+    });
+    containerComponents.push({
+      type: 1,
+      components: buttons,
+    });
+  }
+
+  return {
+    flags: 32768,
+    components: [
+      {
+        type: 17,
+        accent_color: accentColor,
+        components: containerComponents,
+      },
+    ],
+  };
 }
 
 async function sendAndFetchReply(interaction, payload) {
@@ -77,10 +121,8 @@ export async function execute(interaction, client) {
     }
 
     if (!target) {
-      const embed = new EmbedBuilder()
-        .setDescription("Kissing the ghost next to you? Mention someone.")
-        .setColor(EMBED_COLORS.WARNING);
-      return interaction.reply({ embeds: [embed], ephemeral: true });
+      const payload = buildCard("Kissing the ghost next to you? Mention someone.", null, [], EMBED_COLORS.WARNING);
+      return interaction.reply({ ...payload, ephemeral: true });
     }
 
     if (target.id === sender.id) {
@@ -91,10 +133,8 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         selfRoasts[Math.floor(Math.random() * selfRoasts.length)];
-      const selfEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.WARNING);
-      return interaction.reply({ embeds: [selfEmbed] });
+      const selfPayload = buildCard(randomRoast, null, [], EMBED_COLORS.WARNING);
+      return interaction.reply(selfPayload);
     }
 
     if (target.id === client?.user?.id) {
@@ -105,10 +145,8 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         tarsRoasts[Math.floor(Math.random() * tarsRoasts.length)];
-      const botEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.ERROR);
-      return interaction.reply({ embeds: [botEmbed] });
+      const botPayload = buildCard(randomRoast, null, [], EMBED_COLORS.ERROR);
+      return interaction.reply(botPayload);
     } else if (target.bot) {
       const botRoasts = [
         "Kissing a bot? Bro is down bad for plastic and copper. Truly tragic.",
@@ -117,44 +155,29 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         botRoasts[Math.floor(Math.random() * botRoasts.length)];
-      const botEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.ERROR);
-      return interaction.reply({ embeds: [botEmbed] });
-    }
-
-    let count = 0;
-    if (serverId !== "DM") {
-      count = await incrementUserStat(serverId, sender.id, "kissCount");
+      const botPayload = buildCard(randomRoast, null, [], EMBED_COLORS.ERROR);
+      return interaction.reply(botPayload);
     }
 
     const senderShortName = getShortDisplayName(sender, senderMember);
     const targetShortName = getShortDisplayName(target, targetMember);
 
-    const location = getRandomItem(LOCATIONS);
+    const phrase = getRandomItem(PHRASES);
     const gifUrl = await fetchAnimeGif("kiss");
 
-    const embed = new EmbedBuilder()
-      .setDescription(
-        `**${senderShortName}** kissed **${targetShortName}** on ${location}!\n\n-# Total Kisses: ${count}`,
-      )
-      .setColor(EMBED_COLORS.RED);
+    const buttons = [
+      {
+        type: 2,
+        custom_id: `kiss_back_${target.id}`,
+        label: "Kiss Back 💋",
+        style: 2,
+      },
+    ];
 
-    if (gifUrl) {
-      embed.setImage(gifUrl);
-    }
+    const content = `**${senderShortName}** kissed **${targetShortName}**! ${phrase}`;
+    const initialPayload = buildCard(content, gifUrl, buttons, EMBED_COLORS.RED);
 
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`kiss_back_${target.id}`)
-        .setLabel("Kiss Back 💋")
-        .setStyle(ButtonStyle.Secondary),
-    );
-
-    const response = await sendAndFetchReply(interaction, {
-      embeds: [embed],
-      components: [row],
-    });
+    const response = await sendAndFetchReply(interaction, initialPayload);
 
     if (
       !response ||
@@ -179,34 +202,18 @@ export async function execute(interaction, client) {
 
       const kisserUser = i.user;
       const kisserMember = i.member;
-      const kisserId = kisserUser.id;
-
-      let newCount = 0;
-      if (serverId !== "DM") {
-        newCount = await incrementUserStat(serverId, kisserId, "kissCount");
-      }
-
       const kisserShortName = getShortDisplayName(kisserUser, kisserMember);
-      const newLoc = getRandomItem(
-        LOCATIONS.filter((l) => l !== location),
-      ) || getRandomItem(LOCATIONS);
+      const backPhrase = getRandomItem(BACK_PHRASES);
 
       let newGif = await fetchAnimeGif("kiss");
       if (newGif && newGif === gifUrl) {
         newGif = (await fetchAnimeGif("kiss")) || newGif;
       }
 
-      const replyEmbed = new EmbedBuilder()
-        .setDescription(
-          `**${kisserShortName}** kissed **${senderShortName}** back on ${newLoc}!\n\n-# Total Kisses: ${newCount}`,
-        )
-        .setColor(EMBED_COLORS.RED);
+      const replyContent = `**${kisserShortName}** kissed **${senderShortName}** back! ${backPhrase}`;
+      const replyPayload = buildCard(replyContent, newGif, [], EMBED_COLORS.RED);
 
-      if (newGif) {
-        replyEmbed.setImage(newGif);
-      }
-
-      await i.followUp({ embeds: [replyEmbed] });
+      await i.followUp(replyPayload);
     });
   } catch (err) {
     logger.error("Error in Kiss command handler:", err);

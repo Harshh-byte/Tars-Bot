@@ -1,14 +1,7 @@
-import {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType,
-} from "discord.js";
+import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import { incrementUserStat } from "../../services/database.js";
 import { fetchAnimeGif } from "../../utils/gif.js";
 
 export const data = {
@@ -25,12 +18,18 @@ export const data = {
   ],
 };
 
-const LOCATIONS = [
-  "tightly",
-  "warmly",
-  "from behind",
-  "gently",
-  "around the waist",
+const PHRASES = [
+  "So warm!",
+  "So sweet!",
+  "Need this!",
+  "A tight embrace!",
+];
+
+const BACK_PHRASES = [
+  "Couldn't resist hugging back!",
+  "Warm cuddles returned!",
+  "Much needed embrace!",
+  "Double the warmth!",
 ];
 
 function getRandomItem(arr) {
@@ -45,6 +44,51 @@ function getShortDisplayName(user, member) {
     user?.username ||
     "User";
   return name.trim().split(/\s+/)[0];
+}
+
+function buildCard(content, gifUrl, buttons = [], accentColor = EMBED_COLORS.PINK) {
+  const containerComponents = [
+    {
+      type: 10,
+      content,
+    },
+  ];
+
+  if (gifUrl) {
+    containerComponents.push({
+      type: 12,
+      items: [
+        {
+          media: {
+            url: gifUrl,
+          },
+        },
+      ],
+    });
+  }
+
+  if (buttons.length > 0) {
+    containerComponents.push({
+      type: 14,
+      divider: true,
+      spacing: 1,
+    });
+    containerComponents.push({
+      type: 1,
+      components: buttons,
+    });
+  }
+
+  return {
+    flags: 32768,
+    components: [
+      {
+        type: 17,
+        accent_color: accentColor,
+        components: containerComponents,
+      },
+    ],
+  };
 }
 
 async function sendAndFetchReply(interaction, payload) {
@@ -75,10 +119,8 @@ export async function execute(interaction, client) {
     }
 
     if (!target) {
-      const embed = new EmbedBuilder()
-        .setDescription("Who are you hugging, the air? Mention someone.")
-        .setColor(EMBED_COLORS.WARNING);
-      return interaction.reply({ embeds: [embed], ephemeral: true });
+      const payload = buildCard("Who are you hugging, the air? Mention someone.", null, [], EMBED_COLORS.WARNING);
+      return interaction.reply({ ...payload, ephemeral: true });
     }
 
     if (target.id === sender.id) {
@@ -89,10 +131,8 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         selfRoasts[Math.floor(Math.random() * selfRoasts.length)];
-      const selfEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.WARNING);
-      return interaction.reply({ embeds: [selfEmbed] });
+      const selfPayload = buildCard(randomRoast, null, [], EMBED_COLORS.WARNING);
+      return interaction.reply(selfPayload);
     }
 
     if (target.id === client?.user?.id) {
@@ -103,10 +143,8 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         tarsRoasts[Math.floor(Math.random() * tarsRoasts.length)];
-      const botEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.ERROR);
-      return interaction.reply({ embeds: [botEmbed] });
+      const botPayload = buildCard(randomRoast, null, [], EMBED_COLORS.ERROR);
+      return interaction.reply(botPayload);
     } else if (target.bot) {
       const botRoasts = [
         "Hugging a bot? Even a bunch of 1s and 0s have higher standards than you.",
@@ -115,44 +153,29 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         botRoasts[Math.floor(Math.random() * botRoasts.length)];
-      const botEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.ERROR);
-      return interaction.reply({ embeds: [botEmbed] });
-    }
-
-    let count = 0;
-    if (serverId !== "DM") {
-      count = await incrementUserStat(serverId, sender.id, "hugCount");
+      const botPayload = buildCard(randomRoast, null, [], EMBED_COLORS.ERROR);
+      return interaction.reply(botPayload);
     }
 
     const senderShortName = getShortDisplayName(sender, senderMember);
     const targetShortName = getShortDisplayName(target, targetMember);
 
-    const style = getRandomItem(LOCATIONS);
+    const phrase = getRandomItem(PHRASES);
     const gifUrl = await fetchAnimeGif("hug");
 
-    const embed = new EmbedBuilder()
-      .setDescription(
-        `**${senderShortName}** hugged **${targetShortName}** ${style}!\n\n-# Total Hugs: ${count}`,
-      )
-      .setColor(EMBED_COLORS.PINK);
+    const buttons = [
+      {
+        type: 2,
+        custom_id: `hug_back_${target.id}`,
+        label: "Hug Back 🫂",
+        style: 2,
+      },
+    ];
 
-    if (gifUrl) {
-      embed.setImage(gifUrl);
-    }
+    const content = `**${senderShortName}** hugs **${targetShortName}**!! ${phrase}`;
+    const initialPayload = buildCard(content, gifUrl, buttons, EMBED_COLORS.PINK);
 
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`hug_back_${target.id}`)
-        .setLabel("Hug Back 🫂")
-        .setStyle(ButtonStyle.Secondary),
-    );
-
-    const response = await sendAndFetchReply(interaction, {
-      embeds: [embed],
-      components: [row],
-    });
+    const response = await sendAndFetchReply(interaction, initialPayload);
 
     if (
       !response ||
@@ -177,34 +200,18 @@ export async function execute(interaction, client) {
 
       const huggerUser = i.user;
       const huggerMember = i.member;
-      const huggerId = huggerUser.id;
-
-      let newCount = 0;
-      if (serverId !== "DM") {
-        newCount = await incrementUserStat(serverId, huggerId, "hugCount");
-      }
-
       const huggerShortName = getShortDisplayName(huggerUser, huggerMember);
-      const newStyle = getRandomItem(
-        LOCATIONS.filter((l) => l !== style),
-      ) || getRandomItem(LOCATIONS);
+      const backPhrase = getRandomItem(BACK_PHRASES);
 
       let newGif = await fetchAnimeGif("hug");
       if (newGif && newGif === gifUrl) {
         newGif = (await fetchAnimeGif("hug")) || newGif;
       }
 
-      const replyEmbed = new EmbedBuilder()
-        .setDescription(
-          `**${huggerShortName}** hugged **${senderShortName}** back ${newStyle}!\n\n-# Total Hugs: ${newCount}`,
-        )
-        .setColor(EMBED_COLORS.PINK);
+      const replyContent = `**${huggerShortName}** hugs **${senderShortName}** back!! ${backPhrase}`;
+      const replyPayload = buildCard(replyContent, newGif, [], EMBED_COLORS.PINK);
 
-      if (newGif) {
-        replyEmbed.setImage(newGif);
-      }
-
-      await i.followUp({ embeds: [replyEmbed] });
+      await i.followUp(replyPayload);
     });
   } catch (err) {
     logger.error("Error in Hug command handler:", err);

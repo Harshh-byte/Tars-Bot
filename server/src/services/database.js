@@ -516,6 +516,152 @@ export async function deleteAutoMemeConfig(serverId) {
   }
 }
 
+export async function getUserFamily(serverId, userId) {
+  if (!serverId || !userId || serverId === "DM") {
+    return { partnerId: null, marriedAt: null, parentIds: [], childrenIds: [] };
+  }
+  try {
+    const doc = await serverDoc(serverId).collection("families").doc(userId).get();
+    if (doc.exists) {
+      const data = doc.data();
+      return {
+        partnerId: data.partnerId || null,
+        marriedAt: data.marriedAt || null,
+        parentIds: Array.isArray(data.parentIds) ? data.parentIds : [],
+        childrenIds: Array.isArray(data.childrenIds) ? data.childrenIds : [],
+      };
+    }
+  } catch (err) {
+    logger.error(`Failed to fetch user family for ${userId} in ${serverId}:`, err);
+  }
+  return { partnerId: null, marriedAt: null, parentIds: [], childrenIds: [] };
+}
+
+export async function marryUsers(serverId, user1Id, user2Id) {
+  if (!serverId || !user1Id || !user2Id) return false;
+  try {
+    const now = Math.floor(Date.now() / 1000);
+    const batch = db.batch();
+    const fam1Ref = serverDoc(serverId).collection("families").doc(user1Id);
+    const fam2Ref = serverDoc(serverId).collection("families").doc(user2Id);
+
+    batch.set(fam1Ref, { partnerId: user2Id, marriedAt: now, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    batch.set(fam2Ref, { partnerId: user1Id, marriedAt: now, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    await batch.commit();
+    return true;
+  } catch (err) {
+    logger.error(`Failed to marry users ${user1Id} and ${user2Id} in ${serverId}:`, err);
+    return false;
+  }
+}
+
+export async function divorceUsers(serverId, user1Id) {
+  if (!serverId || !user1Id) return null;
+  try {
+    const fam1 = await getUserFamily(serverId, user1Id);
+    if (!fam1.partnerId) return null;
+    const partnerId = fam1.partnerId;
+
+    const batch = db.batch();
+    const fam1Ref = serverDoc(serverId).collection("families").doc(user1Id);
+    const fam2Ref = serverDoc(serverId).collection("families").doc(partnerId);
+
+    batch.set(fam1Ref, { partnerId: null, marriedAt: null, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    batch.set(fam2Ref, { partnerId: null, marriedAt: null, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    await batch.commit();
+    return partnerId;
+  } catch (err) {
+    logger.error(`Failed to divorce user ${user1Id} in ${serverId}:`, err);
+    return null;
+  }
+}
+
+export async function adoptChild(serverId, parentId, childId) {
+  if (!serverId || !parentId || !childId) return false;
+  try {
+    const batch = db.batch();
+    const parentRef = serverDoc(serverId).collection("families").doc(parentId);
+    const childRef = serverDoc(serverId).collection("families").doc(childId);
+
+    const parentFam = await getUserFamily(serverId, parentId);
+    const childFam = await getUserFamily(serverId, childId);
+
+    const newChildren = Array.from(new Set([...parentFam.childrenIds, childId]));
+    const newParents = Array.from(new Set([...childFam.parentIds, parentId]));
+
+    batch.set(parentRef, { childrenIds: newChildren, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    batch.set(childRef, { parentIds: newParents, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+
+    // If parent has a spouse, also add child to spouse
+    if (parentFam.partnerId) {
+      const spouseRef = serverDoc(serverId).collection("families").doc(parentFam.partnerId);
+      const spouseFam = await getUserFamily(serverId, parentFam.partnerId);
+      const spouseChildren = Array.from(new Set([...spouseFam.childrenIds, childId]));
+      newParents.push(parentFam.partnerId);
+      batch.set(spouseRef, { childrenIds: spouseChildren, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+      batch.set(childRef, { parentIds: Array.from(new Set(newParents)) }, { merge: true });
+    }
+
+    await batch.commit();
+    return true;
+  } catch (err) {
+    logger.error(`Failed to adopt ${childId} by ${parentId} in ${serverId}:`, err);
+    return false;
+  }
+}
+
+export async function disownChild(serverId, parentId, childId) {
+  if (!serverId || !parentId || !childId) return false;
+  try {
+    const batch = db.batch();
+    const parentRef = serverDoc(serverId).collection("families").doc(parentId);
+    const childRef = serverDoc(serverId).collection("families").doc(childId);
+
+    const parentFam = await getUserFamily(serverId, parentId);
+    const childFam = await getUserFamily(serverId, childId);
+
+    const updatedChildren = parentFam.childrenIds.filter((id) => id !== childId);
+    const updatedParents = childFam.parentIds.filter((id) => id !== parentId);
+
+    batch.set(parentRef, { childrenIds: updatedChildren, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    batch.set(childRef, { parentIds: updatedParents, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+
+    if (parentFam.partnerId) {
+      const spouseRef = serverDoc(serverId).collection("families").doc(parentFam.partnerId);
+      const spouseFam = await getUserFamily(serverId, parentFam.partnerId);
+      const spouseChildren = spouseFam.childrenIds.filter((id) => id !== childId);
+      batch.set(spouseRef, { childrenIds: spouseChildren, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    }
+
+    await batch.commit();
+    return true;
+  } catch (err) {
+    logger.error(`Failed to disown ${childId} by ${parentId} in ${serverId}:`, err);
+    return false;
+  }
+}
+
+export async function getAllSiblings(serverId, userId) {
+  if (!serverId || !userId) return [];
+  try {
+    const fam = await getUserFamily(serverId, userId);
+    if (!fam.parentIds || fam.parentIds.length === 0) return [];
+
+    const siblingsSet = new Set();
+    for (const pId of fam.parentIds) {
+      const parentFam = await getUserFamily(serverId, pId);
+      for (const cId of parentFam.childrenIds) {
+        if (cId !== userId) {
+          siblingsSet.add(cId);
+        }
+      }
+    }
+    return Array.from(siblingsSet);
+  } catch (err) {
+    return [];
+  }
+}
+
 cron.schedule("0 0 * * *", async () => {
   try {
     const cutoff = Timestamp.fromDate(new Date(Date.now() - DATA_RETENTION_MS));

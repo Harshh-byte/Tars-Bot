@@ -119,6 +119,36 @@ const modulesCatalog = {
         cmd: "meme",
         desc: "Display a trending meme from Reddit!",
       },
+      {
+        name: "Family Tree",
+        cmd: "family",
+        desc: "View a user's family tree in this server!",
+      },
+      {
+        name: "Marry",
+        cmd: "marry",
+        desc: "Propose to marry another user in this server!",
+      },
+      {
+        name: "Divorce",
+        cmd: "divorce",
+        desc: "Divorce your current partner in this server.",
+      },
+      {
+        name: "Adopt",
+        cmd: "adopt",
+        desc: "Adopt another user into your server family!",
+      },
+      {
+        name: "Disown",
+        cmd: "disown",
+        desc: "Disown a child from your family tree.",
+      },
+      {
+        name: "Run Away",
+        cmd: "runaway",
+        desc: "Run away from your parents.",
+      },
     ],
   },
   module_actions: {

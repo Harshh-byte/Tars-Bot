@@ -1,14 +1,7 @@
-import {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType,
-} from "discord.js";
+import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import { incrementUserStat } from "../../services/database.js";
 import { fetchAnimeGif } from "../../utils/gif.js";
 
 export const data = {
@@ -25,12 +18,18 @@ export const data = {
   ],
 };
 
-const LOCATIONS = [
-  "right cheek",
-  "left cheek",
-  "face",
-  "forehead",
-  "back of the head",
+const PHRASES = [
+  "That gotta hurt!",
+  "Right across the face!",
+  "Ouch!! That sounded personal!",
+  "Stay in your lane!",
+];
+
+const BACK_PHRASES = [
+  "Returned with interest!",
+  "Did not let that slide!",
+  "An eye for an eye!",
+  "Taste your own medicine!",
 ];
 
 function getRandomItem(arr) {
@@ -45,6 +44,51 @@ function getShortDisplayName(user, member) {
     user?.username ||
     "User";
   return name.trim().split(/\s+/)[0];
+}
+
+function buildCard(content, gifUrl, buttons = [], accentColor = EMBED_COLORS.ORANGE) {
+  const containerComponents = [
+    {
+      type: 10,
+      content,
+    },
+  ];
+
+  if (gifUrl) {
+    containerComponents.push({
+      type: 12,
+      items: [
+        {
+          media: {
+            url: gifUrl,
+          },
+        },
+      ],
+    });
+  }
+
+  if (buttons.length > 0) {
+    containerComponents.push({
+      type: 14,
+      divider: true,
+      spacing: 1,
+    });
+    containerComponents.push({
+      type: 1,
+      components: buttons,
+    });
+  }
+
+  return {
+    flags: 32768,
+    components: [
+      {
+        type: 17,
+        accent_color: accentColor,
+        components: containerComponents,
+      },
+    ],
+  };
 }
 
 async function sendAndFetchReply(interaction, payload) {
@@ -75,10 +119,8 @@ export async function execute(interaction, client) {
     }
 
     if (!target) {
-      const embed = new EmbedBuilder()
-        .setDescription("Air slapping? Mention someone to hit.")
-        .setColor(EMBED_COLORS.WARNING);
-      return interaction.reply({ embeds: [embed], ephemeral: true });
+      const payload = buildCard("Air slapping? Mention someone to hit.", null, [], EMBED_COLORS.WARNING);
+      return interaction.reply({ ...payload, ephemeral: true });
     }
 
     if (target.id === sender.id) {
@@ -89,10 +131,8 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         selfRoasts[Math.floor(Math.random() * selfRoasts.length)];
-      const selfEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.WARNING);
-      return interaction.reply({ embeds: [selfEmbed] });
+      const selfPayload = buildCard(randomRoast, null, [], EMBED_COLORS.WARNING);
+      return interaction.reply(selfPayload);
     }
 
     if (target.id === client?.user?.id) {
@@ -103,10 +143,8 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         tarsRoasts[Math.floor(Math.random() * tarsRoasts.length)];
-      const botEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.ERROR);
-      return interaction.reply({ embeds: [botEmbed] });
+      const botPayload = buildCard(randomRoast, null, [], EMBED_COLORS.ERROR);
+      return interaction.reply(botPayload);
     } else if (target.bot) {
       const botRoasts = [
         "Slapping a bot? Solid steel doesn't care about your anger issues.",
@@ -115,44 +153,29 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         botRoasts[Math.floor(Math.random() * botRoasts.length)];
-      const botEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.ERROR);
-      return interaction.reply({ embeds: [botEmbed] });
-    }
-
-    let count = 0;
-    if (serverId !== "DM") {
-      count = await incrementUserStat(serverId, sender.id, "slapCount");
+      const botPayload = buildCard(randomRoast, null, [], EMBED_COLORS.ERROR);
+      return interaction.reply(botPayload);
     }
 
     const senderShortName = getShortDisplayName(sender, senderMember);
     const targetShortName = getShortDisplayName(target, targetMember);
 
-    const location = getRandomItem(LOCATIONS);
+    const phrase = getRandomItem(PHRASES);
     const gifUrl = await fetchAnimeGif("slap");
 
-    const embed = new EmbedBuilder()
-      .setDescription(
-        `**${senderShortName}** slapped **${targetShortName}** across the ${location}!\n\n-# Total Slaps: ${count}`,
-      )
-      .setColor(EMBED_COLORS.ORANGE);
+    const buttons = [
+      {
+        type: 2,
+        custom_id: `slap_back_${target.id}`,
+        label: "Slap Back 👋",
+        style: 2,
+      },
+    ];
 
-    if (gifUrl) {
-      embed.setImage(gifUrl);
-    }
+    const content = `**${senderShortName}** slapped **${targetShortName}**!! ${phrase}`;
+    const initialPayload = buildCard(content, gifUrl, buttons, EMBED_COLORS.ORANGE);
 
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`slap_back_${target.id}`)
-        .setLabel("Slap Back 👋")
-        .setStyle(ButtonStyle.Secondary),
-    );
-
-    const response = await sendAndFetchReply(interaction, {
-      embeds: [embed],
-      components: [row],
-    });
+    const response = await sendAndFetchReply(interaction, initialPayload);
 
     if (
       !response ||
@@ -177,34 +200,18 @@ export async function execute(interaction, client) {
 
       const slapperUser = i.user;
       const slapperMember = i.member;
-      const slapperId = slapperUser.id;
-
-      let newCount = 0;
-      if (serverId !== "DM") {
-        newCount = await incrementUserStat(serverId, slapperId, "slapCount");
-      }
-
       const slapperShortName = getShortDisplayName(slapperUser, slapperMember);
-      const newLoc =
-        getRandomItem(LOCATIONS.filter((l) => l !== location)) ||
-        getRandomItem(LOCATIONS);
+      const backPhrase = getRandomItem(BACK_PHRASES);
 
       let newGif = await fetchAnimeGif("slap");
       if (newGif && newGif === gifUrl) {
         newGif = (await fetchAnimeGif("slap")) || newGif;
       }
 
-      const replyEmbed = new EmbedBuilder()
-        .setDescription(
-          `**${slapperShortName}** slapped **${senderShortName}** back across the ${newLoc}!\n\n-# Total Slaps: ${newCount}`,
-        )
-        .setColor(EMBED_COLORS.ORANGE);
+      const replyContent = `**${slapperShortName}** slapped **${senderShortName}** back!! ${backPhrase}`;
+      const replyPayload = buildCard(replyContent, newGif, [], EMBED_COLORS.ORANGE);
 
-      if (newGif) {
-        replyEmbed.setImage(newGif);
-      }
-
-      await i.followUp({ embeds: [replyEmbed] });
+      await i.followUp(replyPayload);
     });
   } catch (err) {
     logger.error("Error in Slap command handler:", err);

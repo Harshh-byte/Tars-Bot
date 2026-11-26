@@ -1,14 +1,7 @@
-import {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType,
-} from "discord.js";
+import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import { incrementUserStat } from "../../services/database.js";
 import { fetchAnimeGif } from "../../utils/gif.js";
 
 export const data = {
@@ -25,12 +18,18 @@ export const data = {
   ],
 };
 
-const LOCATIONS = [
-  "face",
-  "jaw",
-  "stomach",
-  "ribs",
-  "nose",
+const PHRASES = [
+  "Knocked right out!",
+  "That gotta leave a mark!",
+  "Oof! Brutal hit!",
+  "Sent flying!",
+];
+
+const BACK_PHRASES = [
+  "Returned with double the force!",
+  "Threw a counter punch!",
+  "Never saw it coming!",
+  "Paid back in full!",
 ];
 
 function getRandomItem(arr) {
@@ -45,6 +44,51 @@ function getShortDisplayName(user, member) {
     user?.username ||
     "User";
   return name.trim().split(/\s+/)[0];
+}
+
+function buildCard(content, gifUrl, buttons = [], accentColor = EMBED_COLORS.DARK_RED) {
+  const containerComponents = [
+    {
+      type: 10,
+      content,
+    },
+  ];
+
+  if (gifUrl) {
+    containerComponents.push({
+      type: 12,
+      items: [
+        {
+          media: {
+            url: gifUrl,
+          },
+        },
+      ],
+    });
+  }
+
+  if (buttons.length > 0) {
+    containerComponents.push({
+      type: 14,
+      divider: true,
+      spacing: 1,
+    });
+    containerComponents.push({
+      type: 1,
+      components: buttons,
+    });
+  }
+
+  return {
+    flags: 32768,
+    components: [
+      {
+        type: 17,
+        accent_color: accentColor,
+        components: containerComponents,
+      },
+    ],
+  };
 }
 
 async function sendAndFetchReply(interaction, payload) {
@@ -75,10 +119,8 @@ export async function execute(interaction, client) {
     }
 
     if (!target) {
-      const embed = new EmbedBuilder()
-        .setDescription("Shadowboxing? Mention someone to punch.")
-        .setColor(EMBED_COLORS.WARNING);
-      return interaction.reply({ embeds: [embed], ephemeral: true });
+      const payload = buildCard("Shadowboxing? Mention someone to punch.", null, [], EMBED_COLORS.WARNING);
+      return interaction.reply({ ...payload, ephemeral: true });
     }
 
     if (target.id === sender.id) {
@@ -89,10 +131,8 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         selfRoasts[Math.floor(Math.random() * selfRoasts.length)];
-      const selfEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.WARNING);
-      return interaction.reply({ embeds: [selfEmbed] });
+      const selfPayload = buildCard(randomRoast, null, [], EMBED_COLORS.WARNING);
+      return interaction.reply(selfPayload);
     }
 
     if (target.id === client?.user?.id) {
@@ -103,10 +143,8 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         tarsRoasts[Math.floor(Math.random() * tarsRoasts.length)];
-      const botEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.ERROR);
-      return interaction.reply({ embeds: [botEmbed] });
+      const botPayload = buildCard(randomRoast, null, [], EMBED_COLORS.ERROR);
+      return interaction.reply(botPayload);
     } else if (target.bot) {
       const botRoasts = [
         "Punching a bot? The machine literally didn't even register your pathetic hit.",
@@ -115,44 +153,29 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         botRoasts[Math.floor(Math.random() * botRoasts.length)];
-      const botEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.ERROR);
-      return interaction.reply({ embeds: [botEmbed] });
-    }
-
-    let count = 0;
-    if (serverId !== "DM") {
-      count = await incrementUserStat(serverId, sender.id, "punchCount");
+      const botPayload = buildCard(randomRoast, null, [], EMBED_COLORS.ERROR);
+      return interaction.reply(botPayload);
     }
 
     const senderShortName = getShortDisplayName(sender, senderMember);
     const targetShortName = getShortDisplayName(target, targetMember);
 
-    const location = getRandomItem(LOCATIONS);
+    const phrase = getRandomItem(PHRASES);
     const gifUrl = await fetchAnimeGif("punch");
 
-    const embed = new EmbedBuilder()
-      .setDescription(
-        `**${senderShortName}** punched **${targetShortName}** in the ${location}!\n\n-# Total Punches: ${count}`,
-      )
-      .setColor(EMBED_COLORS.DARK_RED);
+    const buttons = [
+      {
+        type: 2,
+        custom_id: `punch_back_${target.id}`,
+        label: "Punch Back 👊🏻",
+        style: 2,
+      },
+    ];
 
-    if (gifUrl) {
-      embed.setImage(gifUrl);
-    }
+    const content = `**${senderShortName}** punched **${targetShortName}**!! ${phrase}`;
+    const initialPayload = buildCard(content, gifUrl, buttons, EMBED_COLORS.DARK_RED);
 
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`punch_back_${target.id}`)
-        .setLabel("Punch Back 👊🏻")
-        .setStyle(ButtonStyle.Secondary),
-    );
-
-    const response = await sendAndFetchReply(interaction, {
-      embeds: [embed],
-      components: [row],
-    });
+    const response = await sendAndFetchReply(interaction, initialPayload);
 
     if (
       !response ||
@@ -177,34 +200,18 @@ export async function execute(interaction, client) {
 
       const puncherUser = i.user;
       const puncherMember = i.member;
-      const puncherId = puncherUser.id;
-
-      let newCount = 0;
-      if (serverId !== "DM") {
-        newCount = await incrementUserStat(serverId, puncherId, "punchCount");
-      }
-
       const puncherShortName = getShortDisplayName(puncherUser, puncherMember);
-      const newLoc = getRandomItem(
-        LOCATIONS.filter((l) => l !== location),
-      ) || getRandomItem(LOCATIONS);
+      const backPhrase = getRandomItem(BACK_PHRASES);
 
       let newGif = await fetchAnimeGif("punch");
       if (newGif && newGif === gifUrl) {
         newGif = (await fetchAnimeGif("punch")) || newGif;
       }
 
-      const replyEmbed = new EmbedBuilder()
-        .setDescription(
-          `**${puncherShortName}** punched **${senderShortName}** back in the ${newLoc}!\n\n-# Total Punches: ${newCount}`,
-        )
-        .setColor(EMBED_COLORS.DARK_RED);
+      const replyContent = `**${puncherShortName}** punched **${senderShortName}** back!! ${backPhrase}`;
+      const replyPayload = buildCard(replyContent, newGif, [], EMBED_COLORS.DARK_RED);
 
-      if (newGif) {
-        replyEmbed.setImage(newGif);
-      }
-
-      await i.followUp({ embeds: [replyEmbed] });
+      await i.followUp(replyPayload);
     });
   } catch (err) {
     logger.error("Error in Punch command handler:", err);

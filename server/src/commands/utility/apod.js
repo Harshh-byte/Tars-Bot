@@ -134,7 +134,7 @@ function getRandomSpaceEmoji() {
   return SPACE_EMOJIS[Math.floor(Math.random() * SPACE_EMOJIS.length)];
 }
 
-async function buildApodV2Payload(apod, offset = 0, disabled = false) {
+async function buildApodPayload(apod, offset = 0, disabled = false) {
   const imageUrl = apod.hdurl || apod.url;
   const rawExplanation = cleanHtmlTags(apod.explanation || "");
   const fullExplanation =
@@ -263,7 +263,7 @@ export async function execute(interaction, client) {
       return await interaction.reply({ content: errorMsg });
     }
 
-    const payload = await buildApodV2Payload(apod, currentOffset, false);
+    const payload = await buildApodPayload(apod, currentOffset, false);
 
     let replyMessage;
     if (interaction.deferred || interaction.replied) {
@@ -302,7 +302,7 @@ export async function execute(interaction, client) {
       try {
         const updatedApod = await fetchApodByOffset(currentOffset);
         if (updatedApod) {
-          const updatedPayload = await buildApodV2Payload(
+          const updatedPayload = await buildApodPayload(
             updatedApod,
             currentOffset,
             false,
@@ -325,7 +325,7 @@ export async function execute(interaction, client) {
 
     collector.on("end", async () => {
       if (apod) {
-        const disabledPayload = await buildApodV2Payload(
+        const disabledPayload = await buildApodPayload(
           apod,
           currentOffset,
           true,

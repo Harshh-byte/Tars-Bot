@@ -1,14 +1,7 @@
-import {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType,
-} from "discord.js";
+import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { EMBED_COLORS } from "../../utils/embeds.js";
-import { incrementUserStat } from "../../services/database.js";
 import { fetchAnimeGif } from "../../utils/gif.js";
 
 export const aliases = ["headpat"];
@@ -27,12 +20,18 @@ export const data = {
   ],
 };
 
-const LOCATIONS = [
-  "head",
-  "hair",
-  "softly on the head",
-  "back",
-  "shoulder",
+const PHRASES = [
+  "There, there!",
+  "Pat pat!",
+  "So soft!",
+  "Gentle headpats!",
+];
+
+const BACK_PHRASES = [
+  "Gave headpats right back!",
+  "Headpats returned!",
+  "Mutual pats!",
+  "Double the pats!",
 ];
 
 function getRandomItem(arr) {
@@ -47,6 +46,51 @@ function getShortDisplayName(user, member) {
     user?.username ||
     "User";
   return name.trim().split(/\s+/)[0];
+}
+
+function buildCard(content, gifUrl, buttons = [], accentColor = EMBED_COLORS.LIGHT_BLUE) {
+  const containerComponents = [
+    {
+      type: 10,
+      content,
+    },
+  ];
+
+  if (gifUrl) {
+    containerComponents.push({
+      type: 12,
+      items: [
+        {
+          media: {
+            url: gifUrl,
+          },
+        },
+      ],
+    });
+  }
+
+  if (buttons.length > 0) {
+    containerComponents.push({
+      type: 14,
+      divider: true,
+      spacing: 1,
+    });
+    containerComponents.push({
+      type: 1,
+      components: buttons,
+    });
+  }
+
+  return {
+    flags: 32768,
+    components: [
+      {
+        type: 17,
+        accent_color: accentColor,
+        components: containerComponents,
+      },
+    ],
+  };
 }
 
 async function sendAndFetchReply(interaction, payload) {
@@ -77,10 +121,8 @@ export async function execute(interaction, client) {
     }
 
     if (!target) {
-      const embed = new EmbedBuilder()
-        .setDescription("Patting thin air? Mention someone.")
-        .setColor(EMBED_COLORS.WARNING);
-      return interaction.reply({ embeds: [embed], ephemeral: true });
+      const payload = buildCard("Patting thin air? Mention someone.", null, [], EMBED_COLORS.WARNING);
+      return interaction.reply({ ...payload, ephemeral: true });
     }
 
     if (target.id === sender.id) {
@@ -91,10 +133,8 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         selfRoasts[Math.floor(Math.random() * selfRoasts.length)];
-      const selfEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.WARNING);
-      return interaction.reply({ embeds: [selfEmbed] });
+      const selfPayload = buildCard(randomRoast, null, [], EMBED_COLORS.WARNING);
+      return interaction.reply(selfPayload);
     }
 
     if (target.id === client?.user?.id) {
@@ -105,10 +145,8 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         tarsRoasts[Math.floor(Math.random() * tarsRoasts.length)];
-      const botEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.ERROR);
-      return interaction.reply({ embeds: [botEmbed] });
+      const botPayload = buildCard(randomRoast, null, [], EMBED_COLORS.ERROR);
+      return interaction.reply(botPayload);
     } else if (target.bot) {
       const botRoasts = [
         "Patting a bot? Metal doesn't feel affection, and neither do people around you.",
@@ -117,44 +155,29 @@ export async function execute(interaction, client) {
       ];
       const randomRoast =
         botRoasts[Math.floor(Math.random() * botRoasts.length)];
-      const botEmbed = new EmbedBuilder()
-        .setDescription(randomRoast)
-        .setColor(EMBED_COLORS.ERROR);
-      return interaction.reply({ embeds: [botEmbed] });
-    }
-
-    let count = 0;
-    if (serverId !== "DM") {
-      count = await incrementUserStat(serverId, sender.id, "patCount");
+      const botPayload = buildCard(randomRoast, null, [], EMBED_COLORS.ERROR);
+      return interaction.reply(botPayload);
     }
 
     const senderShortName = getShortDisplayName(sender, senderMember);
     const targetShortName = getShortDisplayName(target, targetMember);
 
-    const location = getRandomItem(LOCATIONS);
+    const phrase = getRandomItem(PHRASES);
     const gifUrl = await fetchAnimeGif("pat");
 
-    const embed = new EmbedBuilder()
-      .setDescription(
-        `**${senderShortName}** patted **${targetShortName}** on the ${location}!\n\n-# Total Pats: ${count}`,
-      )
-      .setColor(EMBED_COLORS.LIGHT_BLUE);
+    const buttons = [
+      {
+        type: 2,
+        custom_id: `pat_back_${target.id}`,
+        label: "Pat Back 🫳🏻",
+        style: 2,
+      },
+    ];
 
-    if (gifUrl) {
-      embed.setImage(gifUrl);
-    }
+    const content = `**${senderShortName}** patted **${targetShortName}**! ${phrase}`;
+    const initialPayload = buildCard(content, gifUrl, buttons, EMBED_COLORS.LIGHT_BLUE);
 
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`pat_back_${target.id}`)
-        .setLabel("Pat Back 🫳🏻")
-        .setStyle(ButtonStyle.Secondary),
-    );
-
-    const response = await sendAndFetchReply(interaction, {
-      embeds: [embed],
-      components: [row],
-    });
+    const response = await sendAndFetchReply(interaction, initialPayload);
 
     if (
       !response ||
@@ -179,34 +202,18 @@ export async function execute(interaction, client) {
 
       const patterUser = i.user;
       const patterMember = i.member;
-      const patterId = patterUser.id;
-
-      let newCount = 0;
-      if (serverId !== "DM") {
-        newCount = await incrementUserStat(serverId, patterId, "patCount");
-      }
-
       const patterShortName = getShortDisplayName(patterUser, patterMember);
-      const newLoc = getRandomItem(
-        LOCATIONS.filter((l) => l !== location),
-      ) || getRandomItem(LOCATIONS);
+      const backPhrase = getRandomItem(BACK_PHRASES);
 
       let newGif = await fetchAnimeGif("pat");
       if (newGif && newGif === gifUrl) {
         newGif = (await fetchAnimeGif("pat")) || newGif;
       }
 
-      const replyEmbed = new EmbedBuilder()
-        .setDescription(
-          `**${patterShortName}** patted **${senderShortName}** back on the ${newLoc}!\n\n-# Total Pats: ${newCount}`,
-        )
-        .setColor(EMBED_COLORS.LIGHT_BLUE);
+      const replyContent = `**${patterShortName}** patted **${senderShortName}** back! ${backPhrase}`;
+      const replyPayload = buildCard(replyContent, newGif, [], EMBED_COLORS.LIGHT_BLUE);
 
-      if (newGif) {
-        replyEmbed.setImage(newGif);
-      }
-
-      await i.followUp({ embeds: [replyEmbed] });
+      await i.followUp(replyPayload);
     });
   } catch (err) {
     logger.error("Error in Pat command handler:", err);

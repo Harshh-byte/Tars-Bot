@@ -26,7 +26,7 @@ A sharp-witted, modern Discord bot built with **Discord.js v14**, **Node.js**, *
 | **Utility** | `/about`, `/apod`, `/ask`, `/avatar`, `/help`, `/ping`, `/prefix`, `/remind`, `/reminders`, `/serverinfo`, `/userinfo`                         | Server tools and utilities                                    |
 | **Actions** | `/hug`, `/kiss`, `/pat`, `/punch`, `/slap`, `/smoke`, `/vape`                                                                     | Roleplay & social interactions                                |
 | **Games**   | `/flag`, `/flip`, `/impostor`, `/leaderboard`, `/nhie`, `/para`, `/pokemon`, `/roll`, `/rps`, `/scramble`, `/tod`, `/ttt`, `/wyr` | Interactive games & scoreboards |
-| **Fun**     | `/autism`, `/bitches`, `/gay`, `/iq`, `/lesbian`, `/meme`, `/pp`, `/roast`, `/ship`, `/simp`, `/wish`                             | Calculators, roasts, and memes                                |
+| **Fun**     | `/adopt`, `/autism`, `/bitches`, `/disown`, `/divorce`, `/family`, `/gay`, `/iq`, `/lesbian`, `/marry`, `/meme`, `/pp`, `/roast`, `/runaway`, `/ship`, `/simp`, `/wish` | Calculators, roasts, memes, and family trees |
 | **Mod**     | `/automeme`, `/purge`, `/resetlb`                                                                                                 | Server moderation and management                              |
 | **Admin**   | `/erase`, `/maintenance`                                                                                                          | Owner-only administrative tools                               |
 

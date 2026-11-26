@@ -38,7 +38,7 @@ export async function execute(message, client, { buildAiReply }) {
 
   const isMentioned = message.mentions.has(client.user);
   let isReplyToBot = false;
-  let isReplyToAutoMeme = false;
+  let isReplyToNonChatBotMessage = false;
   let referencedAuthor = null;
 
   if (message.reference?.messageId) {
@@ -47,10 +47,29 @@ export async function execute(message, client, { buildAiReply }) {
       isReplyToBot = original?.author?.id === client.user.id;
       referencedAuthor = original?.author || null;
 
-      if (isReplyToBot && original?.embeds && original.embeds.length > 0) {
-        const footerText = original.embeds[0].footer?.text || "";
-        if (footerText.startsWith("AutoMeme")) {
-          isReplyToAutoMeme = true;
+      if (isReplyToBot) {
+        if (client.chatMessageIds?.has(original.id)) {
+          isReplyToNonChatBotMessage = false;
+        } else {
+          const isInteractionResponse =
+            original.interactionMetadata != null ||
+            original.interaction != null ||
+            original.type === 20;
+
+          const hasEmbeds = original.embeds && original.embeds.length > 0;
+          const hasComponents =
+            original.components && original.components.length > 0;
+          const isComponentsV2 =
+            (original.flags?.bitfield ?? original.flags ?? 0) & 32768;
+
+          if (
+            isInteractionResponse ||
+            hasEmbeds ||
+            hasComponents ||
+            Boolean(isComponentsV2)
+          ) {
+            isReplyToNonChatBotMessage = true;
+          }
         }
       }
     } catch {
@@ -64,7 +83,7 @@ export async function execute(message, client, { buildAiReply }) {
     message.guild?.id !== EXEMPT_GUILD_ID &&
     message.author.id !== process.env.OWNER_ID
   ) {
-    if (message.content.startsWith(PREFIX) || isMentioned || isReplyToBot) {
+    if (message.content.startsWith(PREFIX) || isMentioned || (isReplyToBot && !isReplyToNonChatBotMessage)) {
       const maintenanceEmbed = new EmbedBuilder()
         .setColor(0xffa502)
         .setTitle(`${EMOJIS.Updates} **System Maintenance**`)
@@ -221,7 +240,7 @@ export async function execute(message, client, { buildAiReply }) {
     }
   }
 
-  if ((!isMentioned && !isReplyToBot) || isReplyToAutoMeme) return;
+  if ((!isMentioned && !isReplyToBot) || isReplyToNonChatBotMessage) return;
 
   try {
     const replyData = await buildAiReply({
@@ -268,7 +287,15 @@ export async function execute(message, client, { buildAiReply }) {
 
     if (messagePayload.content || messagePayload.files || messagePayload.stickers) {
       messagePayload.allowedMentions = { parse: [], repliedUser: false };
-      await message.reply(messagePayload);
+      const sentChatMsg = await message.reply(messagePayload);
+      if (sentChatMsg?.id) {
+        if (!client.chatMessageIds) client.chatMessageIds = new Set();
+        client.chatMessageIds.add(sentChatMsg.id);
+        if (client.chatMessageIds.size > 2000) {
+          const firstKey = client.chatMessageIds.values().next().value;
+          client.chatMessageIds.delete(firstKey);
+        }
+      }
     }
   } catch (err) {
     logger.error("Error in MessageCreate event handler execution:", err);
