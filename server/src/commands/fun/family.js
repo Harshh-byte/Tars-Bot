@@ -24,16 +24,22 @@ function truncateName(name, maxLen = 14) {
 }
 
 function drawRoundedRect(ctx, x, y, width, height, radius) {
+  if (typeof ctx.roundRect === "function") {
+    ctx.beginPath();
+    ctx.roundRect(x, y, width, height, radius);
+    ctx.closePath();
+    return;
+  }
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
   ctx.lineTo(x + width - radius, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.arcTo(x + width, y, x + width, y + radius, radius);
   ctx.lineTo(x + width, y + height - radius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.arcTo(x + width, y + height, x + width - radius, y + height, radius);
   ctx.lineTo(x + radius, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-  ctx.lineTo(x + radius, y);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.arcTo(x, y + height, x, y + height - radius, radius);
+  ctx.lineTo(x, y + radius);
+  ctx.arcTo(x, y, x + radius, y, radius);
   ctx.closePath();
 }
 
@@ -58,27 +64,27 @@ async function renderFamilyCanvas(targetUser, partnerUser, parentsUsers, childre
   ctx.fillRect(0, 0, width, height);
 
   async function drawNode(user, x, y, label, borderColor = "#6366f1", glowColor = "rgba(99, 102, 241, 0.4)") {
-    const cardW = 280;
-    const cardH = 110;
+    const cardW = 340;
+    const cardH = 130;
     const cardX = x - cardW / 2;
     const cardY = y - cardH / 2;
 
     ctx.save();
     ctx.shadowColor = glowColor;
-    ctx.shadowBlur = 24;
-    ctx.fillStyle = "rgba(22, 27, 46, 0.92)";
+    ctx.shadowBlur = 28;
+    ctx.fillStyle = "rgba(20, 24, 40, 0.94)";
     ctx.strokeStyle = borderColor;
-    ctx.lineWidth = 3;
-    drawRoundedRect(ctx, cardX, cardY, cardW, cardH, 20);
+    ctx.lineWidth = 3.5;
+    drawRoundedRect(ctx, cardX, cardY, cardW, cardH, 24);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
 
     const innerGrad = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
-    innerGrad.addColorStop(0, "rgba(255, 255, 255, 0.05)");
-    innerGrad.addColorStop(1, "rgba(0, 0, 0, 0.35)");
+    innerGrad.addColorStop(0, "rgba(255, 255, 255, 0.06)");
+    innerGrad.addColorStop(1, "rgba(0, 0, 0, 0.4)");
     ctx.fillStyle = innerGrad;
-    drawRoundedRect(ctx, cardX + 2, cardY + 2, cardW - 4, cardH - 4, 18);
+    drawRoundedRect(ctx, cardX + 2, cardY + 2, cardW - 4, cardH - 4, 22);
     ctx.fill();
 
     if (user) {
@@ -87,8 +93,8 @@ async function renderFamilyCanvas(targetUser, partnerUser, parentsUsers, childre
         const img = await loadImage(avatarUrl).catch(() => null);
         if (img) {
           ctx.save();
-          const avatarSize = 74;
-          const avatarX = cardX + 18;
+          const avatarSize = 90;
+          const avatarX = cardX + 20;
           const avatarY = cardY + (cardH - avatarSize) / 2;
 
           ctx.beginPath();
@@ -101,23 +107,23 @@ async function renderFamilyCanvas(targetUser, partnerUser, parentsUsers, childre
           ctx.beginPath();
           ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
           ctx.strokeStyle = borderColor;
-          ctx.lineWidth = 3.5;
+          ctx.lineWidth = 4;
           ctx.stroke();
           ctx.restore();
         }
       } catch (e) {}
 
       ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 23px sans-serif";
-      ctx.fillText(truncateName(user.displayName || user.username, 12), cardX + 106, cardY + 48);
+      ctx.font = "bold 26px sans-serif";
+      ctx.fillText(truncateName(user.displayName || user.username, 13), cardX + 126, cardY + 54);
 
       ctx.fillStyle = borderColor;
-      ctx.font = "700 18px sans-serif";
-      ctx.fillText(label, cardX + 106, cardY + 78);
+      ctx.font = "700 20px sans-serif";
+      ctx.fillText(label, cardX + 126, cardY + 90);
     } else {
       ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
-      ctx.font = "italic 20px sans-serif";
-      ctx.fillText("None", cardX + 115, cardY + 62);
+      ctx.font = "italic 22px sans-serif";
+      ctx.fillText("None", cardX + 130, cardY + 70);
     }
   }
 
@@ -133,56 +139,62 @@ async function renderFamilyCanvas(targetUser, partnerUser, parentsUsers, childre
     ctx.restore();
   }
 
-  const centerY = 450;
-  const mainX = partnerUser ? 620 : 800;
+  const hasParents = parentsUsers.length > 0;
+  const hasChildren = childrenUsers.length > 0;
+
+  let centerY = 450;
+  let parentsY = 170;
+  let childrenY = 730;
+
+  if (hasParents && !hasChildren) {
+    parentsY = 270;
+    centerY = 630;
+  } else if (!hasParents && hasChildren) {
+    centerY = 270;
+    childrenY = 630;
+  } else if (!hasParents && !hasChildren) {
+    centerY = 450;
+  }
+
+  const mainX = partnerUser ? 590 : 800;
 
   await drawNode(targetUser, mainX, centerY, "Root", "#6366f1", "rgba(99, 102, 241, 0.6)");
 
   if (partnerUser) {
-    const partnerX = 980;
-    drawLine(mainX + 140, centerY, partnerX - 140, centerY, "#ec4899");
-    await drawNode(partnerUser, partnerX, centerY, "Spouse 💍", "#ec4899", "rgba(236, 72, 153, 0.6)");
+    const partnerX = 1010;
+    drawLine(mainX + 170, centerY, partnerX - 170, centerY, "#ec4899");
+    await drawNode(partnerUser, partnerX, centerY, "Spouse", "#ec4899", "rgba(236, 72, 153, 0.6)");
   }
 
-  const parentsY = 160;
-  if (parentsUsers.length > 0) {
+  if (hasParents) {
     if (parentsUsers.length === 1) {
-      drawLine(mainX, centerY - 55, mainX, parentsY + 55, "#38bdf8");
-      await drawNode(parentsUsers[0], mainX, parentsY, "Parent 👨‍👧", "#38bdf8", "rgba(56, 189, 248, 0.6)");
+      drawLine(mainX, centerY - 65, mainX, parentsY + 65, "#38bdf8");
+      await drawNode(parentsUsers[0], mainX, parentsY, "Parent", "#38bdf8", "rgba(56, 189, 248, 0.6)");
     } else {
-      const p1X = mainX - 180;
-      const p2X = mainX + 180;
-      drawLine(mainX, centerY - 55, p1X, parentsY + 55, "#38bdf8");
-      drawLine(mainX, centerY - 55, p2X, parentsY + 55, "#38bdf8");
+      const p1X = mainX - 200;
+      const p2X = mainX + 200;
+      drawLine(mainX, centerY - 65, p1X, parentsY + 65, "#38bdf8");
+      drawLine(mainX, centerY - 65, p2X, parentsY + 65, "#38bdf8");
       await drawNode(parentsUsers[0], p1X, parentsY, "Parent 1", "#38bdf8", "rgba(56, 189, 248, 0.6)");
       await drawNode(parentsUsers[1], p2X, parentsY, "Parent 2", "#38bdf8", "rgba(56, 189, 248, 0.6)");
     }
-  } else {
-    ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-    ctx.font = "italic 20px sans-serif";
-    ctx.fillText("No Parents Registered", mainX - 110, parentsY + 15);
   }
 
-  const childrenY = 740;
   const numChildren = Math.min(childrenUsers.length, 4);
   if (numChildren > 0) {
-    const spacing = 320;
+    const spacing = 370;
     const startX = 800 - ((numChildren - 1) * spacing) / 2;
     const parentConnectX = partnerUser ? 800 : mainX;
     for (let i = 0; i < numChildren; i++) {
       const childX = startX + i * spacing;
-      drawLine(parentConnectX, centerY + 55, childX, childrenY - 55, "#10b981");
-      await drawNode(childrenUsers[i], childX, childrenY, "Child 👶", "#10b981", "rgba(16, 185, 129, 0.6)");
+      drawLine(parentConnectX, centerY + 65, childX, childrenY - 65, "#10b981");
+      await drawNode(childrenUsers[i], childX, childrenY, "Child", "#10b981", "rgba(16, 185, 129, 0.6)");
     }
     if (childrenUsers.length > 4) {
       ctx.fillStyle = "#10b981";
-      ctx.font = "bold 22px sans-serif";
+      ctx.font = "bold 24px sans-serif";
       ctx.fillText(`+${childrenUsers.length - 4} more children`, 1340, childrenY + 10);
     }
-  } else {
-    ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-    ctx.font = "italic 20px sans-serif";
-    ctx.fillText("No Children Registered", (partnerUser ? 800 : mainX) - 105, childrenY - 5);
   }
 
   return canvas.toBuffer("image/png");
