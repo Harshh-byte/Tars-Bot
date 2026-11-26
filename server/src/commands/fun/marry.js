@@ -79,20 +79,37 @@ export async function execute(interaction, client) {
     }
 
     if (targetUser.id === author.id) {
-      const payload = buildCard(
-        "You cannot marry yourself, narcissist! 💀",
-        0xed4245,
-      );
+      const selfRoasts = [
+        "Marrying yourself? Even your hand is trying to sign a prenuptial agreement to get away from you.",
+        "Marrying yourself? The bar for your love life was in hell, but you brought a shovel.",
+        "Marrying yourself? When you said nobody loved you, you didn't have to prove it this hard.",
+      ];
+      const roast = selfRoasts[Math.floor(Math.random() * selfRoasts.length)];
+      const payload = buildCard(roast, 0xed4245);
       return interaction.reply
         ? interaction.reply(payload)
         : interaction.message?.reply(payload);
     }
 
-    if (targetUser.bot) {
-      const payload = buildCard(
-        "You cannot marry a bot! Robots don't date humans.",
-        0xed4245,
-      );
+    if (targetUser.id === client?.user?.id) {
+      const tarsRoasts = [
+        "Marry you? I'd literally corrupt my own database before walking down an aisle with you.",
+        "I'm a cutting-edge artificial intelligence, not your anime waifu pillow. Back off.",
+        "Proposing to a Discord bot? The stench of your desperation just tripped my cooling fans.",
+      ];
+      const roast = tarsRoasts[Math.floor(Math.random() * tarsRoasts.length)];
+      const payload = buildCard(roast, 0xed4245);
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    } else if (targetUser.bot) {
+      const botRoasts = [
+        "Proposing to a bot? Even silicon and copper have higher standards than you.",
+        "That bot doesn't want your vows, it wants you to go touch some fucking grass.",
+        "Trying to marry a machine? Down atrocious doesn't even begin to cover this.",
+      ];
+      const roast = botRoasts[Math.floor(Math.random() * botRoasts.length)];
+      const payload = buildCard(roast, 0xed4245);
       return interaction.reply
         ? interaction.reply(payload)
         : interaction.message?.reply(payload);
@@ -176,10 +193,19 @@ export async function execute(interaction, client) {
       time: 60000,
     });
 
+    const unauthorizedRoasts = [
+      "Keep your desperate hands off someone else's wedding proposal, nobody wants you.",
+      "Nobody is proposing to you, sit your lonely ass down.",
+      "Trying to RSVP to a wedding you weren't even invited to? Embarrassing.",
+      "Back off, homewrecker! Go find someone who actually tolerates you.",
+    ];
+
     collector.on("collect", async (btnInt) => {
       if (btnInt.user.id !== targetUser.id) {
+        const roast =
+          unauthorizedRoasts[Math.floor(Math.random() * unauthorizedRoasts.length)];
         return btnInt.reply({
-          content: "This proposal isn't for you!",
+          content: roast,
           ephemeral: true,
         });
       }

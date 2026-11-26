@@ -162,6 +162,9 @@ const modulesCatalog = {
       { name: "Slap", cmd: "slap", desc: "Slap someone." },
       { name: "Pat", cmd: "pat", desc: "Pat someone." },
       { name: "Punch", cmd: "punch", desc: "Punch someone." },
+      { name: "Bite", cmd: "bite", desc: "Bite someone." },
+      { name: "Poke", cmd: "poke", desc: "Poke someone." },
+      { name: "Bonk", cmd: "bonk", desc: "Bonk someone." },
     ],
   },
   module_utility: {

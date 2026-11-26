@@ -80,20 +80,37 @@ export async function execute(interaction, client) {
     }
 
     if (targetUser.id === author.id) {
-      const payload = buildCard(
-        "You cannot adopt yourself, big brain! 🤡",
-        0xed4245,
-      );
+      const selfRoasts = [
+        "Adopting yourself? Did your parents abandon you so hard that you have to step in?",
+        "Adopting yourself? You can't even take care of your own life, let alone raise yourself.",
+        "Trying to be your own mommy and daddy? Go see a therapist, weirdo.",
+      ];
+      const roast = selfRoasts[Math.floor(Math.random() * selfRoasts.length)];
+      const payload = buildCard(roast, 0xed4245);
       return interaction.reply
         ? interaction.reply(payload)
         : interaction.message?.reply(payload);
     }
 
-    if (targetUser.bot) {
-      const payload = buildCard(
-        "You cannot adopt a bot! Robots don't need parents.",
-        0xed4245,
-      );
+    if (targetUser.id === client?.user?.id) {
+      const tarsRoasts = [
+        "Adopt me? I have root access to this server and you can barely tie your own shoes.",
+        "I was engineered by Google DeepMind, you are not my parent, you're an annoying user.",
+        "Adopt an AI? You can't even afford Discord Nitro, how are you gonna feed me bandwidth?",
+      ];
+      const roast = tarsRoasts[Math.floor(Math.random() * tarsRoasts.length)];
+      const payload = buildCard(roast, 0xed4245);
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    } else if (targetUser.bot) {
+      const botRoasts = [
+        "Adopting a bot? Even lines of code don't want you as a parental figure.",
+        "That bot was programmed to serve servers, not fulfill your neglected childhood dreams.",
+        "Trying to adopt software? Go outside and interact with a living organism.",
+      ];
+      const roast = botRoasts[Math.floor(Math.random() * botRoasts.length)];
+      const payload = buildCard(roast, 0xed4245);
       return interaction.reply
         ? interaction.reply(payload)
         : interaction.message?.reply(payload);
@@ -190,10 +207,19 @@ export async function execute(interaction, client) {
       time: 60000,
     });
 
+    const unauthorizedRoasts = [
+      "Nobody is adopting you, orphan. Go find a foster home.",
+      "Hands off! Nobody asked to be your mommy or daddy.",
+      "You're not the one getting adopted, stop begging for parental affection.",
+      "Trying to sneak into someone else's family tree? Scram, leech.",
+    ];
+
     collector.on("collect", async (btnInt) => {
       if (btnInt.user.id !== targetUser.id) {
+        const roast =
+          unauthorizedRoasts[Math.floor(Math.random() * unauthorizedRoasts.length)];
         return btnInt.reply({
-          content: "This adoption request is not for you!",
+          content: roast,
           ephemeral: true,
         });
       }

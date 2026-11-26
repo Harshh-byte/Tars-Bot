@@ -62,6 +62,26 @@ export async function execute(interaction, client) {
         : interaction.message?.reply(payload);
     }
 
+    if (targetUser.id === author.id) {
+      const payload = buildCard(
+        "Disowning yourself? What, did you finally realize you're a disappointment to yourself too?",
+        0xed4245,
+      );
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    }
+
+    if (targetUser.bot) {
+      const payload = buildCard(
+        "Disowning a bot? You never owned it in the first place, delusional clown.",
+        0xed4245,
+      );
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    }
+
     const authorFam = await getUserFamily(serverId, author.id);
     if (!authorFam.childrenIds.includes(targetUser.id)) {
       const payload = buildCard(

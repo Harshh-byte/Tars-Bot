@@ -96,10 +96,19 @@ export async function execute(interaction, client) {
       time: 60000,
     });
 
+    const unauthorizedRoasts = [
+      "Mind your own fucking business, you're not the one getting divorced.",
+      "Trying to sign someone else's divorce papers? Get a life, nosy parasite.",
+      "This isn't your marriage to destroy, back the fuck off.",
+      "Nobody asked for your input on their relationship, butt out.",
+    ];
+
     collector.on("collect", async (btnInt) => {
       if (btnInt.user.id !== author.id) {
+        const roast =
+          unauthorizedRoasts[Math.floor(Math.random() * unauthorizedRoasts.length)];
         return btnInt.reply({
-          content: "You cannot control this confirmation menu!",
+          content: roast,
           ephemeral: true,
         });
       }

@@ -167,7 +167,7 @@ export async function execute(interaction, client) {
       {
         type: 2,
         custom_id: `slap_back_${target.id}`,
-        label: "Slap Back 👋",
+        label: "Slap Back 👋🏻",
         style: 2,
       },
     ];
