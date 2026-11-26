@@ -662,6 +662,36 @@ export async function getAllSiblings(serverId, userId) {
   }
 }
 
+export async function getFullFamilyNetwork(serverId, startUserId) {
+  if (!serverId || !startUserId) return { members: {}, relationships: [] };
+
+  const members = {};
+  const queue = [startUserId];
+  const visited = new Set();
+
+  while (queue.length > 0) {
+    const currentId = queue.shift();
+    if (visited.has(currentId)) continue;
+    visited.add(currentId);
+
+    const fam = await getUserFamily(serverId, currentId);
+    members[currentId] = fam;
+
+    const neighbors = [];
+    if (fam.partnerId) neighbors.push(fam.partnerId);
+    if (Array.isArray(fam.parentIds)) neighbors.push(...fam.parentIds);
+    if (Array.isArray(fam.childrenIds)) neighbors.push(...fam.childrenIds);
+
+    for (const nId of neighbors) {
+      if (!visited.has(nId)) {
+        queue.push(nId);
+      }
+    }
+  }
+
+  return members;
+}
+
 cron.schedule("0 0 * * *", async () => {
   try {
     const cutoff = Timestamp.fromDate(new Date(Date.now() - DATA_RETENTION_MS));

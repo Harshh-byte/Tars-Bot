@@ -136,8 +136,8 @@ export async function execute(interaction, client) {
     collector.on("end", async (_, reason) => {
       if (reason !== "divorced" && reason !== "cancelled") {
         const timeoutPayload = buildCard(
-          "Divorce confirmation timed out. Marriage remains intact.",
-          0x747f8d,
+          "### ⏳ Divorce Expired\n\nDivorce confirmation timed out. Marriage remains intact.",
+          0x7f8c8d,
         );
         await replyMsg.edit(timeoutPayload).catch(() => null);
       }

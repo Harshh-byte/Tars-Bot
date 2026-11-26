@@ -236,7 +236,7 @@ export async function execute(interaction, client) {
         collector.stop("accepted");
       } else {
         const rejectPayload = buildCard(
-          `### 🍼 Adoption Rejected!\n\n<@${targetUser.id}> refused to be adopted by <@${author.id}>. Staying independent! 😎`,
+          `### 🍼 Adoption Rejected!\n\n<@${targetUser.id}> refused to be adopted by <@${author.id}>.\n\nStaying independent!`,
           0xed4245,
         );
         await replyMsg.edit(rejectPayload).catch(() => null);
@@ -247,7 +247,7 @@ export async function execute(interaction, client) {
     collector.on("end", async (_, reason) => {
       if (reason === "time") {
         const timeoutPayload = buildCard(
-          `### ⏱️ Adoption Expired\n\n<@${targetUser.id}> did not respond in time.`,
+          `### ⏳ Adoption Expired\n\n<@${targetUser.id}> did not respond in time.`,
           0x7f8c8d,
         );
         await replyMsg.edit(timeoutPayload).catch(() => null);

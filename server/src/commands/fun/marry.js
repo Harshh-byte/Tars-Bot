@@ -233,7 +233,7 @@ export async function execute(interaction, client) {
     collector.on("end", async (_, reason) => {
       if (reason === "time") {
         const timeoutPayload = buildCard(
-          `### ⏱️ Proposal Expired\n\n<@${targetUser.id}> took too long to answer. <@${author.id}> walked away in awkward silence.`,
+          `### ⏳ Proposal Expired\n\n<@${targetUser.id}> took too long to answer. <@${author.id}> walked away in awkward silence.`,
           0x7f8c8d,
         );
         await replyMsg.edit(timeoutPayload).catch(() => null);
