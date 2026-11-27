@@ -563,8 +563,13 @@ client.updateBotPresence = function () {
       activities: [
         {
           name: "custom",
-          state: " System Maintenance",
+          state: "System Maintenance",
           type: ActivityType.Custom,
+          emoji: {
+            id: "1558458220094423060",
+            name: "Warning",
+            animated: false,
+          },
         },
       ],
     });

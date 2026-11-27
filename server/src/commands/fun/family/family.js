@@ -104,37 +104,13 @@ async function renderFullFamilyCanvas(rootUserId, network, userMap) {
   const sortedGens = Object.keys(genLevels).map(Number).sort((a, b) => a - b);
   const totalGenerations = sortedGens.length;
 
-  for (const g of sortedGens) {
-    const list = genLevels[g];
-    const ordered = [];
-    const added = new Set();
-
-    list.sort((a, b) => {
-      const aPartner = network[a]?.partnerId;
-      const bPartner = network[b]?.partnerId;
-      if (aPartner && !bPartner) return -1;
-      if (!aPartner && bPartner) return 1;
-      return a.localeCompare(b);
-    });
-
-    for (const mId of list) {
-      if (added.has(mId)) continue;
-      ordered.push(mId);
-      added.add(mId);
-      const partner = network[mId]?.partnerId;
-      if (partner && list.includes(partner) && !added.has(partner)) {
-        ordered.push(partner);
-        added.add(partner);
-      }
-    }
-    genLevels[g] = ordered;
-  }
+  const rootGen = normalizedGens[rootUserId] ?? 0;
 
   const maxItemsInGen = Math.max(...sortedGens.map((g) => genLevels[g].length), 1);
   const cardW = 340;
   const cardH = 130;
-  const xSpacing = 390;
-  const ySpacing = 250;
+  const xSpacing = 400;
+  const ySpacing = 270;
 
   const width = Math.max(1600, maxItemsInGen * xSpacing + 200);
   const height = Math.max(900, totalGenerations * ySpacing + 200);
@@ -230,19 +206,85 @@ async function renderFullFamilyCanvas(rootUserId, network, userMap) {
   const totalGenHeight = (totalGenerations - 1) * ySpacing;
   const startY = (height - totalGenHeight) / 2;
 
-  sortedGens.forEach((g, gIdx) => {
+  // Track parent positions from previous generations to group and order children directly under their parents
+  for (let gIdx = 0; gIdx < sortedGens.length; gIdx++) {
+    const g = sortedGens[gIdx];
     const list = genLevels[g];
+    const ordered = [];
+    const added = new Set();
+
+    // Sort individuals based on parent/couple center position if available
+    list.sort((a, b) => {
+      const aFam = network[a] || {};
+      const bFam = network[b] || {};
+
+      const aParents = aFam.parentIds || [];
+      const bParents = bFam.parentIds || [];
+
+      const getAvgParentX = (pIds) => {
+        const xs = pIds.map((p) => positions[p]?.x).filter((x) => x !== undefined);
+        return xs.length ? xs.reduce((acc, v) => acc + v, 0) / xs.length : null;
+      };
+
+      const aParentX = getAvgParentX(aParents);
+      const bParentX = getAvgParentX(bParents);
+
+      if (aParentX !== null && bParentX !== null && Math.abs(aParentX - bParentX) > 1) {
+        return aParentX - bParentX;
+      }
+      if (aParentX !== null && bParentX === null) return -1;
+      if (aParentX === null && bParentX !== null) return 1;
+
+      const aParentKey = aParents.slice().sort().join("_");
+      const bParentKey = bParents.slice().sort().join("_");
+      if (aParentKey !== bParentKey) {
+        return aParentKey.localeCompare(bParentKey);
+      }
+
+      return a.localeCompare(b);
+    });
+
+    for (const mId of list) {
+      if (added.has(mId)) continue;
+      const partner = network[mId]?.partnerId;
+      const mFam = network[mId] || {};
+      const mHasParents = (mFam.parentIds || []).length > 0;
+
+      if (partner && list.includes(partner) && !added.has(partner)) {
+        const pFam = network[partner] || {};
+        const pHasParents = (pFam.parentIds || []).length > 0;
+
+        if (mHasParents && !pHasParents) {
+          ordered.push(mId);
+          ordered.push(partner);
+        } else if (!mHasParents && pHasParents) {
+          ordered.push(partner);
+          ordered.push(mId);
+        } else {
+          ordered.push(mId);
+          ordered.push(partner);
+        }
+        added.add(mId);
+        added.add(partner);
+      } else {
+        ordered.push(mId);
+        added.add(mId);
+      }
+    }
+    genLevels[g] = ordered;
+
+    // Calculate initial positions for this generation
     const genY = startY + gIdx * ySpacing;
-    const totalGenWidth = (list.length - 1) * xSpacing;
+    const totalGenWidth = (ordered.length - 1) * xSpacing;
     const genStartX = (width - totalGenWidth) / 2;
 
-    list.forEach((mId, mIdx) => {
+    ordered.forEach((mId, mIdx) => {
       positions[mId] = {
         x: genStartX + mIdx * xSpacing,
         y: genY,
       };
     });
-  });
+  }
 
   const drawnSpouses = new Set();
   for (const mId of memberIds) {
@@ -259,6 +301,8 @@ async function renderFullFamilyCanvas(rootUserId, network, userMap) {
   }
 
   const processedCouples = new Set();
+  const coupleParentGroups = [];
+
   for (const mId of memberIds) {
     const fam = network[mId];
     if (!fam || !Array.isArray(fam.childrenIds) || fam.childrenIds.length === 0) continue;
@@ -285,65 +329,106 @@ async function renderFullFamilyCanvas(rootUserId, network, userMap) {
     const maxChildX = Math.max(...childXs);
     const firstChildY = positions[validChildren[0]].y - cardH / 2;
 
-    const midY = (parentConnectY + firstChildY) / 2;
-
-    drawStraightLine(parentConnectX, parentConnectY, parentConnectX, midY, "#10b981");
-
-    if (validChildren.length > 1) {
-      const busStartX = Math.min(parentConnectX, minChildX);
-      const busEndX = Math.max(parentConnectX, maxChildX);
-      drawStraightLine(busStartX, midY, busEndX, midY, "#10b981");
-    } else if (parentConnectX !== minChildX) {
-      drawStraightLine(parentConnectX, midY, minChildX, midY, "#10b981");
-    }
-
-    for (const cId of validChildren) {
-      const cPos = positions[cId];
-      drawStraightLine(cPos.x, midY, cPos.x, firstChildY, "#10b981");
-    }
+    coupleParentGroups.push({
+      coupleKey,
+      parentConnectX,
+      parentConnectY,
+      validChildren,
+      minChildX,
+      maxChildX,
+      firstChildY,
+    });
   }
 
-  const rootGen = normalizedGens[rootUserId];
+  // Group couples by generation level so we can assign non-overlapping midY heights if their spans cross
+  const couplesByGen = {};
+  for (const group of coupleParentGroups) {
+    const key = group.parentConnectY;
+    if (!couplesByGen[key]) couplesByGen[key] = [];
+    couplesByGen[key].push(group);
+  }
+
+  for (const groups of Object.values(couplesByGen)) {
+    // Sort couples from left to right by their connection X
+    groups.sort((a, b) => a.parentConnectX - b.parentConnectX);
+
+    groups.forEach((group, idx) => {
+      const { parentConnectX, parentConnectY, validChildren, minChildX, maxChildX, firstChildY } = group;
+
+      // Base midpoint between parent row and child row
+      const baseMidY = (parentConnectY + firstChildY) / 2;
+      // Stagger midY slightly (by 24px per overlapping couple) to guarantee lines never merge or overlap
+      const offset = groups.length > 1 ? (idx % 2 === 0 ? -14 : 14) : 0;
+      const midY = baseMidY + offset;
+
+      drawStraightLine(parentConnectX, parentConnectY, parentConnectX, midY, "#10b981");
+
+      if (validChildren.length > 1) {
+        const busStartX = Math.min(parentConnectX, minChildX);
+        const busEndX = Math.max(parentConnectX, maxChildX);
+        drawStraightLine(busStartX, midY, busEndX, midY, "#10b981");
+      } else if (parentConnectX !== minChildX) {
+        drawStraightLine(parentConnectX, midY, minChildX, midY, "#10b981");
+      }
+
+      for (const cId of validChildren) {
+        const cPos = positions[cId];
+        drawStraightLine(cPos.x, midY, cPos.x, firstChildY, "#10b981");
+      }
+    });
+  }
+
   for (const mId of memberIds) {
     const pos = positions[mId];
     if (!pos) continue;
 
     const u = userMap[mId];
     const fam = network[mId] || {};
+    const rootFam = network[rootUserId] || {};
     const genDiff = normalizedGens[mId] - rootGen;
 
     let roleLabel = "Family";
     let color = "#6366f1";
     let glow = "rgba(99, 102, 241, 0.5)";
 
+    const isDirectChild = (rootFam.childrenIds || []).includes(mId);
+    const isDirectParent = (rootFam.parentIds || []).includes(mId);
+    const isDirectStepParent = (rootFam.stepParentIds || []).includes(mId);
+    const isDirectSpouse = fam.partnerId === rootUserId || rootFam.partnerId === mId;
+    const isSibling = (rootFam.parentIds || []).some((p) => (fam.parentIds || []).includes(p));
+
     if (mId === rootUserId) {
       roleLabel = "Root";
       color = "#6366f1";
       glow = "rgba(99, 102, 241, 0.7)";
-    } else if (fam.partnerId === rootUserId || network[rootUserId]?.partnerId === mId) {
+    } else if (isDirectSpouse) {
       roleLabel = "Spouse";
       color = "#ec4899";
       glow = "rgba(236, 72, 153, 0.6)";
-    } else if (network[rootUserId]?.parentIds?.includes(mId)) {
+    } else if (isDirectParent) {
       roleLabel = "Parent";
       color = "#38bdf8";
       glow = "rgba(56, 189, 248, 0.6)";
-    } else if (network[rootUserId]?.stepParentIds?.includes(mId)) {
+    } else if (isDirectStepParent) {
       roleLabel = "Step-Parent";
       color = "#0284c7";
       glow = "rgba(2, 132, 199, 0.6)";
-    } else if (network[rootUserId]?.childrenIds?.includes(mId)) {
+    } else if (isDirectChild) {
       roleLabel = "Child";
       color = "#10b981";
       glow = "rgba(16, 185, 129, 0.6)";
     } else if (genDiff === 0) {
-      const shareParent = network[rootUserId]?.parentIds?.some((p) => fam.parentIds?.includes(p));
-      if (shareParent) {
+      if (isSibling) {
         roleLabel = "Sibling";
         color = "#a855f7";
         glow = "rgba(168, 85, 247, 0.6)";
       } else {
-        roleLabel = "In-Law";
+        const spouseSibling = fam.partnerId && (rootFam.parentIds || []).some((p) => (network[fam.partnerId]?.parentIds || []).includes(p));
+        if (spouseSibling) {
+          roleLabel = "In-Law";
+        } else {
+          roleLabel = "In-Law";
+        }
         color = "#e879f9";
         glow = "rgba(232, 121, 249, 0.5)";
       }
@@ -356,11 +441,19 @@ async function renderFullFamilyCanvas(rootUserId, network, userMap) {
       color = "#f59e0b";
       glow = "rgba(245, 158, 11, 0.6)";
     } else if (genDiff === 1) {
-      roleLabel = "Next Gen";
-      color = "#10b981";
-      glow = "rgba(16, 185, 129, 0.6)";
+      const isChildsSpouse = (rootFam.childrenIds || []).some((cId) => network[cId]?.partnerId === mId);
+      if (isChildsSpouse) {
+        roleLabel = "Child-in-Law";
+        color = "#e879f9";
+        glow = "rgba(232, 121, 249, 0.6)";
+      } else {
+        roleLabel = "Next Gen";
+        color = "#10b981";
+        glow = "rgba(16, 185, 129, 0.6)";
+      }
     } else if (genDiff >= 2) {
-      roleLabel = genDiff === 2 ? "Grandchild" : "Descendant";
+      const isGrandchild = (rootFam.childrenIds || []).some((cId) => (network[cId]?.childrenIds || []).includes(mId));
+      roleLabel = isGrandchild ? "Grandchild" : "Descendant";
       color = "#34d399";
       glow = "rgba(52, 211, 153, 0.6)";
     }
