@@ -1,7 +1,7 @@
 import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { getUserFamily, adoptChild } from "../../services/database.js";
+import { getUserFamily, adoptChild, getAllSiblings, getFullFamilyNetwork } from "../../services/database.js";
 import { EMOJI_IDS } from "../../utils/emojis.js";
 
 export const data = {
@@ -149,6 +149,36 @@ export async function execute(interaction, client) {
         : interaction.message?.reply(payload);
     }
 
+    const siblings = await getAllSiblings(serverId, author.id);
+    if (siblings.includes(targetUser.id)) {
+      const payload = buildCard(
+        `<@${targetUser.id}> is your sibling! You cannot adopt your own brother or sister. 💀`,
+        0xed4245,
+      );
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    }
+
+    const network = await getFullFamilyNetwork(serverId, author.id);
+    function isAncestor(currentId, targetAncestorId, visited = new Set()) {
+      if (visited.has(currentId)) return false;
+      visited.add(currentId);
+      const fam = network[currentId];
+      if (!fam || !fam.parentIds) return false;
+      if (fam.parentIds.includes(targetAncestorId)) return true;
+      return fam.parentIds.some((pId) => isAncestor(pId, targetAncestorId, visited));
+    }
+    if (isAncestor(author.id, targetUser.id)) {
+      const payload = buildCard(
+        `<@${targetUser.id}> is your ancestor! You cannot adopt your own grandparent/ancestor. 💀`,
+        0xed4245,
+      );
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    }
+
     if (authorFam.childrenIds.length >= 10) {
       const payload = buildCard(
         "You already have 10 children! Your family is at maximum capacity. 🛑",
@@ -229,7 +259,7 @@ export async function execute(interaction, client) {
       if (btnInt.customId === "adopt_accept") {
         await adoptChild(serverId, author.id, targetUser.id);
         const successPayload = buildCard(
-          `### 🍼 Adoption Approved!\n\n👶 Congratulations! <@${targetUser.id}> has officially been adopted by **<@${author.id}>**!\n\nWelcome to the family! 🎉`,
+          `### 🎉 Adoption Approved!\n\nCongratulations! <@${targetUser.id}> has officially been adopted by **<@${author.id}>**!\n\nWelcome to the family!`,
           0x2ecc71,
         );
         await replyMsg.edit(successPayload).catch(() => null);

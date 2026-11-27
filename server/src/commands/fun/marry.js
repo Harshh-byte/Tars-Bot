@@ -1,7 +1,7 @@
 import { ComponentType } from "discord.js";
 import logger from "../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { getUserFamily, marryUsers } from "../../services/database.js";
+import { getUserFamily, marryUsers, getAllSiblings, getFullFamilyNetwork } from "../../services/database.js";
 
 export const data = {
   name: "marry",
@@ -150,6 +150,36 @@ export async function execute(interaction, client) {
     if (authorFam.parentIds.includes(targetUser.id)) {
       const payload = buildCard(
         "You cannot marry your own parent! 💀",
+        0xed4245,
+      );
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    }
+
+    const siblings = await getAllSiblings(serverId, author.id);
+    if (siblings.includes(targetUser.id)) {
+      const payload = buildCard(
+        "Sweet Home Alabama? 🪕 You cannot marry your own sibling!",
+        0xed4245,
+      );
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    }
+
+    const network = await getFullFamilyNetwork(serverId, author.id);
+    function isDescendant(ancestorId, currentId, visited = new Set()) {
+      if (visited.has(currentId)) return false;
+      visited.add(currentId);
+      const fam = network[currentId];
+      if (!fam || !fam.childrenIds) return false;
+      if (fam.childrenIds.includes(ancestorId)) return true;
+      return fam.childrenIds.some((cId) => isDescendant(ancestorId, cId, visited));
+    }
+    if (isDescendant(author.id, targetUser.id) || isDescendant(targetUser.id, author.id)) {
+      const payload = buildCard(
+        "You cannot marry your own direct ancestor or descendant! 🧬",
         0xed4245,
       );
       return interaction.reply

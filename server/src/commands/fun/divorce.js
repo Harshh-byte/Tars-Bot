@@ -66,7 +66,6 @@ export async function execute(interaction, client) {
         style: 4,
         custom_id: "divorce_confirm",
         label: "Divorce",
-        emoji: { id: EMOJI_IDS.Failed, name: "Failed" },
       },
       {
         type: 2,
