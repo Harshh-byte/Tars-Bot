@@ -305,6 +305,10 @@ async function renderFullFamilyCanvas(rootUserId, network, userMap) {
       roleLabel = "Parent";
       color = "#38bdf8";
       glow = "rgba(56, 189, 248, 0.6)";
+    } else if (network[rootUserId]?.stepParentIds?.includes(mId)) {
+      roleLabel = "Step-Parent";
+      color = "#0284c7";
+      glow = "rgba(2, 132, 199, 0.6)";
     } else if (network[rootUserId]?.childrenIds?.includes(mId)) {
       roleLabel = "Child";
       color = "#10b981";
@@ -385,11 +389,12 @@ export async function execute(interaction, client) {
     );
     userMap[targetUser.id] = targetUser;
 
-    const directFamily = network[targetUser.id] || { partnerId: null, parentIds: [], childrenIds: [] };
+    const directFamily = network[targetUser.id] || { partnerId: null, parentIds: [], stepParentIds: [], childrenIds: [] };
     const siblings = await getAllSiblings(serverId, targetUser.id);
 
     const partnerUser = directFamily.partnerId ? userMap[directFamily.partnerId] : null;
     const parentsUsers = (directFamily.parentIds || []).map((id) => userMap[id]).filter(Boolean);
+    const stepParentsUsers = (directFamily.stepParentIds || []).map((id) => userMap[id]).filter(Boolean);
     const childrenUsers = (directFamily.childrenIds || []).map((id) => userMap[id]).filter(Boolean);
     const siblingsUsers = siblings.map((id) => userMap[id]).filter(Boolean);
 
@@ -397,9 +402,18 @@ export async function execute(interaction, client) {
       ? `<@${partnerUser.id}>${directFamily.marriedAt ? ` (Married <t:${directFamily.marriedAt}:R>)` : ""}`
       : "*None*";
 
+    const parentLabel = parentsUsers.length === 1 ? "Parent" : "Parents";
+    const stepParentLabel = stepParentsUsers.length === 1 ? "Step-Parent" : "Step-Parents";
+    const childLabel = childrenUsers.length === 1 ? "Child" : "Children";
+    const siblingLabel = siblingsUsers.length === 1 ? "Sibling" : "Siblings";
+
     const parentsText = parentsUsers.length > 0
       ? parentsUsers.map((p) => `<@${p.id}>`).join(", ")
       : "*None*";
+
+    const stepParentsText = stepParentsUsers.length > 0
+      ? `\n> 🫂 **${stepParentLabel}:** ${stepParentsUsers.map((p) => `<@${p.id}>`).join(", ")}`
+      : "";
 
     const childrenText = childrenUsers.length > 0
       ? childrenUsers.map((c) => `<@${c.id}>`).join(", ")
@@ -415,9 +429,9 @@ export async function execute(interaction, client) {
     const contentText =
       `### 🌳 Family Tree: ${targetUser.displayName || targetUser.username}\n\n` +
       `> 💍 **Spouse:** ${spouseText}\n` +
-      `> 👨‍👩‍👧 **Parents:** ${parentsText}\n` +
-      `> 👶 **Children (${childrenUsers.length}):** ${childrenText}\n` +
-      `> 👥 **Siblings (${siblingsUsers.length}):** ${siblingsText}\n` +
+      `> 👨‍👩‍👧 **${parentLabel}:** ${parentsText}${stepParentsText}\n` +
+      `> 🧒 **${childLabel} (${childrenUsers.length}):** ${childrenText}\n` +
+      `> 👥 **${siblingLabel} (${siblingsUsers.length}):** ${siblingsText}\n` +
       `> 🌐 **Total Connected Family:** ${memberIds.length} members`;
 
     const payload = {

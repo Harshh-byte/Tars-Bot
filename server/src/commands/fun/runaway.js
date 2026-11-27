@@ -6,6 +6,14 @@ export const data = {
   name: "runaway",
   description: "Run away from your parents.",
   dm_permission: false,
+  options: [
+    {
+      name: "parent",
+      description: "Specific parent to run away from (leave empty to leave both).",
+      type: 6,
+      required: false,
+    },
+  ],
 };
 
 function buildCard(content, accentColor = 0xed4245) {
@@ -37,18 +45,35 @@ export async function execute(interaction, client) {
     }
 
     const authorFam = await getUserFamily(serverId, author.id);
-    if (!authorFam.parentIds || authorFam.parentIds.length === 0) {
+    const allParentIds = Array.from(new Set([...(authorFam.parentIds || []), ...(authorFam.stepParentIds || [])]));
+
+    if (allParentIds.length === 0) {
       const payload = buildCard("You don't have any parents to leave! You are already independent.", 0xffa502);
       return interaction.reply ? interaction.reply(payload) : interaction.message?.reply(payload);
     }
 
-    const formerParents = [...authorFam.parentIds];
-    for (const pId of formerParents) {
-      await disownChild(serverId, pId, author.id);
+    const specificParent =
+      interaction.options?.getUser("parent") ||
+      interaction.mentions?.users?.first();
+
+    let formerParents = [];
+
+    if (specificParent) {
+      if (!allParentIds.includes(specificParent.id)) {
+        const payload = buildCard(`<@${specificParent.id}> is not your parent or step-parent!`, 0xffa502);
+        return interaction.reply ? interaction.reply(payload) : interaction.message?.reply(payload);
+      }
+      formerParents = [specificParent.id];
+      await disownChild(serverId, specificParent.id, author.id);
+    } else {
+      formerParents = [...allParentIds];
+      for (const pId of formerParents) {
+        await disownChild(serverId, pId, author.id);
+      }
     }
 
     const parentsMentions = formerParents.map((id) => `<@${id}>`).join(" & ");
-    const content = `### 🏃 Emancipated!\n\n<@${author.id}> packed their bags, ran away, and officially left ${parentsMentions}!\n\n`;
+    const content = `### 🏃 Emancipated!\n\n<@${author.id}> packed their bags, ran away, and officially left ${parentsMentions}!`;
     const payload = buildCard(content, 0x2ecc71);
 
     if (interaction.reply) {

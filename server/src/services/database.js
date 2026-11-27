@@ -518,7 +518,7 @@ export async function deleteAutoMemeConfig(serverId) {
 
 export async function getUserFamily(serverId, userId) {
   if (!serverId || !userId || serverId === "DM") {
-    return { partnerId: null, marriedAt: null, parentIds: [], childrenIds: [] };
+    return { partnerId: null, marriedAt: null, parentIds: [], stepParentIds: [], childrenIds: [] };
   }
   try {
     const doc = await serverDoc(serverId).collection("families").doc(userId).get();
@@ -528,13 +528,14 @@ export async function getUserFamily(serverId, userId) {
         partnerId: data.partnerId || null,
         marriedAt: data.marriedAt || null,
         parentIds: Array.isArray(data.parentIds) ? data.parentIds : [],
+        stepParentIds: Array.isArray(data.stepParentIds) ? data.stepParentIds : [],
         childrenIds: Array.isArray(data.childrenIds) ? data.childrenIds : [],
       };
     }
   } catch (err) {
     logger.error(`Failed to fetch user family for ${userId} in ${serverId}:`, err);
   }
-  return { partnerId: null, marriedAt: null, parentIds: [], childrenIds: [] };
+  return { partnerId: null, marriedAt: null, parentIds: [], stepParentIds: [], childrenIds: [] };
 }
 
 export async function marryUsers(serverId, user1Id, user2Id) {
@@ -545,8 +546,40 @@ export async function marryUsers(serverId, user1Id, user2Id) {
     const fam1Ref = serverDoc(serverId).collection("families").doc(user1Id);
     const fam2Ref = serverDoc(serverId).collection("families").doc(user2Id);
 
-    batch.set(fam1Ref, { partnerId: user2Id, marriedAt: now, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-    batch.set(fam2Ref, { partnerId: user1Id, marriedAt: now, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    const fam1 = await getUserFamily(serverId, user1Id);
+    const fam2 = await getUserFamily(serverId, user2Id);
+
+    let fam1Children = [...fam1.childrenIds];
+    let fam2Children = [...fam2.childrenIds];
+
+    for (const cId of fam1.childrenIds) {
+      if (!fam2Children.includes(cId)) {
+        const childFam = await getUserFamily(serverId, cId);
+        const allParentCount = childFam.parentIds.length + (childFam.stepParentIds || []).length;
+        if (allParentCount < 2) {
+          fam2Children.push(cId);
+          const childRef = serverDoc(serverId).collection("families").doc(cId);
+          const updatedStepParents = Array.from(new Set([...(childFam.stepParentIds || []), user2Id]));
+          batch.set(childRef, { stepParentIds: updatedStepParents, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+        }
+      }
+    }
+
+    for (const cId of fam2.childrenIds) {
+      if (!fam1Children.includes(cId)) {
+        const childFam = await getUserFamily(serverId, cId);
+        const allParentCount = childFam.parentIds.length + (childFam.stepParentIds || []).length;
+        if (allParentCount < 2) {
+          fam1Children.push(cId);
+          const childRef = serverDoc(serverId).collection("families").doc(cId);
+          const updatedStepParents = Array.from(new Set([...(childFam.stepParentIds || []), user1Id]));
+          batch.set(childRef, { stepParentIds: updatedStepParents, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+        }
+      }
+    }
+
+    batch.set(fam1Ref, { partnerId: user2Id, marriedAt: now, childrenIds: Array.from(new Set(fam1Children)), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    batch.set(fam2Ref, { partnerId: user1Id, marriedAt: now, childrenIds: Array.from(new Set(fam2Children)), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
     await batch.commit();
     return true;
   } catch (err) {
@@ -592,7 +625,6 @@ export async function adoptChild(serverId, parentId, childId) {
     batch.set(parentRef, { childrenIds: newChildren, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
     batch.set(childRef, { parentIds: newParents, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
 
-    // If parent has a spouse, also add child to spouse
     if (parentFam.partnerId) {
       const spouseRef = serverDoc(serverId).collection("families").doc(parentFam.partnerId);
       const spouseFam = await getUserFamily(serverId, parentFam.partnerId);
@@ -622,16 +654,10 @@ export async function disownChild(serverId, parentId, childId) {
 
     const updatedChildren = parentFam.childrenIds.filter((id) => id !== childId);
     const updatedParents = childFam.parentIds.filter((id) => id !== parentId);
+    const updatedStepParents = (childFam.stepParentIds || []).filter((id) => id !== parentId);
 
     batch.set(parentRef, { childrenIds: updatedChildren, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-    batch.set(childRef, { parentIds: updatedParents, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-
-    if (parentFam.partnerId) {
-      const spouseRef = serverDoc(serverId).collection("families").doc(parentFam.partnerId);
-      const spouseFam = await getUserFamily(serverId, parentFam.partnerId);
-      const spouseChildren = spouseFam.childrenIds.filter((id) => id !== childId);
-      batch.set(spouseRef, { childrenIds: spouseChildren, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-    }
+    batch.set(childRef, { parentIds: updatedParents, stepParentIds: updatedStepParents, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
 
     await batch.commit();
     return true;
@@ -645,10 +671,11 @@ export async function getAllSiblings(serverId, userId) {
   if (!serverId || !userId) return [];
   try {
     const fam = await getUserFamily(serverId, userId);
-    if (!fam.parentIds || fam.parentIds.length === 0) return [];
+    const allParentIds = Array.from(new Set([...(fam.parentIds || []), ...(fam.stepParentIds || [])]));
+    if (allParentIds.length === 0) return [];
 
     const siblingsSet = new Set();
-    for (const pId of fam.parentIds) {
+    for (const pId of allParentIds) {
       const parentFam = await getUserFamily(serverId, pId);
       for (const cId of parentFam.childrenIds) {
         if (cId !== userId) {
@@ -680,6 +707,7 @@ export async function getFullFamilyNetwork(serverId, startUserId) {
     const neighbors = [];
     if (fam.partnerId) neighbors.push(fam.partnerId);
     if (Array.isArray(fam.parentIds)) neighbors.push(...fam.parentIds);
+    if (Array.isArray(fam.stepParentIds)) neighbors.push(...fam.stepParentIds);
     if (Array.isArray(fam.childrenIds)) neighbors.push(...fam.childrenIds);
 
     for (const nId of neighbors) {
