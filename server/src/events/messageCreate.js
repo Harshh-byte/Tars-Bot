@@ -84,17 +84,33 @@ export async function execute(message, client, { buildAiReply }) {
     message.author.id !== process.env.OWNER_ID
   ) {
     if (message.content.startsWith(PREFIX) || isMentioned || (isReplyToBot && !isReplyToNonChatBotMessage)) {
-      const maintenanceEmbed = new EmbedBuilder()
-        .setColor(0xffa502)
-        .setTitle(`${EMOJIS.Updates} **System Maintenance**`)
-        .setDescription(
-          `${client.user.displayName} is currently undergoing scheduled maintenance and will be back online shortly.`,
-        )
-        .setFooter({
-          text: getFormattedMaintenanceTime(client.maintenanceStartTime),
-        });
+      const timeText = getFormattedMaintenanceTime(client.maintenanceStartTime);
+      const maintenancePayload = {
+        flags: 32768,
+        components: [
+          {
+            type: 17,
+            accent_color: 0xffa502,
+            components: [
+              {
+                type: 10,
+                content: `### ${EMOJIS.Updates} System Maintenance`,
+              },
+              {
+                type: 14,
+                divider: true,
+                spacing: 1,
+              },
+              {
+                type: 10,
+                content: `${client.user.displayName} is currently undergoing scheduled maintenance and will be back online shortly.\n\n-# ${timeText}`,
+              },
+            ],
+          },
+        ],
+      };
 
-      await message.reply({ embeds: [maintenanceEmbed] }).catch(() => null);
+      await message.reply(maintenancePayload).catch(() => null);
     }
     return;
   }

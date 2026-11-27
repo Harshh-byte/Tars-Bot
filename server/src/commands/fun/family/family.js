@@ -110,9 +110,11 @@ async function renderFullFamilyCanvas(rootUserId, network, userMap) {
     const added = new Set();
 
     list.sort((a, b) => {
-      if (a === rootUserId) return -1;
-      if (b === rootUserId) return 1;
-      return 0;
+      const aPartner = network[a]?.partnerId;
+      const bPartner = network[b]?.partnerId;
+      if (aPartner && !bPartner) return -1;
+      if (!aPartner && bPartner) return 1;
+      return a.localeCompare(b);
     });
 
     for (const mId of list) {
@@ -132,7 +134,7 @@ async function renderFullFamilyCanvas(rootUserId, network, userMap) {
   const cardW = 340;
   const cardH = 130;
   const xSpacing = 390;
-  const ySpacing = 240;
+  const ySpacing = 250;
 
   const width = Math.max(1600, maxItemsInGen * xSpacing + 200);
   const height = Math.max(900, totalGenerations * ySpacing + 200);
@@ -212,7 +214,7 @@ async function renderFullFamilyCanvas(rootUserId, network, userMap) {
     }
   }
 
-  function drawLine(x1, y1, x2, y2, color = "rgba(129, 140, 248, 0.65)") {
+  function drawStraightLine(x1, y1, x2, y2, color = "rgba(129, 140, 248, 0.65)") {
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(x1, y1);
@@ -248,35 +250,56 @@ async function renderFullFamilyCanvas(rootUserId, network, userMap) {
     if (fam?.partnerId && !drawnSpouses.has(mId) && positions[mId] && positions[fam.partnerId]) {
       const posA = positions[mId];
       const posB = positions[fam.partnerId];
-      if (posA.x < posB.x) {
-        drawLine(posA.x + cardW / 2, posA.y, posB.x - cardW / 2, posB.y, "#ec4899");
-      } else {
-        drawLine(posB.x + cardW / 2, posB.y, posA.x - cardW / 2, posA.y, "#ec4899");
-      }
+      const leftPos = posA.x < posB.x ? posA : posB;
+      const rightPos = posA.x < posB.x ? posB : posA;
+      drawStraightLine(leftPos.x + cardW / 2, leftPos.y, rightPos.x - cardW / 2, rightPos.y, "#ec4899");
       drawnSpouses.add(mId);
       drawnSpouses.add(fam.partnerId);
     }
   }
 
+  const processedCouples = new Set();
   for (const mId of memberIds) {
     const fam = network[mId];
-    if (Array.isArray(fam?.childrenIds)) {
-      const parentPos = positions[mId];
-      if (!parentPos) continue;
+    if (!fam || !Array.isArray(fam.childrenIds) || fam.childrenIds.length === 0) continue;
 
-      let connX = parentPos.x;
-      let connY = parentPos.y + cardH / 2;
+    const coupleKey = [mId, fam.partnerId].filter(Boolean).sort().join("_");
+    if (processedCouples.has(coupleKey)) continue;
+    processedCouples.add(coupleKey);
 
-      if (fam.partnerId && positions[fam.partnerId]) {
-        connX = (parentPos.x + positions[fam.partnerId].x) / 2;
-      }
+    const parentPos = positions[mId];
+    if (!parentPos) continue;
 
-      for (const cId of fam.childrenIds) {
-        const childPos = positions[cId];
-        if (childPos) {
-          drawLine(connX, connY, childPos.x, childPos.y - cardH / 2, "#10b981");
-        }
-      }
+    let parentConnectX = parentPos.x;
+    let parentConnectY = parentPos.y + cardH / 2;
+
+    if (fam.partnerId && positions[fam.partnerId]) {
+      parentConnectX = (parentPos.x + positions[fam.partnerId].x) / 2;
+    }
+
+    const validChildren = fam.childrenIds.filter((cId) => positions[cId]);
+    if (validChildren.length === 0) continue;
+
+    const childXs = validChildren.map((cId) => positions[cId].x);
+    const minChildX = Math.min(...childXs);
+    const maxChildX = Math.max(...childXs);
+    const firstChildY = positions[validChildren[0]].y - cardH / 2;
+
+    const midY = (parentConnectY + firstChildY) / 2;
+
+    drawStraightLine(parentConnectX, parentConnectY, parentConnectX, midY, "#10b981");
+
+    if (validChildren.length > 1) {
+      const busStartX = Math.min(parentConnectX, minChildX);
+      const busEndX = Math.max(parentConnectX, maxChildX);
+      drawStraightLine(busStartX, midY, busEndX, midY, "#10b981");
+    } else if (parentConnectX !== minChildX) {
+      drawStraightLine(parentConnectX, midY, minChildX, midY, "#10b981");
+    }
+
+    for (const cId of validChildren) {
+      const cPos = positions[cId];
+      drawStraightLine(cPos.x, midY, cPos.x, firstChildY, "#10b981");
     }
   }
 

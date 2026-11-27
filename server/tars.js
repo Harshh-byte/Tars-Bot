@@ -150,53 +150,6 @@ async function searchKlipy(query) {
   }
 }
 
-const COMMON_UNICODE_EMOJIS = {
-  skull: "💀",
-  clown: "🤡",
-  moyai: "🗿",
-  fire: "🔥",
-  sob: "😭",
-  rofl: "🤣",
-  joy: "😂",
-  eyes: "👀",
-  nail_care: "💅",
-  cap: "🧢",
-  saluting_face: "🫡",
-  melting_face: "🫠",
-  pinch: "🤏",
-  thumbsup: "👍",
-  thumbsdown: "👎",
-  poop: "💩",
-  heart: "❤️",
-  facepalm: "🤦",
-};
-
-client.resolveEmoji = function (emojiInput) {
-  if (!emojiInput) return emojiInput;
-  const raw = emojiInput.trim();
-  const nameOnly = raw.replace(/^:+|:+$/g, "").toLowerCase();
-
-  const match = raw.match(/<?a?:?\w+:(\d+)>?/);
-  const id = match ? match[1] : raw;
-
-  const customEmoji =
-    client.emojis.cache.get(id) ||
-    client.emojis.cache.find(
-      (e) =>
-        e.available !== false &&
-        (e.name.toLowerCase() === nameOnly || e.id === id),
-    );
-  if (customEmoji && customEmoji.available !== false) {
-    return customEmoji;
-  }
-
-  if (COMMON_UNICODE_EMOJIS[nameOnly]) {
-    return COMMON_UNICODE_EMOJIS[nameOnly];
-  }
-
-  return raw;
-};
-
 function replaceEmojiNamesWithTags(text, guild) {
   if (!text) return text;
   let cleaned = text.replace(/:\s*@\s*:/g, "");
@@ -610,7 +563,7 @@ client.updateBotPresence = function () {
       activities: [
         {
           name: "custom",
-          state: "🛠️ System Maintenance",
+          state: " System Maintenance",
           type: ActivityType.Custom,
         },
       ],

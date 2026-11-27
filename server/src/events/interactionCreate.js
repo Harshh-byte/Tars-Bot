@@ -25,30 +25,36 @@ export async function execute(interaction, client, context) {
     interaction.guild?.id !== EXEMPT_GUILD_ID &&
     interaction.user.id !== process.env.OWNER_ID
   ) {
-    const maintenanceEmbed = new EmbedBuilder()
-      .setColor(0xffa502)
-      .setTitle(`${EMOJIS.Updates} **System Maintenance**`)
-      .setDescription(
-        `${client.user.displayName} is currently undergoing scheduled maintenance and will be back online shortly.`,
-      )
-      .setFooter({
-        text: getFormattedMaintenanceTime(client.maintenanceStartTime),
-      });
+    const timeText = getFormattedMaintenanceTime(client.maintenanceStartTime);
+    const maintenancePayload = {
+      flags: 32768 | MessageFlags.Ephemeral,
+      components: [
+        {
+          type: 17,
+          accent_color: 0xffa502,
+          components: [
+            {
+              type: 10,
+              content: `### ${EMOJIS.Updates} System Maintenance`,
+            },
+            {
+              type: 14,
+              divider: true,
+              spacing: 1,
+            },
+            {
+              type: 10,
+              content: `${client.user.displayName} is currently undergoing scheduled maintenance and will be back online shortly.\n\n-# ${timeText}`,
+            },
+          ],
+        },
+      ],
+    };
 
     if (interaction.deferred || interaction.replied) {
-      return interaction
-        .followUp({
-          embeds: [maintenanceEmbed],
-          flags: MessageFlags.Ephemeral,
-        })
-        .catch(() => null);
+      return interaction.followUp(maintenancePayload).catch(() => null);
     }
-    return interaction
-      .reply({
-        embeds: [maintenanceEmbed],
-        flags: MessageFlags.Ephemeral,
-      })
-      .catch(() => null);
+    return interaction.reply(maintenancePayload).catch(() => null);
   }
 
   if (!interaction.isChatInputCommand()) return;
