@@ -256,22 +256,6 @@ export const commands = [
     badgeColor: "text-ds-blurple bg-ds-blurple/10",
   },
   {
-    trigger: "/smoke",
-    category: "actions",
-    title: "Smoke",
-    description: "Take a hit of smoke.",
-    badge: "Actions",
-    badgeColor: "text-ds-blurple bg-ds-blurple/10",
-  },
-  {
-    trigger: "/vape",
-    category: "actions",
-    title: "Vape",
-    description: "Hit the vape.",
-    badge: "Actions",
-    badgeColor: "text-ds-blurple bg-ds-blurple/10",
-  },
-  {
     trigger: "/hug",
     category: "actions",
     title: "Hug",

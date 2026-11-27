@@ -1,7 +1,7 @@
 import { ComponentType } from "discord.js";
-import logger from "../../utils/logger.js";
+import logger from "../../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { getUserFamily, marryUsers, getAllSiblings, getFullFamilyNetwork } from "../../services/database.js";
+import { getUserFamily, marryUsers, getAllSiblings, getFullFamilyNetwork } from "../../../services/database.js";
 
 export const data = {
   name: "marry",

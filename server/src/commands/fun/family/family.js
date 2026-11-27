@@ -1,8 +1,8 @@
 import { AttachmentBuilder } from "discord.js";
 import { createCanvas, loadImage } from "@napi-rs/canvas";
-import logger from "../../utils/logger.js";
+import logger from "../../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { getAllSiblings, getFullFamilyNetwork } from "../../services/database.js";
+import { getAllSiblings, getFullFamilyNetwork } from "../../../services/database.js";
 
 export const data = {
   name: "family",

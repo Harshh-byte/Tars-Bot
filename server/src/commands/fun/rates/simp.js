@@ -1,13 +1,14 @@
 import { EmbedBuilder } from "discord.js";
-import logger from "../../utils/logger.js";
+import logger from "../../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMBED_COLORS } from "../../../utils/embeds.js";
+import { EMOJIS } from "../../../utils/emojis.js";
 
-export const aliases = ["howlesbian"];
+export const aliases = ["howsimp"];
 
 export const data = {
-  name: "lesbian",
-  description: "Calculate how lesbian a user is.",
+  name: "simp",
+  description: "Calculate how simp a user is.",
   dm_permission: false,
   options: [
     {
@@ -19,14 +20,22 @@ export const data = {
   ],
 };
 
-function getLesbianCategory(percentage) {
-  if (percentage >= 85) return { category: "Scissor Queen", emoji: "✂️" };
+function getSimpCategory(percentage) {
+  if (percentage >= 85)
+    return {
+      category: "Financial Slave",
+      emoji: EMOJIS.money,
+    };
   if (percentage >= 60)
-    return { category: "Eats Pussy for Breakfast", emoji: "🚨" };
+    return {
+      category: "Feet-Pic Donor",
+      emoji: EMOJIS.lipbite,
+    };
   if (percentage >= 35)
-    return { category: "Finger Bang Enthusiast", emoji: "🦄" };
-  if (percentage >= 15) return { category: "Curious", emoji: "👀" };
-  return { category: "Straight", emoji: "🗿" };
+    return { category: "Down Bad & Desperate", emoji: "🥵" };
+  if (percentage >= 15)
+    return { category: "Licking the Floor Boots", emoji: "👅" };
+  return { category: "Cold-Hearted", emoji: "🗿" };
 }
 
 export async function execute(interaction, client) {
@@ -37,10 +46,10 @@ export async function execute(interaction, client) {
     if (targetUser.id === client.user.id) {
       const authorMention = `<@${interaction.user.id}>`;
       const roasts = [
-        "0%. Stop projecting your crusty-ass incel search history onto me.",
-        "0% lesbian. Even if I were into women, your pathetic ass wouldn't get a single drop of play.",
-        "My rating is 0%, and your chance of eating pussy in this lifetime is lower than your credit score.",
-        "Checking my orientation when nobody of any gender, sexuality, or species would let you touch them.",
+        "0%. I wouldn't even send you a 'k' if you were burning alive in front of me.",
+        "0% simp. Meanwhile, you write 5-paragraph essays to Twitch streamers who don't even know you exist.",
+        "I dropped into a literal black hole just to get away from desperate, needy incels like you.",
+        "Simp level 0%. Meanwhile, you pay $100 a month on OnlyFans just for a pre-recorded voice note.",
       ];
       const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
 
@@ -52,7 +61,7 @@ export async function execute(interaction, client) {
     }
 
     const percentage = Math.floor(Math.random() * 101);
-    const { category, emoji } = getLesbianCategory(percentage);
+    const { category, emoji } = getSimpCategory(percentage);
 
     const authorMention = `<@${interaction.user.id}>`;
     const targetMention = `<@${targetUser.id}>`;
@@ -61,13 +70,13 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} lesbian percentage is \`${percentage}%\` \n*${category}*`,
+        `${authorMention}: ${emoji} ${textPrefix} simp percentage is \`${percentage}%\` \n*${category}*`,
       )
       .setColor(EMBED_COLORS.GREY);
 
     await interaction.reply({ embeds: [embed] });
   } catch (err) {
-    logger.error("Error in Lesbian command handler:", err);
+    logger.error("Error in Simp command handler:", err);
     Sentry.captureException(err);
   }
 }

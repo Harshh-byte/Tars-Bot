@@ -1,8 +1,8 @@
 import { ComponentType } from "discord.js";
-import logger from "../../utils/logger.js";
+import logger from "../../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { getUserFamily, divorceUsers } from "../../services/database.js";
-import { EMOJI_IDS } from "../../utils/emojis.js";
+import { getUserFamily, divorceUsers } from "../../../services/database.js";
+import { EMOJI_IDS } from "../../../utils/emojis.js";
 
 export const data = {
   name: "divorce",

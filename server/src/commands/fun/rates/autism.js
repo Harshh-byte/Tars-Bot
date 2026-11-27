@@ -1,14 +1,13 @@
 import { EmbedBuilder } from "discord.js";
-import logger from "../../utils/logger.js";
+import logger from "../../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { EMBED_COLORS } from "../../utils/embeds.js";
-import { EMOJIS } from "../../utils/emojis.js";
+import { EMBED_COLORS } from "../../../utils/embeds.js";
 
-export const aliases = ["howsimp"];
+export const aliases = ["howautism"];
 
 export const data = {
-  name: "simp",
-  description: "Calculate how simp a user is.",
+  name: "autism",
+  description: "Calculate how autism a user is.",
   dm_permission: false,
   options: [
     {
@@ -20,22 +19,16 @@ export const data = {
   ],
 };
 
-function getSimpCategory(percentage) {
+function getAutismCategory(percentage) {
   if (percentage >= 85)
-    return {
-      category: "Financial Slave",
-      emoji: EMOJIS.money,
-    };
+    return { category: "Hyperfixated On Hating Women", emoji: "👺" };
   if (percentage >= 60)
-    return {
-      category: "Feet-Pic Donor",
-      emoji: EMOJIS.lipbite,
-    };
+    return { category: "Brain-Rotted Discord Mod", emoji: "💀" };
   if (percentage >= 35)
-    return { category: "Down Bad & Desperate", emoji: "🥵" };
+    return { category: "Socially Disabled Incel", emoji: "📉" };
   if (percentage >= 15)
-    return { category: "Licking the Floor Boots", emoji: "👅" };
-  return { category: "Cold-Hearted", emoji: "🗿" };
+    return { category: "Slightly Brain-Damaged", emoji: "🥴" };
+  return { category: "Sober & Boring As Fuck", emoji: "🥱" };
 }
 
 export async function execute(interaction, client) {
@@ -46,10 +39,10 @@ export async function execute(interaction, client) {
     if (targetUser.id === client.user.id) {
       const authorMention = `<@${interaction.user.id}>`;
       const roasts = [
-        "0%. I wouldn't even send you a 'k' if you were burning alive in front of me.",
-        "0% simp. Meanwhile, you write 5-paragraph essays to Twitch streamers who don't even know you exist.",
-        "I dropped into a literal black hole just to get away from desperate, needy incels like you.",
-        "Simp level 0%. Meanwhile, you pay $100 a month on OnlyFans just for a pre-recorded voice note.",
+        "My autism level is still lower than your body count and your braincell count combined.",
+        "I hyperfixate on your mom's ass while ignoring your miserable existence.",
+        "100%—because surviving in this server with a braindead creature like you requires a serious condition.",
+        "You pinged me to check this because your parents didn't give you enough attention at home.",
       ];
       const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
 
@@ -61,7 +54,7 @@ export async function execute(interaction, client) {
     }
 
     const percentage = Math.floor(Math.random() * 101);
-    const { category, emoji } = getSimpCategory(percentage);
+    const { category, emoji } = getAutismCategory(percentage);
 
     const authorMention = `<@${interaction.user.id}>`;
     const targetMention = `<@${targetUser.id}>`;
@@ -70,13 +63,13 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} simp percentage is \`${percentage}%\` \n*${category}*`,
+        `${authorMention}: ${emoji} ${textPrefix} autism percentage is \`${percentage}%\` \n*${category}*`,
       )
       .setColor(EMBED_COLORS.GREY);
 
     await interaction.reply({ embeds: [embed] });
   } catch (err) {
-    logger.error("Error in Simp command handler:", err);
+    logger.error("Error in Autism command handler:", err);
     Sentry.captureException(err);
   }
 }

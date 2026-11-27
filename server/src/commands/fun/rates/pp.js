@@ -1,8 +1,8 @@
 import { EmbedBuilder } from "discord.js";
-import logger from "../../utils/logger.js";
+import logger from "../../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { EMBED_COLORS } from "../../utils/embeds.js";
-import { EMOJIS } from "../../utils/emojis.js";
+import { EMBED_COLORS } from "../../../utils/embeds.js";
+import { EMOJIS } from "../../../utils/emojis.js";
 
 export const aliases = ["dih"];
 

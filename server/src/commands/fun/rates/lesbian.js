@@ -1,13 +1,13 @@
 import { EmbedBuilder } from "discord.js";
-import logger from "../../utils/logger.js";
+import logger from "../../../utils/logger.js";
 import * as Sentry from "@sentry/node";
-import { EMBED_COLORS } from "../../utils/embeds.js";
+import { EMBED_COLORS } from "../../../utils/embeds.js";
 
-export const aliases = ["howautism"];
+export const aliases = ["howlesbian"];
 
 export const data = {
-  name: "autism",
-  description: "Calculate how autism a user is.",
+  name: "lesbian",
+  description: "Calculate how lesbian a user is.",
   dm_permission: false,
   options: [
     {
@@ -19,16 +19,14 @@ export const data = {
   ],
 };
 
-function getAutismCategory(percentage) {
-  if (percentage >= 85)
-    return { category: "Hyperfixated On Hating Women", emoji: "👺" };
+function getLesbianCategory(percentage) {
+  if (percentage >= 85) return { category: "Scissor Queen", emoji: "✂️" };
   if (percentage >= 60)
-    return { category: "Brain-Rotted Discord Mod", emoji: "💀" };
+    return { category: "Eats Pussy for Breakfast", emoji: "🚨" };
   if (percentage >= 35)
-    return { category: "Socially Disabled Incel", emoji: "📉" };
-  if (percentage >= 15)
-    return { category: "Slightly Brain-Damaged", emoji: "🥴" };
-  return { category: "Sober & Boring As Fuck", emoji: "🥱" };
+    return { category: "Finger Bang Enthusiast", emoji: "🦄" };
+  if (percentage >= 15) return { category: "Curious", emoji: "👀" };
+  return { category: "Straight", emoji: "🗿" };
 }
 
 export async function execute(interaction, client) {
@@ -39,10 +37,10 @@ export async function execute(interaction, client) {
     if (targetUser.id === client.user.id) {
       const authorMention = `<@${interaction.user.id}>`;
       const roasts = [
-        "My autism level is still lower than your body count and your braincell count combined.",
-        "I hyperfixate on your mom's ass while ignoring your miserable existence.",
-        "100%—because surviving in this server with a braindead creature like you requires a serious condition.",
-        "You pinged me to check this because your parents didn't give you enough attention at home.",
+        "0%. Stop projecting your crusty-ass incel search history onto me.",
+        "0% lesbian. Even if I were into women, your pathetic ass wouldn't get a single drop of play.",
+        "My rating is 0%, and your chance of eating pussy in this lifetime is lower than your credit score.",
+        "Checking my orientation when nobody of any gender, sexuality, or species would let you touch them.",
       ];
       const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
 
@@ -54,7 +52,7 @@ export async function execute(interaction, client) {
     }
 
     const percentage = Math.floor(Math.random() * 101);
-    const { category, emoji } = getAutismCategory(percentage);
+    const { category, emoji } = getLesbianCategory(percentage);
 
     const authorMention = `<@${interaction.user.id}>`;
     const targetMention = `<@${targetUser.id}>`;
@@ -63,13 +61,13 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} autism percentage is \`${percentage}%\` \n*${category}*`,
+        `${authorMention}: ${emoji} ${textPrefix} lesbian percentage is \`${percentage}%\` \n*${category}*`,
       )
       .setColor(EMBED_COLORS.GREY);
 
     await interaction.reply({ embeds: [embed] });
   } catch (err) {
-    logger.error("Error in Autism command handler:", err);
+    logger.error("Error in Lesbian command handler:", err);
     Sentry.captureException(err);
   }
 }

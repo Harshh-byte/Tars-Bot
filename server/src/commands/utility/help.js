@@ -74,12 +74,19 @@ const modulesCatalog = {
   },
   module_fun: {
     title: `${EMOJIS.Fun} Fun Module`,
-    description: "Calculators, roasts, and memes.",
+    description: "Entertainment, rates & family.",
     commands: [
       {
         name: "Love Calculator",
         cmd: "ship",
         desc: "Calculate love percentage between two users!",
+      },
+      { name: "Sarcastic Roast", cmd: "roast", desc: "Roast a user." },
+      { name: "Charismatic Wish", cmd: "wish", desc: "Send a wish message." },
+      {
+        name: "Memes",
+        cmd: "meme",
+        desc: "Display a trending meme from Reddit!",
       },
       {
         name: "Gay Calculator",
@@ -111,13 +118,6 @@ const modulesCatalog = {
         name: "IQ Calculator",
         cmd: "iq",
         desc: "Calculate a user's IQ score.",
-      },
-      { name: "Sarcastic Roast", cmd: "roast", desc: "Roast a user." },
-      { name: "Charismatic Wish", cmd: "wish", desc: "Send a wish message." },
-      {
-        name: "Memes",
-        cmd: "meme",
-        desc: "Display a trending meme from Reddit!",
       },
       {
         name: "Family Tree",
@@ -155,8 +155,6 @@ const modulesCatalog = {
     title: `${EMOJIS.Actions} Actions Module`,
     description: "Roleplay & social interactions.",
     commands: [
-      { name: "Smoke", cmd: "smoke", desc: "Take a hit of smoke." },
-      { name: "Vape", cmd: "vape", desc: "Hit the vape." },
       { name: "Hug", cmd: "hug", desc: "Hug someone." },
       { name: "Kiss", cmd: "kiss", desc: "Kiss someone." },
       { name: "Slap", cmd: "slap", desc: "Slap someone." },
