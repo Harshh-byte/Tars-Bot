@@ -26,11 +26,11 @@ function getPpCategory(inches) {
       category: "Throat Destroyer",
       emoji: EMOJIS.lipbite,
     };
-  if (inches >= 8) return { category: "Heavy Duty Meat", emoji: "🍌" };
-  if (inches >= 4) return { category: "Average Pencil Pusher", emoji: "🍆" };
+  if (inches >= 8) return { category: "Pussy Ripper", emoji: "🍌" };
+  if (inches >= 4) return { category: "Disappointing Pencil", emoji: "🍆" };
   if (inches > 0)
     return {
-      category: "Limp Micro-Needle",
+      category: "Micro-Clit",
       emoji: EMOJIS.nopepe,
     };
   return { category: "Inverted Hole", emoji: "🕳️" };
@@ -68,7 +68,7 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} dih is \`${inches} inches\` \n*${category}*`,
+        `${authorMention}: ${emoji} ${textPrefix} dih is \`${inches} inches\` \n\n-# ${category}`,
       )
       .setColor(EMBED_COLORS.GREY);
 

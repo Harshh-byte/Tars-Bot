@@ -91,9 +91,13 @@ export function initAutoMemeService(client) {
           }
 
           const intervalMs = (cfg.intervalHours || 1) * 3600 * 1000;
+          let newNextPostAt = (cfg.nextPostAt || now) + intervalMs;
+          while (newNextPostAt <= now) {
+            newNextPostAt += intervalMs;
+          }
           await saveAutoMemeConfig(cfg.serverId, {
             ...cfg,
-            nextPostAt: now + intervalMs,
+            nextPostAt: newNextPostAt,
             lastPostedAt: now,
           });
         }

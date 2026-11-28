@@ -3,9 +3,13 @@ import logger from "../../../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { getUserFamily, marryUsers, getAllSiblings, getFullFamilyNetwork } from "../../../services/database.js";
 
+export const aliases = [];
+
+const activeProposals = new Set();
+
 export const data = {
   name: "marry",
-  description: "Marry another user.",
+  description: "Marry a user.",
   dm_permission: false,
   options: [
     {
@@ -115,6 +119,26 @@ export async function execute(interaction, client) {
         : interaction.message?.reply(payload);
     }
 
+    if (activeProposals.has(author.id)) {
+      const payload = buildCard(
+        "You already have a pending marriage proposal waiting! Finish or wait for that one to expire first. ⏳",
+        0xffa502,
+      );
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    }
+
+    if (activeProposals.has(targetUser.id)) {
+      const payload = buildCard(
+        `<@${targetUser.id}> already has an active marriage proposal pending! Give them a moment to decide. ⏳`,
+        0xffa502,
+      );
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    }
+
     const authorFam = await getUserFamily(serverId, author.id);
     if (authorFam.partnerId) {
       const payload = buildCard(
@@ -205,6 +229,9 @@ export async function execute(interaction, client) {
 
     const payload = buildCard(proposalContent, 0xff70a6, buttons);
 
+    activeProposals.add(author.id);
+    activeProposals.add(targetUser.id);
+
     let replyMsg;
     if (interaction.reply) {
       const resp = await interaction.reply({
@@ -216,11 +243,20 @@ export async function execute(interaction, client) {
       replyMsg = await interaction.message?.reply(payload);
     }
 
-    if (!replyMsg) return;
+    if (!replyMsg) {
+      activeProposals.delete(author.id);
+      activeProposals.delete(targetUser.id);
+      return;
+    }
 
     const collector = replyMsg.createMessageComponentCollector({
       componentType: ComponentType.Button,
       time: 60000,
+    });
+
+    collector.on("end", () => {
+      activeProposals.delete(author.id);
+      activeProposals.delete(targetUser.id);
     });
 
     const unauthorizedRoasts = [

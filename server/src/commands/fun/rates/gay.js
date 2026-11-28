@@ -21,17 +21,15 @@ export const data = {
 };
 
 function getGayCategory(percentage) {
-  if (percentage >= 85)
-    return { category: "Full-Blown Cock Fiend", emoji: "🏳️‍🌈" };
-  if (percentage >= 60)
-    return { category: "Taking It Deep Daily", emoji: "🤨" };
+  if (percentage >= 85) return { category: "Cock Fiend", emoji: "🏳️‍🌈" };
+  if (percentage >= 60) return { category: "Sweet Home Alabama", emoji: "�" };
   if (percentage >= 35) return { category: "Closet Fruity", emoji: "💅" };
   if (percentage >= 15)
     return {
-      category: "Checks Out Guys in Gym Showers",
+      category: "Gym Shower Peeper",
       emoji: EMOJIS.suseyes,
     };
-  return { category: "Hetero Alpha", emoji: "🗿" };
+  return { category: "Hetero Chad", emoji: "🗿" };
 }
 
 export async function execute(interaction, client) {
@@ -66,7 +64,7 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} gay percentage is \`${percentage}%\` \n*${category}*`,
+        `${authorMention}: ${emoji} ${textPrefix} gay percentage is \`${percentage}%\` \n\n-# ${category}`,
       )
       .setColor(EMBED_COLORS.GREY);
 

@@ -21,12 +21,10 @@ export const data = {
 
 function getLesbianCategory(percentage) {
   if (percentage >= 85) return { category: "Scissor Queen", emoji: "✂️" };
-  if (percentage >= 60)
-    return { category: "Eats Pussy for Breakfast", emoji: "🚨" };
-  if (percentage >= 35)
-    return { category: "Finger Bang Enthusiast", emoji: "🦄" };
-  if (percentage >= 15) return { category: "Curious", emoji: "👀" };
-  return { category: "Straight", emoji: "🗿" };
+  if (percentage >= 60) return { category: "Pussy Muncher", emoji: "🚨" };
+  if (percentage >= 35) return { category: "Finger Banger", emoji: "🦄" };
+  if (percentage >= 15) return { category: "Bi-Curious Slut", emoji: "👀" };
+  return { category: "Pure Hetero", emoji: "🗿" };
 }
 
 export async function execute(interaction, client) {
@@ -61,7 +59,7 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} lesbian percentage is \`${percentage}%\` \n*${category}*`,
+        `${authorMention}: ${emoji} ${textPrefix} lesbian percentage is \`${percentage}%\` \n\n-# ${category}`,
       )
       .setColor(EMBED_COLORS.GREY);
 

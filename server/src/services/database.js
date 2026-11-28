@@ -720,6 +720,54 @@ export async function getFullFamilyNetwork(serverId, startUserId) {
   return members;
 }
 
+export async function removeUserFromFamily(serverId, userId) {
+  if (!serverId || !userId) return;
+
+  const famRef = db.collection("servers").doc(serverId).collection("families").doc(userId);
+  const famDoc = await famRef.get();
+  if (!famDoc.exists) return;
+
+  const famData = famDoc.data() || {};
+  const batch = db.batch();
+
+  // 1. If married, remove spouse link on partner
+  if (famData.partnerId) {
+    const partnerRef = db.collection("servers").doc(serverId).collection("families").doc(famData.partnerId);
+    batch.update(partnerRef, {
+      partnerId: null,
+      marriedAt: null,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+  }
+
+  // 2. If child of parents, remove user from parents' childrenIds
+  if (Array.isArray(famData.parentIds)) {
+    for (const pId of famData.parentIds) {
+      const parentRef = db.collection("servers").doc(serverId).collection("families").doc(pId);
+      batch.update(parentRef, {
+        childrenIds: FieldValue.arrayRemove(userId),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+  // 3. If parent of children, remove user from children's parentIds
+  if (Array.isArray(famData.childrenIds)) {
+    for (const cId of famData.childrenIds) {
+      const childRef = db.collection("servers").doc(serverId).collection("families").doc(cId);
+      batch.update(childRef, {
+        parentIds: FieldValue.arrayRemove(userId),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+  // 4. Delete user's family document
+  batch.delete(famRef);
+
+  await batch.commit();
+}
+
 cron.schedule("0 0 * * *", async () => {
   try {
     const cutoff = Timestamp.fromDate(new Date(Date.now() - DATA_RETENTION_MS));

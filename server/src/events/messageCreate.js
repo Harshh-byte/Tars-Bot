@@ -3,7 +3,7 @@ import logger from "../utils/logger.js";
 import * as Sentry from "@sentry/node";
 import { checkCooldown } from "../utils/cooldowns.js";
 import { errorEmbed } from "../utils/embeds.js";
-import { EMOJIS } from "../utils/emojis.js";
+import { EMOJIS, EMOJI_IDS } from "../utils/emojis.js";
 
 export const name = Events.MessageCreate;
 
@@ -59,6 +59,8 @@ export async function execute(message, client, { buildAiReply }) {
           const hasEmbeds = original.embeds && original.embeds.length > 0;
           const hasComponents =
             original.components && original.components.length > 0;
+          const hasAttachments =
+            original.attachments && original.attachments.size > 0;
           const isComponentsV2 =
             (original.flags?.bitfield ?? original.flags ?? 0) & 32768;
 
@@ -66,6 +68,7 @@ export async function execute(message, client, { buildAiReply }) {
             isInteractionResponse ||
             hasEmbeds ||
             hasComponents ||
+            hasAttachments ||
             Boolean(isComponentsV2)
           ) {
             isReplyToNonChatBotMessage = true;
@@ -268,16 +271,22 @@ export async function execute(message, client, { buildAiReply }) {
     });
 
     if ((replyData.text && replyData.text.trim() !== "") || replyData.gifUrl) {
-      await message.channel.sendTyping();
-
+      await message.channel.sendTyping().catch(() => null);
       await new Promise((resolve) => setTimeout(resolve, 800));
     }
 
     if (replyData.reactions && replyData.reactions.length > 0) {
       for (const emoji of replyData.reactions) {
-        const resolved = client.resolveEmoji(emoji);
-        if (resolved) {
-          await message.react(resolved).catch(() => null);
+        if (!emoji) continue;
+        const cleanName = emoji.replace(/:/g, "").trim();
+        const customEmoji =
+          EMOJI_IDS[cleanName] ||
+          client.emojis?.cache?.get(cleanName) ||
+          client.emojis?.cache?.find((e) => e.name.toLowerCase() === cleanName.toLowerCase());
+
+        const toReact = customEmoji || emoji;
+        if (toReact) {
+          await message.react(toReact).catch(() => null);
         }
       }
     }

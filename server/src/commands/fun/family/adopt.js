@@ -4,9 +4,13 @@ import * as Sentry from "@sentry/node";
 import { getUserFamily, adoptChild, getAllSiblings, getFullFamilyNetwork } from "../../../services/database.js";
 import { EMOJI_IDS } from "../../../utils/emojis.js";
 
+export const aliases = [];
+
+const activeAdoptions = new Set();
+
 export const data = {
   name: "adopt",
-  description: "Adopt a user into your family.",
+  description: "Adopt a user.",
   dm_permission: false,
   options: [
     {
@@ -116,6 +120,26 @@ export async function execute(interaction, client) {
         : interaction.message?.reply(payload);
     }
 
+    if (activeAdoptions.has(author.id)) {
+      const payload = buildCard(
+        "You already have a pending adoption request waiting! Wait for it to finish or expire first. ⏳",
+        0xffa502,
+      );
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    }
+
+    if (activeAdoptions.has(targetUser.id)) {
+      const payload = buildCard(
+        `<@${targetUser.id}> already has an active adoption request pending! Give them time to answer. ⏳`,
+        0xffa502,
+      );
+      return interaction.reply
+        ? interaction.reply(payload)
+        : interaction.message?.reply(payload);
+    }
+
     const authorFam = await getUserFamily(serverId, author.id);
     const targetFam = await getUserFamily(serverId, targetUser.id);
 
@@ -179,6 +203,19 @@ export async function execute(interaction, client) {
         : interaction.message?.reply(payload);
     }
 
+    if (authorFam.partnerId) {
+      const spouseFam = network[authorFam.partnerId] || {};
+      if (Array.isArray(spouseFam.parentIds) && spouseFam.parentIds.includes(targetUser.id)) {
+        const payload = buildCard(
+          `<@${targetUser.id}> is your mother/father-in-law! You cannot adopt your spouse's parents. 💀`,
+          0xed4245,
+        );
+        return interaction.reply
+          ? interaction.reply(payload)
+          : interaction.message?.reply(payload);
+      }
+    }
+
     if (authorFam.childrenIds.length >= 10) {
       const payload = buildCard(
         "You already have 10 children! Your family is at maximum capacity. 🛑",
@@ -219,6 +256,9 @@ export async function execute(interaction, client) {
 
     const payload = buildCard(content, 0x68d8d6, buttons);
 
+    activeAdoptions.add(author.id);
+    activeAdoptions.add(targetUser.id);
+
     let replyMsg;
     if (interaction.reply) {
       const resp = await interaction.reply({
@@ -230,11 +270,20 @@ export async function execute(interaction, client) {
       replyMsg = await interaction.message?.reply(payload);
     }
 
-    if (!replyMsg) return;
+    if (!replyMsg) {
+      activeAdoptions.delete(author.id);
+      activeAdoptions.delete(targetUser.id);
+      return;
+    }
 
     const collector = replyMsg.createMessageComponentCollector({
       componentType: ComponentType.Button,
       time: 60000,
+    });
+
+    collector.on("end", () => {
+      activeAdoptions.delete(author.id);
+      activeAdoptions.delete(targetUser.id);
     });
 
     const unauthorizedRoasts = [

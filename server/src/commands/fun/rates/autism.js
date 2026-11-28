@@ -20,15 +20,11 @@ export const data = {
 };
 
 function getAutismCategory(percentage) {
-  if (percentage >= 85)
-    return { category: "Hyperfixated On Hating Women", emoji: "👺" };
-  if (percentage >= 60)
-    return { category: "Brain-Rotted Discord Mod", emoji: "💀" };
-  if (percentage >= 35)
-    return { category: "Socially Disabled Incel", emoji: "📉" };
-  if (percentage >= 15)
-    return { category: "Slightly Brain-Damaged", emoji: "🥴" };
-  return { category: "Sober & Boring As Fuck", emoji: "🥱" };
+  if (percentage >= 85) return { category: "Weaponized Retard", emoji: "👺" };
+  if (percentage >= 60) return { category: "Brain-Rotted Mod", emoji: "💀" };
+  if (percentage >= 35) return { category: "Socially Crippled", emoji: "📉" };
+  if (percentage >= 15) return { category: "Mildly Damaged", emoji: "🥴" };
+  return { category: "Boring As Fuck", emoji: "🥱" };
 }
 
 export async function execute(interaction, client) {
@@ -63,7 +59,7 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} autism percentage is \`${percentage}%\` \n*${category}*`,
+        `${authorMention}: ${emoji} ${textPrefix} autism percentage is \`${percentage}%\` \n\n-# ${category}`,
       )
       .setColor(EMBED_COLORS.GREY);
 

@@ -23,19 +23,17 @@ export const data = {
 function getSimpCategory(percentage) {
   if (percentage >= 85)
     return {
-      category: "Financial Slave",
+      category: "Financial Cuck",
       emoji: EMOJIS.money,
     };
   if (percentage >= 60)
     return {
-      category: "Feet-Pic Donor",
+      category: "Feet-Pic Buyer",
       emoji: EMOJIS.lipbite,
     };
-  if (percentage >= 35)
-    return { category: "Down Bad & Desperate", emoji: "🥵" };
-  if (percentage >= 15)
-    return { category: "Licking the Floor Boots", emoji: "👅" };
-  return { category: "Cold-Hearted", emoji: "🗿" };
+  if (percentage >= 35) return { category: "Desperate Beggar", emoji: "🥵" };
+  if (percentage >= 15) return { category: "Boot Licker", emoji: "👅" };
+  return { category: "Emotionless GigaChad", emoji: "🗿" };
 }
 
 export async function execute(interaction, client) {
@@ -70,7 +68,7 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} simp percentage is \`${percentage}%\` \n*${category}*`,
+        `${authorMention}: ${emoji} ${textPrefix} simp percentage is \`${percentage}%\` \n\n-# ${category}`,
       )
       .setColor(EMBED_COLORS.GREY);
 

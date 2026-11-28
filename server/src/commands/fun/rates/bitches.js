@@ -20,17 +20,16 @@ export const data = {
 
 function getBitchesCategory(count) {
   if (count >= 85) return { category: "Pussy Magnet", emoji: "🗿" };
-  if (count >= 60) return { category: "Certified Rizz God", emoji: "🥶" };
+  if (count >= 60) return { category: "Rizz God", emoji: "🥶" };
   if (count >= 35)
     return {
-      category: "Getting Your Dick Wet",
+      category: "Casual Smasher",
       emoji: EMOJIS.lipbite,
     };
-  if (count >= 15)
-    return { category: "Scraping Bottom of the Barrel", emoji: "🚮" };
-  if (count > 0) return { category: "Desperate Crumb-Snatcher", emoji: "🤏" };
+  if (count >= 15) return { category: "Bottom Feeder", emoji: "🚮" };
+  if (count > 0) return { category: "Crumb Snatcher", emoji: "🤏" };
   return {
-    category: "Chronically Maidenless",
+    category: "Chronically Virgin",
     emoji: "🥺",
   };
 }
@@ -67,7 +66,7 @@ export async function execute(interaction, client) {
 
     const embed = new EmbedBuilder()
       .setDescription(
-        `${authorMention}: ${emoji} ${textPrefix} \`${count}\` bitches\n*${category}*`,
+        `${authorMention}: ${emoji} ${textPrefix} \`${count}\` bitches\n\n-# ${category}`,
       )
       .setColor(EMBED_COLORS.GREY);
 
