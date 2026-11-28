@@ -142,7 +142,7 @@ export async function execute(interaction, client) {
     const authorFam = await getUserFamily(serverId, author.id);
     if (authorFam.partnerId) {
       const payload = buildCard(
-        `You are already married to <@${authorFam.partnerId}>! Divorce them first with \`/divorce\`. 💔`,
+        `You are already married to <@${authorFam.partnerId}>! Divorce them first.`,
         0xffa502,
       );
       return interaction.reply
@@ -153,7 +153,7 @@ export async function execute(interaction, client) {
     const targetFam = await getUserFamily(serverId, targetUser.id);
     if (targetFam.partnerId) {
       const payload = buildCard(
-        `<@${targetUser.id}> is already married to <@${targetFam.partnerId}>! Respect their vows. 💍`,
+        `<@${targetUser.id}> is already married to <@${targetFam.partnerId}>! Respect their vows.`,
         0xffa502,
       );
       return interaction.reply
@@ -161,49 +161,10 @@ export async function execute(interaction, client) {
         : interaction.message?.reply(payload);
     }
 
-    if (authorFam.childrenIds.includes(targetUser.id)) {
-      const payload = buildCard(
-        "You cannot marry your own child! 🤢",
-        0xed4245,
-      );
-      return interaction.reply
-        ? interaction.reply(payload)
-        : interaction.message?.reply(payload);
-    }
-
-    if (authorFam.parentIds.includes(targetUser.id)) {
-      const payload = buildCard(
-        "You cannot marry your own parent! 💀",
-        0xed4245,
-      );
-      return interaction.reply
-        ? interaction.reply(payload)
-        : interaction.message?.reply(payload);
-    }
-
-    const siblings = await getAllSiblings(serverId, author.id);
-    if (siblings.includes(targetUser.id)) {
-      const payload = buildCard(
-        "Sweet Home Alabama? 🪕 You cannot marry your own sibling!",
-        0xed4245,
-      );
-      return interaction.reply
-        ? interaction.reply(payload)
-        : interaction.message?.reply(payload);
-    }
-
     const network = await getFullFamilyNetwork(serverId, author.id);
-    function isDescendant(ancestorId, currentId, visited = new Set()) {
-      if (visited.has(currentId)) return false;
-      visited.add(currentId);
-      const fam = network[currentId];
-      if (!fam || !fam.childrenIds) return false;
-      if (fam.childrenIds.includes(ancestorId)) return true;
-      return fam.childrenIds.some((cId) => isDescendant(ancestorId, cId, visited));
-    }
-    if (isDescendant(author.id, targetUser.id) || isDescendant(targetUser.id, author.id)) {
+    if (network[targetUser.id]) {
       const payload = buildCard(
-        "You cannot marry your own direct ancestor or descendant! 🧬",
+        "That user is already in your family tree! You cannot marry family.",
         0xed4245,
       );
       return interaction.reply

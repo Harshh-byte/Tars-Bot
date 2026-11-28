@@ -53,7 +53,7 @@ export async function execute(interaction, client) {
 
     const authorFam = await getUserFamily(serverId, author.id);
     if (!authorFam.partnerId) {
-      const payload = buildCard("You aren't even married to anyone! 💀", 0xffa502);
+      const payload = buildCard("You aren't even married to anyone!", 0xffa502);
       return interaction.reply ? interaction.reply(payload) : interaction.message?.reply(payload);
     }
 

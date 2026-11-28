@@ -140,43 +140,11 @@ export async function execute(interaction, client) {
         : interaction.message?.reply(payload);
     }
 
-    const authorFam = await getUserFamily(serverId, author.id);
     const targetFam = await getUserFamily(serverId, targetUser.id);
 
     if (authorFam.partnerId === targetUser.id) {
       const payload = buildCard(
-        "You cannot adopt your own spouse! 💀",
-        0xed4245,
-      );
-      return interaction.reply
-        ? interaction.reply(payload)
-        : interaction.message?.reply(payload);
-    }
-
-    if (authorFam.childrenIds.includes(targetUser.id)) {
-      const payload = buildCard(
-        `<@${targetUser.id}> is already your child!`,
-        0xffa502,
-      );
-      return interaction.reply
-        ? interaction.reply(payload)
-        : interaction.message?.reply(payload);
-    }
-
-    if (authorFam.parentIds.includes(targetUser.id)) {
-      const payload = buildCard(
-        `<@${targetUser.id}> is your parent! You cannot adopt your own parent. 💀`,
-        0xed4245,
-      );
-      return interaction.reply
-        ? interaction.reply(payload)
-        : interaction.message?.reply(payload);
-    }
-
-    const siblings = await getAllSiblings(serverId, author.id);
-    if (siblings.includes(targetUser.id)) {
-      const payload = buildCard(
-        `<@${targetUser.id}> is your sibling! You cannot adopt your own brother or sister. 💀`,
+        "You cannot adopt your own spouse!",
         0xed4245,
       );
       return interaction.reply
@@ -185,17 +153,9 @@ export async function execute(interaction, client) {
     }
 
     const network = await getFullFamilyNetwork(serverId, author.id);
-    function isAncestor(currentId, targetAncestorId, visited = new Set()) {
-      if (visited.has(currentId)) return false;
-      visited.add(currentId);
-      const fam = network[currentId];
-      if (!fam || !fam.parentIds) return false;
-      if (fam.parentIds.includes(targetAncestorId)) return true;
-      return fam.parentIds.some((pId) => isAncestor(pId, targetAncestorId, visited));
-    }
-    if (isAncestor(author.id, targetUser.id)) {
+    if (network[targetUser.id]) {
       const payload = buildCard(
-        `<@${targetUser.id}> is your ancestor! You cannot adopt your own grandparent/ancestor. 💀`,
+        `<@${targetUser.id}> is already in your family tree! You cannot adopt someone already in your family.`,
         0xed4245,
       );
       return interaction.reply
@@ -203,22 +163,9 @@ export async function execute(interaction, client) {
         : interaction.message?.reply(payload);
     }
 
-    if (authorFam.partnerId) {
-      const spouseFam = network[authorFam.partnerId] || {};
-      if (Array.isArray(spouseFam.parentIds) && spouseFam.parentIds.includes(targetUser.id)) {
-        const payload = buildCard(
-          `<@${targetUser.id}> is your mother/father-in-law! You cannot adopt your spouse's parents. 💀`,
-          0xed4245,
-        );
-        return interaction.reply
-          ? interaction.reply(payload)
-          : interaction.message?.reply(payload);
-      }
-    }
-
     if (authorFam.childrenIds.length >= 10) {
       const payload = buildCard(
-        "You already have 10 children! Your family is at maximum capacity. 🛑",
+        "You already have 10 children! Your family is at maximum capacity.",
         0xed4245,
       );
       return interaction.reply
@@ -315,7 +262,7 @@ export async function execute(interaction, client) {
         collector.stop("accepted");
       } else {
         const rejectPayload = buildCard(
-          `### 🍼 Adoption Rejected!\n\n<@${targetUser.id}> refused to be adopted by <@${author.id}>.\n\nStaying independent!`,
+          `### 🚯 Adoption Rejected!\n\n<@${targetUser.id}> refused to be adopted by <@${author.id}>.\n\nStaying independent!`,
           0xed4245,
         );
         await replyMsg.edit(rejectPayload).catch(() => null);
