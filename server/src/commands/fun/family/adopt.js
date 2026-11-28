@@ -234,10 +234,10 @@ export async function execute(interaction, client) {
     });
 
     const unauthorizedRoasts = [
-      "Nobody is adopting you, orphan. Go find a foster home.",
-      "Hands off! Nobody asked to be your mommy or daddy.",
-      "You're not the one getting adopted, stop begging for parental affection.",
-      "Trying to sneak into someone else's family tree? Scram, leech.",
+      "Nobody is adopting you, orphan.",
+      "Hands off, nobody wants to be your parent.",
+      "Stop begging for parental affection, leech.",
+      "You're not on the birth certificate, fuck off.",
     ];
 
     collector.on("collect", async (btnInt) => {

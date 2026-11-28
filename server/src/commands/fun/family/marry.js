@@ -221,10 +221,10 @@ export async function execute(interaction, client) {
     });
 
     const unauthorizedRoasts = [
-      "Keep your desperate hands off someone else's wedding proposal, nobody wants you.",
-      "Nobody is proposing to you, sit your lonely ass down.",
-      "Trying to RSVP to a wedding you weren't even invited to? Embarrassing.",
-      "Back off, homewrecker! Go find someone who actually tolerates you.",
+      "Nobody is proposing to you, sit your maidenless ass down.",
+      "You weren't invited to this wedding, back the fuck off.",
+      "Hands off the ring, homewrecker.",
+      "Stop begging for validation, nobody loves you here.",
     ];
 
     collector.on("collect", async (btnInt) => {

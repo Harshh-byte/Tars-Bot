@@ -95,10 +95,10 @@ export async function execute(interaction, client) {
     });
 
     const unauthorizedRoasts = [
-      "Mind your own fucking business, you're not the one getting divorced.",
-      "Trying to sign someone else's divorce papers? Get a life, nosy parasite.",
-      "This isn't your marriage to destroy, back the fuck off.",
-      "Nobody asked for your input on their relationship, butt out.",
+      "Mind your own fucking business.",
+      "Not your marriage to sign away, nosy parasite.",
+      "Back the fuck off and get a life.",
+      "Nobody asked you, butt out.",
     ];
 
     collector.on("collect", async (btnInt) => {
