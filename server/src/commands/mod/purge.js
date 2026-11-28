@@ -5,18 +5,18 @@ import logger from "../../utils/logger.js";
 
 export const data = {
   name: "purge",
-  description: "Purge messages from the current channel.",
+  description: "Purge messages.",
   dm_permission: false,
   default_member_permissions: PermissionFlagsBits.ManageMessages.toString(),
   options: [
     {
       type: 1,
       name: "any",
-      description: "Purge any messages from the channel.",
+      description: "Purge any messages.",
       options: [
         {
           name: "count",
-          description: "Number of messages to delete (up to 100).",
+          description: "Number of messages (up to 100).",
           type: 4,
           required: true,
           min_value: 1,
@@ -27,11 +27,11 @@ export const data = {
     {
       type: 1,
       name: "user",
-      description: "Purge messages from a specific user.",
+      description: "Purge messages from user.",
       options: [
         {
           name: "user",
-          description: "Target user whose messages should be deleted.",
+          description: "Target user.",
           type: 6,
           required: true,
         },
@@ -48,7 +48,7 @@ export const data = {
     {
       type: 1,
       name: "bots",
-      description: "Delete messages sent by bots.",
+      description: "Purge messages from bots.",
       options: [
         {
           name: "count",

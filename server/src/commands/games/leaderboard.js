@@ -12,7 +12,7 @@ export const aliases = ["flb", "plb", "wslb", "lb"];
 
 export const data = {
   name: "leaderboard",
-  description: "View top game scorers.",
+  description: "View top scorers.",
   dm_permission: false,
   options: [
     {

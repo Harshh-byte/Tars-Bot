@@ -7,7 +7,7 @@ export const aliases = ["si", "server", "guildinfo"];
 
 export const data = {
   name: "serverinfo",
-  description: "Gets information about the server.",
+  description: "View server info.",
   dm_permission: false,
 };
 

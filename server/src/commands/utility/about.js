@@ -5,7 +5,7 @@ export const aliases = ["info"];
 
 export const data = {
   name: "about",
-  description: "View information about the bot.",
+  description: "View bot info.",
   dm_permission: false,
 };
 

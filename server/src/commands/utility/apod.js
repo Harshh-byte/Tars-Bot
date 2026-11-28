@@ -8,7 +8,7 @@ export const aliases = ["nasa"];
 
 export const data = {
   name: "apod",
-  description: "View NASA's Astronomy Picture of the Day (APOD)!",
+  description: "View NASA APOD.",
   dm_permission: false,
 };
 

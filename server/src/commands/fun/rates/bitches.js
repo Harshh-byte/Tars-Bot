@@ -6,7 +6,7 @@ import { EMOJIS } from "../../../utils/emojis.js";
 
 export const data = {
   name: "bitches",
-  description: "Calculate how many bitches a user has.",
+  description: "Calculate bitches count.",
   dm_permission: false,
   options: [
     {

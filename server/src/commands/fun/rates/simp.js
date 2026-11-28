@@ -8,7 +8,7 @@ export const aliases = ["howsimp"];
 
 export const data = {
   name: "simp",
-  description: "Calculate how simp a user is.",
+  description: "Calculate simp percentage.",
   dm_permission: false,
   options: [
     {

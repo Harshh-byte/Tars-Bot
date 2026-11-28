@@ -4,7 +4,7 @@ import { getUserFamily, disownChild } from "../../../services/database.js";
 
 export const data = {
   name: "runaway",
-  description: "Run away from your parents.",
+  description: "Run away from parents.",
   dm_permission: false,
   options: [
     {

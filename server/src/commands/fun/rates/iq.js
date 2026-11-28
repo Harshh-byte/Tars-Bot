@@ -5,7 +5,7 @@ import { EMBED_COLORS } from "../../../utils/embeds.js";
 
 export const data = {
   name: "iq",
-  description: "Calculate a user's IQ.",
+  description: "Calculate IQ score.",
   dm_permission: false,
   options: [
     {

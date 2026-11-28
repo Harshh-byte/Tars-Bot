@@ -346,7 +346,7 @@ export const aliases = ["guessflag"];
 
 export const data = {
   name: "flag",
-  description: "Guess the country by its flag.",
+  description: "Guess country by flag.",
   dm_permission: false,
   options: [
     {

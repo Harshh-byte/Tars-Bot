@@ -15,7 +15,7 @@ export const aliases = ["ui", "whois", "user"];
 
 export const data = {
   name: "userinfo",
-  description: "Gets information about a user.",
+  description: "View user info.",
   dm_permission: false,
   options: [
     {

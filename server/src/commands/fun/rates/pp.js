@@ -8,7 +8,7 @@ export const aliases = ["dih"];
 
 export const data = {
   name: "pp",
-  description: "Check a user's pp size.",
+  description: "Check pp size.",
   dm_permission: false,
   options: [
     {

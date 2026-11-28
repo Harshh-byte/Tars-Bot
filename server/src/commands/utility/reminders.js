@@ -7,7 +7,7 @@ import * as Sentry from "@sentry/node";
 
 export const data = {
   name: "reminders",
-  description: "View and manage reminders.",
+  description: "Manage reminders.",
   dm_permission: false,
 };
 

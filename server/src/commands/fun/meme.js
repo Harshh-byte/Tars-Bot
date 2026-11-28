@@ -5,7 +5,7 @@ import { EMOJI_IDS } from "../../utils/emojis.js";
 
 export const data = {
   name: "meme",
-  description: "Display a trending meme from Reddit!",
+  description: "View trending memes.",
   dm_permission: false,
   options: [
     {

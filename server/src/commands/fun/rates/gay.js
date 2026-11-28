@@ -8,7 +8,7 @@ export const aliases = ["howgay"];
 
 export const data = {
   name: "gay",
-  description: "Calculate how gay a user is.",
+  description: "Calculate gay percentage.",
   dm_permission: false,
   options: [
     {
@@ -22,7 +22,7 @@ export const data = {
 
 function getGayCategory(percentage) {
   if (percentage >= 85) return { category: "Cock Fiend", emoji: "🏳️‍🌈" };
-  if (percentage >= 60) return { category: "Sweet Home Alabama", emoji: "�" };
+  if (percentage >= 60) return { category: "Dick Rider", emoji: "🤨" };
   if (percentage >= 35) return { category: "Closet Fruity", emoji: "💅" };
   if (percentage >= 15)
     return {

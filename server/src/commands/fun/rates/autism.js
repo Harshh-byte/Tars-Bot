@@ -7,7 +7,7 @@ export const aliases = ["howautism"];
 
 export const data = {
   name: "autism",
-  description: "Calculate how autism a user is.",
+  description: "Calculate autism percentage.",
   dm_permission: false,
   options: [
     {

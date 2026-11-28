@@ -149,7 +149,7 @@ export const aliases = ["poke"];
 
 export const data = {
   name: "pokemon",
-  description: "Who's That Pokémon?",
+  description: "Guess the Pokémon.",
   dm_permission: false,
   options: [
     {

@@ -8,7 +8,7 @@ export const aliases = ["love"];
 
 export const data = {
   name: "ship",
-  description: "Love meter for two users.",
+  description: "Calculate love percentage.",
   dm_permission: false,
   options: [
     {
